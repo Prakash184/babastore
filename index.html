@@ -96,6 +96,7 @@
         .modal-btn { border: none; padding: 16px; border-radius: 14px; width: 100%; font-weight: 800; margin-top: 12px; cursor: pointer; font-size: 16px; transition: transform 0.2s;}
         .modal-btn:active { transform: scale(0.97); }
         .btn-whatsapp { background: var(--success); color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);}
+        .btn-print { background: var(--primary-gradient); color: white; box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);}
         .btn-close { background: #e5e5ea; color: black; margin-top: 20px;}
         .btn-backup { background: #ffcc00; color: black; margin-top: 15px;}
         .btn-excel { background: #107c41; color: white; margin-top: 15px; box-shadow: 0 4px 15px rgba(16, 124, 65, 0.3);}
@@ -110,8 +111,14 @@
 
         /* Hide specific elements when printing */
         @media print {
-            .no-print { display: none !important; }
+            @page { margin: 10mm; size: auto; }
+            body { background: white !important; margin: 0; padding: 0; color: black; }
+            .header, .container, .no-print { display: none !important; }
+            #billModal { display: block !important; position: static !important; background: white !important; height: auto !important; width: 100% !important; padding: 0 !important; box-sizing: border-box;}
+            .modal-content { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; overflow: visible !important; padding: 0 !important;}
+            .print-only { display: block !important; }
         }
+        .print-only { display: none; }
     </style>
 </head>
 <body>
@@ -200,7 +207,9 @@
     <div id="billModal" class="modal">
         <div class="modal-content">
             <div id="modalBody" style="background: white; padding: 10px;"></div>
-            <button class="modal-btn btn-whatsapp no-print" id="whatsappBtn" onclick="shareBillPDF()">💬 Share PDF on WhatsApp</button>
+            
+            <button class="modal-btn btn-whatsapp no-print" id="whatsappBtn">💬 Send on WhatsApp</button>
+            <button class="modal-btn btn-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
             <button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
         </div>
     </div>
@@ -238,7 +247,6 @@
         let db;
         let editingOrderId = null; 
         let customerMemory = {}; 
-        let currentBillFilename = "BabaStore_Bill.pdf";
 
         function safeId(str) { return str.replace(/[^a-zA-Z0-9]/g, ''); }
 
@@ -437,13 +445,26 @@
             triggerHaptic();
             db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
                 let o = e.target.result;
-                currentBillFilename = `BabaStore_Invoice_${o.customerName.replace(/ /g, "_")}.pdf`;
 
+                // --- TEXT BASED WHATSAPP GENERATION ---
+                let whatsappText = `*BABA STORE INVOICE*\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
                 let itemsHtml = ""; 
+                
                 for (let p in o.items) {
                     itemsHtml += `<tr><td>${p}</td><td>${o.items[p].qty}</td><td>₹${o.items[p].rate}</td><td>₹${o.items[p].total}</td></tr>`;
+                    whatsappText += `${p}: ${o.items[p].qty} x ₹${o.items[p].rate} = ₹${o.items[p].total}\n`;
                 }
 
+                whatsappText += `-----------------\nProducts Total: ₹${o.itemsTotal?.toFixed(2)}\n`;
+                if(o.loadTotal > 0) whatsappText += `Loading (${o.totalBags}x): ₹${o.loadTotal?.toFixed(2)}\n`;
+                if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
+                whatsappText += `*GRAND TOTAL: ₹${o.billTotal?.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
+
+                document.getElementById('whatsappBtn').onclick = () => {
+                    window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
+                };
+
+                // Visual Bill for Modal
                 let loadString = o.loadRate > 0 ? `<br><span style="font-size:12px; color:gray;">(₹${o.loadRate} x ${o.totalBags} bags)</span>` : "";
                 let unloadString = o.unloadRate > 0 ? `<br><span style="font-size:12px; color:gray;">(₹${o.unloadRate} x ${o.totalBags} bags)</span>` : "";
 
@@ -469,48 +490,13 @@
                 `;
                 document.getElementById('modalBody').innerHTML = html;
                 document.getElementById('billModal').style.display = 'flex';
-                document.getElementById('whatsappBtn').innerText = "💬 Share PDF on WhatsApp";
             };
-        }
-
-        // --- BULLETPROOF PDF SHARING METHOD ---
-        function shareBillPDF() {
-            const btn = document.getElementById('whatsappBtn');
-            btn.innerText = "⏳ Generating PDF...";
-
-            if (typeof html2pdf === 'undefined') {
-                alert("PDF Engine is loading. Please check your internet connection.");
-                btn.innerText = "💬 Share PDF on WhatsApp";
-                return;
-            }
-
-            const element = document.getElementById('modalBody');
-            const opt = {
-                margin:       0.2,
-                filename:     currentBillFilename,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Download the PDF directly, then prompt the user to open WhatsApp
-            html2pdf().set(opt).from(element).save().then(() => {
-                btn.innerText = "💬 Share PDF on WhatsApp";
-                
-                // Small delay so the download completes before alert
-                setTimeout(() => {
-                    let confirmShare = confirm("✅ PDF Downloaded successfully!\n\nDue to Apple security rules, we cannot auto-attach files.\n\nWould you like to open WhatsApp now to send the downloaded file?");
-                    if (confirmShare) {
-                        window.location.href = `whatsapp://send?text=Please find your Baba Store bill attached.`;
-                    }
-                }, 500);
-            });
         }
 
         function openSettings() { triggerHaptic(); document.getElementById('settingsModal').style.display = 'flex'; }
         function closeModals() { triggerHaptic(); document.getElementById('billModal').style.display = 'none'; document.getElementById('settingsModal').style.display = 'none'; }
 
-        // --- NEW: HTML2PDF implementation for the Monthly Report ---
+        // --- NEW MONTHLY PDF GENERATION FIX ---
         function exportMonthlyPDF() {
             const btn = document.getElementById('monthlyPdfBtn');
             btn.innerText = "⏳ Generating Report...";
@@ -522,16 +508,20 @@
                     return alert("No orders to export.");
                 }
                 
-                // Build a temporary container for the report
+                // Creates a hidden container attached to the document body so html2pdf can physically "see" it
                 let reportContainer = document.createElement('div');
                 reportContainer.style.padding = '20px';
                 reportContainer.style.backgroundColor = 'white';
                 reportContainer.style.color = 'black';
+                reportContainer.style.width = '1000px'; 
+                reportContainer.style.position = 'absolute';
+                reportContainer.style.left = '-9999px'; // Hides it off-screen!
+                reportContainer.style.top = '0';
 
                 let html = `
-                    <h1 style="text-align:center; color:#007aff; margin-bottom:5px;">Baba Store - Monthly Sales Report</h1>
-                    <p style="text-align:center; margin-top:0;">Generated on: ${new Date().toLocaleDateString()}</p>
-                    <table style="width:100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;">
+                    <h1 style="text-align:center; color:#007aff; margin-bottom:5px; font-family: sans-serif;">Baba Store - Monthly Sales Report</h1>
+                    <p style="text-align:center; margin-top:0; font-family: sans-serif;">Generated on: ${new Date().toLocaleDateString()}</p>
+                    <table style="width:100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; font-family: sans-serif;">
                         <tr style="background:#f2f2f7; text-align:left;">
                             <th style="padding:10px; border:1px solid #ddd;">Date</th>
                             <th style="padding:10px; border:1px solid #ddd;">Customer</th>
@@ -558,28 +548,30 @@
 
                 html += `
                     </table>
-                    <div style="margin-top:20px; padding: 15px; background: #eef7ff; border:1px solid #bce0fd; border-radius: 8px;">
+                    <div style="margin-top:20px; padding: 15px; background: #eef7ff; border:1px solid #bce0fd; border-radius: 8px; font-family: sans-serif;">
                         <h3 style="margin:0;">Total Bags Sold: ${totalBagsSold}</h3>
                         <h2 style="margin:5px 0 0 0; color:#007aff;">Total Revenue: ₹${totalRevenue.toFixed(2)}</h2>
                     </div>
                 `;
 
                 reportContainer.innerHTML = html;
+                document.body.appendChild(reportContainer); // Add to DOM so html2pdf works correctly
 
                 const opt = {
                     margin:       0.5,
                     filename:     `BabaStore_Monthly_Sales_${new Date().toISOString().split('T')[0]}.pdf`,
                     image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2 },
-                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' } // Landscape gives more space for table
+                    html2canvas:  { scale: 2, useCORS: true },
+                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
                 };
 
                 html2pdf().set(opt).from(reportContainer).save().then(() => {
                     btn.innerText = "🖨️ Download Monthly PDF";
-                    alert("✅ Monthly Sales PDF Downloaded Successfully!");
+                    document.body.removeChild(reportContainer); // Clean up
                     closeModals();
                 }).catch(err => {
                     alert("Error generating PDF. Check internet connection.");
+                    document.body.removeChild(reportContainer);
                     btn.innerText = "🖨️ Download Monthly PDF";
                 });
             };
