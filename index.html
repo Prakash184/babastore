@@ -1,5 +1,4 @@
-cp "/mnt/user-data/uploads/FullSizeRender.jpeg" /tmp/ 2>/dev/null; echo "done" # The HTML is in the document context, let's write the fixed version cat > /home/claude/baba_store_fixed.html
-<< 'HTMLEOF' <!DOCTYPE html>
+<!DOCTYPE html>
     <html lang="en">
 
     <head>
@@ -1131,5 +1130,3 @@ cp "/mnt/user-data/uploads/FullSizeRender.jpeg" /tmp/ 2>/dev/null; echo "done" #
     </body>
 
     </html>
-
-    HTMLEOF echo "File created successfully" wc -l /home/claude/baba_store_fixed.html
