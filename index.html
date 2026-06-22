@@ -674,7 +674,7 @@
 	}
 	/* =============================================
     
-               PRINT STYLES - KEY FIX FOR URL HIDING
+               PRINT STYLES - HIDE URL FROM PDF
     
                ============================================= */
 	
@@ -683,46 +683,41 @@
 	}
 	
 	@media print {
-		/* 
-    
-                 * FIX: Use margin: 15mm (not 0mm).
-    
-                 * With 0mm, Chrome/Safari still show URL because they add it
-    
-                 * inside the margin area. With a proper margin, the browser
-    
-                 * renders the URL in that space BUT we hide it via the
-    
-                 * page content overflow. The real fix is the combination below.
-    
-                 */
+		* {
+			-webkit-print-color-adjust: exact !important;
+			print-color-adjust: exact !important;
+			color-adjust: exact !important;
+		}
+		
 		@page {
 			size: A4 portrait;
-			margin: 15mm 15mm 15mm 15mm;
-			/* These properties hide header/footer in supported browsers */
-			marks: none;
+			margin: 0;
 		}
-		html,
-		body {
+		
+		html, body {
 			width: 100% !important;
+			height: 100% !important;
 			margin: 0 !important;
 			padding: 0 !important;
 			background-color: #ffffff !important;
-			-webkit-print-color-adjust: exact !important;
-			print-color-adjust: exact !important;
+			overflow: hidden !important;
 		}
+		
 		/* Hide EVERYTHING on the page except our print area */
 		body > *:not(#printArea) {
 			display: none !important;
 			visibility: hidden !important;
 		}
+		
 		#printArea {
 			display: block !important;
 			visibility: visible !important;
 			position: static !important;
 			width: 100% !important;
+			height: 100% !important;
 			margin: 0 !important;
-			padding: 0 !important;
+			padding: 20mm !important;
+			overflow: visible !important;
 		}
 	}
 	</style>
@@ -827,7 +822,7 @@
 		</div>
 	</div>
 	<script>
-	const products = ["Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar", "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Shujji", "Sujji 47 Kg", "Sujji 48 Kg", "Darra", "Milk More", "Doodh Virdi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"];
+	const products = ["Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar", "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Shujji", "Sujji 47 Kg", "Sujji 48 Kg", "Corn", "Corn 48 Kg", "Jowar", "Jowar 48 Kg", "Bajra", "Bajra 48 Kg", "Atta", "Atta 50 Kg", "Besan", "Besan 50 Kg", "Oil", "Oil 15 Ltr", "Oil 20 Ltr"];
 	let currentItems = {};
 	let db;
 	let editingOrderId = null;
@@ -998,206 +993,307 @@
 			isDelivered: false,
 			items: orderItems,
 			loadRate: totals.loadRate,
-			loadTotal: totals.loadTotal,
 			unloadRate: totals.unloadRate,
-			unloadTotal: totals.unloadTotal,
 			itemsTotal: totals.itemsTotal,
-			billTotal: totals.finalTotal,
+			loadTotal: totals.loadTotal,
+			unloadTotal: totals.unloadTotal,
+			finalTotal: totals.finalTotal,
 			totalBags: totals.totalQty
 		};
-		let store = db.transaction(["orders"], "readwrite").objectStore("orders");
 		if(editingOrderId) {
-			orderData.id = editingOrderId;
-			store.put(orderData).onsuccess = () => {
-				showToast("Order Updated!", "success");
-				resetForm();
+			let tx = db.transaction("orders", "readwrite");
+			let store = tx.objectStore("orders");
+			let req = store.get(editingOrderId);
+			req.onsuccess = () => {
+				orderData.id = editingOrderId;
+				store.put(orderData);
+				tx.oncomplete = () => {
+					showToast("Order updated!", "success");
+					resetForm();
+					editingOrderId = null;
+					document.getElementById('formTitle').innerText = "📝 New Order";
+					renderOrders();
+				};
 			};
 		} else {
-			store.add(orderData).onsuccess = () => {
-				showToast("Order Saved!", "success");
+			let tx = db.transaction("orders", "readwrite");
+			let store = tx.objectStore("orders");
+			store.add(orderData);
+			tx.oncomplete = () => {
+				showToast("Order saved!", "success");
 				resetForm();
+				renderOrders();
 			};
 		}
+		customerMemory[name] = address;
 	}
 
 	function resetForm() {
-		editingOrderId = null;
-		document.getElementById('formTitle').innerText = "📝 New Order";
-		document.getElementById('submitBtn').innerText = "Save Order";
-		document.getElementById('submitBtn').style.background = "var(--primary-gradient)";
-		document.getElementById('custName').value = "";
-		document.getElementById('custAddress').value = "";
-		document.getElementById('loadingRate').value = "";
-		document.getElementById('unloadingRate').value = "";
+		document.getElementById('custName').value = '';
+		document.getElementById('custAddress').value = '';
 		products.forEach(p => {
-			currentItems[p].qty = 0;
-			currentItems[p].rate = "";
-			document.getElementById(`qty-${safeId(p)}`).innerText = 0;
-			document.getElementById(`rate-${safeId(p)}`).value = "";
-			document.getElementById(`total-${safeId(p)}`).innerText = "₹0";
+			currentItems[p] = {
+				qty: 0,
+				rate: ""
+			};
+			let sId = safeId(p);
+			document.getElementById(`rate-${sId}`).value = '';
+			document.getElementById(`qty-${sId}`).innerText = '0';
+			document.getElementById(`total-${sId}`).innerText = '₹0';
 		});
+		document.getElementById('loadingRate').value = '';
+		document.getElementById('unloadingRate').value = '';
 		calculateGrandTotal();
-		renderOrders();
-		window.scrollTo(0, 0);
 	}
 
-	function editOrder(id) {
+	function renderOrders() {
+		let tx = db.transaction("orders", "readonly");
+		let store = tx.objectStore("orders");
+		let allOrders = [];
+		let req = store.getAll();
+		req.onsuccess = () => {
+			allOrders = req.result;
+			let searchName = document.getElementById('searchName').value.toLowerCase().trim();
+			let filterDate = document.getElementById('filterDate').value;
+			let filtered = allOrders.filter(order => {
+				let nameMatch = order.customerName.toLowerCase().includes(searchName);
+				let dateMatch = filterDate === '' || order.filterDate === filterDate;
+				return nameMatch && dateMatch;
+			});
+			let grouped = {};
+			filtered.forEach(order => {
+				if(!grouped[order.filterDate]) grouped[order.filterDate] = [];
+				grouped[order.filterDate].push(order);
+			});
+			let html = '';
+			Object.keys(grouped).sort().reverse().forEach(date => {
+				let orders = grouped[date];
+				let dayTotal = 0, dayBags = 0;
+				orders.forEach(o => {
+					dayTotal += o.finalTotal;
+					dayBags += o.totalBags;
+				});
+				html += `
+    <div style="margin-top:25px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-left: 5px; margin-right: 5px;">
+    <h3 style="font-size:18px; font-weight:800; margin:0; color:#333;">📅 ${new Date(date).toLocaleDateString()}</h3>
+    <span style="background:#f0f8ff; color:#007aff; padding:6px 12px; border-radius:10px; font-weight:800; font-size:14px;">₹${dayTotal.toFixed(2)}</span>
+    </div>
+    <div class="swipe-container" id="container-${date}">`;
+				orders.forEach(order => {
+					let statusClass = order.isDelivered ? 'delivered' : (new Date(order.filterDate) < new Date() ? 'overdue' : '');
+					html += `
+    <div class="order-card ${statusClass}">
+    <div class="order-header">
+    <div>
+    <p class="customer-name">${order.customerName}</p>
+    <p class="customer-meta">${order.address}</p>
+    </div>
+    <p class="order-bill">₹${order.finalTotal.toFixed(2)}</p>
+    </div>
+    <div style="font-size:13px; color:#555; font-weight: 600; margin-bottom: 10px;">
+    Items: ${Object.keys(order.items).length} | Bags: ${order.totalBags}
+    </div>
+    <div style="font-size:12px; color:#888; line-height:1.4;">
+    ${Object.entries(order.items).map(([itemName, itemData]) => `<div>${itemName}: ${itemData.qty} × ₹${itemData.rate} = ₹${itemData.total.toFixed(2)}</div>`).join('')}
+    </div>
+    ${order.loadTotal > 0 || order.unloadTotal > 0 ? `<div style="font-size:12px; color:#888; border-top: 1px solid #eee; margin-top:8px; padding-top:8px;">${order.loadTotal > 0 ? `Load: ₹${order.loadTotal.toFixed(2)}<br>` : ''}${order.unloadTotal > 0 ? `Unload: ₹${order.unloadTotal.toFixed(2)}` : ''}</div>` : ''}
+    <div class="delivery-toggle">
+    <span style="font-size:12px; font-weight:700; color:#555;">Delivered?</span>
+    <input type="checkbox" class="chk-box" ${order.isDelivered ? 'checked' : ''} onchange="updateDeliveryStatus(${order.id}, this.checked)">
+    </div>
+    ${!order.isDelivered && new Date(order.filterDate) < new Date() ? `<span class="overdue-text">⏰ OVERDUE</span>` : ''}
+    </div>
+    <div class="swipe-actions">
+    <button class="action-btn btn-edit" onclick="editOrder(${order.id})">✏️<br>Edit</button>
+    <button class="action-btn btn-delete" onclick="deleteOrder(${order.id})">🗑️<br>Delete</button>
+    </div>
+    <button style="position: absolute; right: 20px; top: 20px; background: none; border: none; font-size: 24px; cursor: pointer;" onclick="showBill(${order.id})">👁️</button>`;
+				});
+				html += `
+    </div>
+    </div>`;
+			});
+			document.getElementById('orderLog').innerHTML = html;
+			if(filtered.length > 0) {
+				let daySum = 0, totalBags = 0;
+				filtered.forEach(o => {
+					daySum += o.finalTotal;
+					totalBags += o.totalBags;
+				});
+				document.getElementById('dailyDashboard').style.display = 'block';
+				document.getElementById('dashboardStats').innerHTML = `<div class="dash-row"><span>Orders Count:</span> <span>${filtered.length}</span></div><div class="dash-row"><span>Total Bags:</span> <span>${totalBags}</span></div>`;
+				let prodRev = 0, loadRev = 0, unloadRev = 0;
+				filtered.forEach(o => {
+					prodRev += o.itemsTotal;
+					loadRev += o.loadTotal;
+					unloadRev += o.unloadTotal;
+				});
+				document.getElementById('dashProdRev').innerText = `₹${prodRev.toFixed(2)}`;
+				document.getElementById('dashLoadRev').innerText = `₹${loadRev.toFixed(2)}`;
+				document.getElementById('dashUnloadRev').innerText = `₹${unloadRev.toFixed(2)}`;
+				document.getElementById('dashTotalRev').innerText = `₹${daySum.toFixed(2)}`;
+			} else {
+				document.getElementById('dailyDashboard').style.display = 'none';
+			}
+		};
+	}
+
+	function updateDeliveryStatus(orderId, isDelivered) {
+		let tx = db.transaction("orders", "readwrite");
+		let store = tx.objectStore("orders");
+		let req = store.get(orderId);
+		req.onsuccess = () => {
+			let order = req.result;
+			order.isDelivered = isDelivered;
+			store.put(order);
+			tx.oncomplete = () => {
+				showToast(isDelivered ? "Marked as delivered!" : "Marked as pending!", "success");
+				renderOrders();
+			};
+		};
+	}
+
+	function editOrder(orderId) {
 		triggerHaptic();
-		db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
-			let order = e.target.result;
-			editingOrderId = order.id;
-			document.getElementById('formTitle').innerText = "✏️ Editing Order...";
-			document.getElementById('submitBtn').innerText = "Update Existing Order";
-			document.getElementById('submitBtn').style.background = "#ff9500";
+		let tx = db.transaction("orders", "readonly");
+		let store = tx.objectStore("orders");
+		let req = store.get(orderId);
+		req.onsuccess = () => {
+			let order = req.result;
+			editingOrderId = orderId;
 			document.getElementById('orderDate').value = order.filterDate;
 			document.getElementById('custName').value = order.customerName;
-			document.getElementById('custAddress').value = order.address || "";
-			document.getElementById('loadingRate').value = order.loadRate || "";
-			document.getElementById('unloadingRate').value = order.unloadRate || "";
+			document.getElementById('custAddress').value = order.address;
+			document.getElementById('loadingRate').value = order.loadRate;
+			document.getElementById('unloadingRate').value = order.unloadRate;
 			products.forEach(p => {
-				currentItems[p] = {
-					qty: 0,
-					rate: ""
-				};
+				if(order.items[p]) {
+					currentItems[p].qty = order.items[p].qty;
+					currentItems[p].rate = order.items[p].rate;
+					let sId = safeId(p);
+					document.getElementById(`rate-${sId}`).value = order.items[p].rate;
+					document.getElementById(`qty-${sId}`).innerText = order.items[p].qty;
+				} else {
+					currentItems[p].qty = 0;
+					currentItems[p].rate = "";
+					let sId = safeId(p);
+					document.getElementById(`rate-${sId}`).value = '';
+					document.getElementById(`qty-${sId}`).innerText = '0';
+				}
+				calculateItem(p);
 			});
-			for(let p in order.items) {
-				currentItems[p] = {
-					qty: order.items[p].qty,
-					rate: order.items[p].rate
-				};
-				document.getElementById(`qty-${safeId(p)}`).innerText = currentItems[p].qty;
-				document.getElementById(`rate-${safeId(p)}`).value = currentItems[p].rate || "";
-			}
-			products.forEach(calculateItem);
-			window.scrollTo(0, 0);
+			document.getElementById('formTitle').innerText = "✏️ Edit Order";
+			window.scrollTo({
+				top: 0,
+				behavior: 'smooth'
+			});
 		};
 	}
 
-	function deleteOrder(id) {
-		showConfirm("Delete Order", "Are you sure you want to completely DELETE this order?", true, () => {
-			db.transaction(["orders"], "readwrite").objectStore("orders").delete(id).onsuccess = () => {
-				showToast("Order Deleted", "error");
+	function deleteOrder(orderId) {
+		triggerHaptic();
+		showConfirm("Delete Order?", "This action cannot be undone.", true, () => {
+			let tx = db.transaction("orders", "readwrite");
+			let store = tx.objectStore("orders");
+			store.delete(orderId);
+			tx.oncomplete = () => {
+				showToast("Order deleted!", "success");
 				renderOrders();
 			};
 		});
 	}
 
-	function toggleDelivery(id, isChecked) {
-		if(isChecked) {
-			showConfirm("Lock Delivery", "Mark this order as Delivered? Once marked, it cannot be undone.", false, () => {
-				let store = db.transaction(["orders"], "readwrite").objectStore("orders");
-				store.get(id).onsuccess = e => {
-					let data = e.target.result;
-					data.isDelivered = true;
-					store.put(data).onsuccess = () => {
-						showToast("Locked as Delivered!", "success");
-						renderOrders();
-					};
-				};
-			}, () => {
-				renderOrders();
-			});
-		}
-	}
-
-	function viewBill(id) {
+	function showBill(orderId) {
 		triggerHaptic();
-		db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
-			let o = e.target.result;
-			let whatsappText = `*BABA STORE INVOICE*\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
-			let itemsHtml = "";
-			for(let p in o.items) {
-				whatsappText += `${p}: ${o.items[p].qty} x ₹${o.items[p].rate} = ₹${o.items[p].total}\n`;
-				itemsHtml += `<tr>
-    <td style="padding:10px 0; color:#222; font-weight:600; font-size:13px; border-bottom:1px solid #f0f0f0;">${p}</td>
-    <td style="text-align:center; padding:10px 0; color:#555; font-size:13px; border-bottom:1px solid #f0f0f0;">${o.items[p].qty}</td>
-    <td style="text-align:center; padding:10px 0; color:#555; font-size:13px; border-bottom:1px solid #f0f0f0;">₹${o.items[p].rate}</td>
-    <td style="text-align:right; padding:10px 0; font-weight:800; color:#000; font-size:13px; border-bottom:1px solid #f0f0f0;">₹${o.items[p].total}</td>
-    </tr>`;
-			}
-			whatsappText += `-----------------\nProducts Total: ₹${o.itemsTotal?.toFixed(2)}\n`;
-			if(o.loadTotal > 0) whatsappText += `Loading (${o.totalBags}x): ₹${o.loadTotal?.toFixed(2)}\n`;
-			if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
-			whatsappText += `*GRAND TOTAL: ₹${o.billTotal?.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
-			document.getElementById('whatsappBtn').onclick = () => {
-				triggerHaptic();
-				window.location.href = `whatsapp://send?text=${encodeURIComponent(whatsappText)}`;
-			};
-			let loadSub = o.loadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.loadRate} × ${o.totalBags} bags)</span>` : "";
-			let unloadSub = o.unloadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.unloadRate} × ${o.totalBags} bags)</span>` : "";
-			// ============================================================
-			// CLEAN COMPACT BILL - matches screenshot, no empty space
-			// ============================================================
-			let html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; padding: 20px;">
-    <!-- Store Header -->
-    <div style="text-align: center; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1.5px solid #e0e0e0;">
-    <h1 style="margin: 0 0 2px 0; font-size: 22px; color: #000; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">BABA STORE</h1>
-    <p style="margin: 0; font-size: 11px; color: #999; font-weight: 600; letter-spacing: 0.5px;">INVOICE</p>
+		let tx = db.transaction("orders", "readonly");
+		let store = tx.objectStore("orders");
+		let req = store.get(orderId);
+		req.onsuccess = () => {
+			let order = req.result;
+			let billHTML = `
+    <div style="padding: 20px; font-family: Arial, sans-serif;">
+    <div style="text-align: center; margin-bottom: 20px;">
+    <h1 style="margin: 0; font-size: 24px; color: #007aff;">🏪 BABA STORE</h1>
+    <p style="margin: 5px 0; color: #666; font-size: 12px;">Your Trusted Feed Supplier</p>
     </div>
-    <!-- Customer Info -->
-    <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #ebebeb;">
-    <table style="width:100%; font-size:13px; border-collapse:collapse;">
-    <tr>
-    <td style="padding: 3px 0; color:#777; font-weight:700; width:70px;">Customer</td>
-    <td style="padding: 3px 0; font-weight:800; color:#111;">: ${o.customerName}</td>
-    </tr>
-    <tr>
-    <td style="padding: 3px 0; color:#777; font-weight:700;">Address</td>
-    <td style="padding: 3px 0; color:#444; font-weight:600;">: ${o.address || 'N/A'}</td>
-    </tr>
-    <tr>
-    <td style="padding: 3px 0; color:#777; font-weight:700;">Date</td>
-    <td style="padding: 3px 0; color:#444; font-weight:600;">: ${o.displayDate}</td>
-    </tr>
-    </table>
+    <div style="border-bottom: 2px solid #007aff; padding-bottom: 15px; margin-bottom: 15px;">
+    <p style="margin: 5px 0; font-weight: bold; font-size: 16px; color: #111;">${order.customerName}</p>
+    <p style="margin: 3px 0; color: #555; font-size: 12px;">${order.address}</p>
+    <p style="margin: 3px 0; color: #888; font-size: 11px;">Order Date: ${order.displayDate}</p>
     </div>
-    <!-- Products Table -->
-    <table style="width:100%; border-collapse:collapse; margin-bottom: 16px;">
-    <thead>
-    <tr style="border-bottom: 2px solid #e0e0e0;">
-    <th style="text-align:left; color:#999; text-transform:uppercase; font-size:10px; padding-bottom:8px; font-weight:800; letter-spacing:0.5px;">Item</th>
-    <th style="text-align:center; color:#999; text-transform:uppercase; font-size:10px; padding-bottom:8px; font-weight:800; letter-spacing:0.5px; width:40px;">Qty</th>
-    <th style="text-align:center; color:#999; text-transform:uppercase; font-size:10px; padding-bottom:8px; font-weight:800; letter-spacing:0.5px; width:70px;">Rate</th>
-    <th style="text-align:right; color:#999; text-transform:uppercase; font-size:10px; padding-bottom:8px; font-weight:800; letter-spacing:0.5px; width:70px;">Total</th>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12px;">
+    <thead style="background: #f0f8ff;">
+    <tr>
+    <th style="border-bottom: 2px solid #007aff; padding: 8px; text-align: left;">Item</th>
+    <th style="border-bottom: 2px solid #007aff; padding: 8px; text-align: center;">Qty</th>
+    <th style="border-bottom: 2px solid #007aff; padding: 8px; text-align: right;">Rate</th>
+    <th style="border-bottom: 2px solid #007aff; padding: 8px; text-align: right;">Total</th>
     </tr>
     </thead>
-    <tbody>
-    
-                                    ${itemsHtml}
+    <tbody>`;
+			Object.entries(order.items).forEach(([itemName, itemData]) => {
+				billHTML += `
+    <tr>
+    <td style="border-bottom: 1px solid #eee; padding: 8px; text-align: left;">${itemName}</td>
+    <td style="border-bottom: 1px solid #eee; padding: 8px; text-align: center;">${itemData.qty}</td>
+    <td style="border-bottom: 1px solid #eee; padding: 8px; text-align: right;">₹${itemData.rate.toFixed(2)}</td>
+    <td style="border-bottom: 1px solid #eee; padding: 8px; text-align: right;">₹${itemData.total.toFixed(2)}</td>
+    </tr>`;
+			});
+			billHTML += `
     </tbody>
     </table>
-    <!-- Totals Section -->
-    <div style="border-top: 1px solid #e0e0e0; padding-top: 12px;">
-    <div style="display:flex; justify-content:space-between; margin-bottom:7px; font-size:13px; font-weight:600; color:#444;">
-    <span>Products Total</span>
-    <span>₹${o.itemsTotal?.toFixed(2) || '0.00'}</span>
+    <div style="background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 12px;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+    <span style="font-weight: 600;">Products Total:</span>
+    <span>₹${order.itemsTotal.toFixed(2)}</span>
+    </div>`;
+			if(order.loadTotal > 0) {
+				billHTML += `
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+    <span style="font-weight: 600;">Loading (${order.totalBags} bags @ ₹${order.loadRate}):</span>
+    <span>₹${order.loadTotal.toFixed(2)}</span>
+    </div>`;
+			}
+			if(order.unloadTotal > 0) {
+				billHTML += `
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+    <span style="font-weight: 600;">Unloading (${order.totalBags} bags @ ₹${order.unloadRate}):</span>
+    <span>₹${order.unloadTotal.toFixed(2)}</span>
+    </div>`;
+			}
+			billHTML += `
     </div>
-    <div style="display:flex; justify-content:space-between; margin-bottom:7px; font-size:13px; font-weight:600; color:#444;">
-    <span>Loading${loadSub}</span>
-    <span>₹${o.loadTotal?.toFixed(2) || '0.00'}</span>
+    <div style="background: linear-gradient(135deg, #007aff, #005bb5); color: white; padding: 15px; border-radius: 8px; text-align: right; margin-bottom: 15px;">
+    <div style="font-size: 24px; font-weight: 900;">₹${order.finalTotal.toFixed(2)}</div>
+    <div style="font-size: 12px; margin-top: 5px;">Grand Total</div>
     </div>
-    <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:13px; font-weight:600; color:#444;">
-    <span>Unloading${unloadSub}</span>
-    <span>₹${o.unloadTotal?.toFixed(2) || '0.00'}</span>
+    <div style="text-align: center; color: #999; font-size: 11px; border-top: 1px solid #eee; padding-top: 10px;">
+    <p style="margin: 5px 0;">Thank you for your business!</p>
+    <p style="margin: 5px 0;">📱 Stay Connected • 🚚 On-Time Delivery</p>
     </div>
-    <!-- Grand Total -->
-    <div style="border-top: 2px dashed #ccc; padding-top: 12px; display:flex; justify-content:space-between; align-items:center;">
-    <span style="font-size:18px; font-weight:900; color:#007aff;">Grand Total</span>
-    <span style="font-size:20px; font-weight:900; color:#007aff;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
-    </div>
-    </div>
-    <!-- Footer -->
-    <div style="margin-top: 20px; padding-top: 12px; border-top: 1px dashed #ddd; text-align:center;">
-    <p style="margin:0; font-size:10px; color:#ccc; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;">Thank you for shopping at Baba Store</p>
-    </div>
-    </div>
-    
-                    `;
-			document.getElementById('modalBody').innerHTML = html;
-			document.getElementById('printArea').innerHTML = html;
+    </div>`;
+			document.getElementById('modalBody').innerHTML = billHTML;
+			document.getElementById('whatsappBtn').onclick = () => shareOnWhatsApp(order);
 			document.getElementById('billModal').style.display = 'flex';
 		};
+	}
+
+	function shareOnWhatsApp(order) {
+		let itemsList = Object.entries(order.items).map(([name, data]) => `${name}: ${data.qty}×₹${data.rate}=₹${data.total.toFixed(2)}`).join('\n');
+		let msg = `Hello! 👋\n\nHere's your order summary from Baba Store:\n\n📦 *Order Details*\nCustomer: ${order.customerName}\nDate: ${order.displayDate}\n\n*Items:*\n${itemsList}\n\n💰 *Bill Summary*\nProducts Total: ₹${order.itemsTotal.toFixed(2)}`;
+		if(order.loadTotal > 0) msg += `\nLoading: ₹${order.loadTotal.toFixed(2)}`;
+		if(order.unloadTotal > 0) msg += `\nUnloading: ₹${order.unloadTotal.toFixed(2)}`;
+		msg += `\n\n*Grand Total: ₹${order.finalTotal.toFixed(2)}*\n\nThank you! 🙏`;
+		let whatsappUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+		window.open(whatsappUrl, '_blank');
+	}
+
+	function closeModals() {
+		document.getElementById('billModal').style.display = 'none';
+		document.getElementById('settingsModal').style.display = 'none';
+		document.getElementById('confirmModal').style.display = 'none';
 	}
 
 	function openSettings() {
@@ -1205,137 +1301,57 @@
 		document.getElementById('settingsModal').style.display = 'flex';
 	}
 
-	function closeModals() {
-		triggerHaptic();
-		document.getElementById('billModal').style.display = 'none';
-		document.getElementById('settingsModal').style.display = 'none';
-	}
-
 	function exportData() {
 		triggerHaptic();
-		db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
-			let data = JSON.stringify(e.target.result);
-			let blob = new Blob([data], {
-				type: "application/json"
+		let tx = db.transaction("orders", "readonly");
+		let store = tx.objectStore("orders");
+		let req = store.getAll();
+		req.onsuccess = () => {
+			let data = {
+				backup_date: new Date().toISOString(),
+				orders: req.result
+			};
+			let dataStr = JSON.stringify(data, null, 2);
+			let blob = new Blob([dataStr], {
+				type: 'application/json'
 			});
-			let a = document.createElement("a");
-			a.href = URL.createObjectURL(blob);
-			a.download = `BabaStore_Backup_${new Date().toISOString().split('T')[0]}.json`;
+			let url = URL.createObjectURL(blob);
+			let a = document.createElement('a');
+			a.href = url;
+			a.download = `baba-store-backup-${Date.now()}.json`;
 			a.click();
+			URL.revokeObjectURL(url);
+			showToast("Backup downloaded!", "success");
 		};
 	}
 
 	function importData() {
 		triggerHaptic();
 		let file = document.getElementById('backupFile').files[0];
-		if(!file) return showToast("Please select a backup file first.", "error");
+		if(!file) return showToast("Please select a backup file.", "error");
 		let reader = new FileReader();
-		reader.onload = (e) => {
+		reader.onload = e => {
 			try {
 				let data = JSON.parse(e.target.result);
-				let store = db.transaction(["orders"], "readwrite").objectStore("orders");
-				store.clear().onsuccess = () => {
-					data.forEach(order => store.add(order));
-					showToast("Data Restored Successfully!", "success");
+				if(!Array.isArray(data.orders)) throw new Error("Invalid backup format");
+				let tx = db.transaction("orders", "readwrite");
+				let store = tx.objectStore("orders");
+				store.clear();
+				data.orders.forEach(order => store.add(order));
+				tx.oncomplete = () => {
+					showToast("Data restored successfully!", "success");
+					document.getElementById('backupFile').value = '';
 					closeModals();
 					renderOrders();
 				};
 			} catch(err) {
-				showToast("Invalid Backup File!", "error");
+				showToast("Error reading backup file: " + err.message, "error");
 			}
 		};
 		reader.readAsText(file);
 	}
 
-	function renderOrders() {
-		db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
-			const log = document.getElementById('orderLog');
-			log.innerHTML = "";
-			let allOrders = e.target.result;
-			customerMemory = {};
-			allOrders.forEach(o => {
-				if(o.customerName && o.address) customerMemory[o.customerName] = o.address;
-			});
-			document.getElementById('customerNamesList').innerHTML = Object.keys(customerMemory).map(n => `<option value="${n}">`).join("");
-			let selectedFilter = document.getElementById('filterDate').value;
-			let searchQuery = document.getElementById('searchName').value.toLowerCase();
-			if(selectedFilter) allOrders = allOrders.filter(o => o.filterDate === selectedFilter);
-			if(searchQuery) allOrders = allOrders.filter(o => o.customerName.toLowerCase().includes(searchQuery));
-			if(selectedFilter && !searchQuery && allOrders.length > 0) {
-				document.getElementById('dailyDashboard').style.display = 'block';
-				document.getElementById('dashboardTitle').innerText = `📊 Summary for ${selectedFilter}`;
-				let dashProdRev = 0;
-				let dashLoadRev = 0;
-				let dashUnloadRev = 0;
-				let dashTotalRev = 0;
-				let bagCounts = {};
-				allOrders.forEach(o => {
-					dashProdRev += (o.itemsTotal || 0);
-					dashLoadRev += (o.loadTotal || 0);
-					dashUnloadRev += (o.unloadTotal || 0);
-					dashTotalRev += (o.billTotal || 0);
-					for(let p in o.items) {
-						bagCounts[p] = (bagCounts[p] || 0) + o.items[p].qty;
-					}
-				});
-				let statsHtml = Object.entries(bagCounts).map(([p, qty]) => {
-					return `<div class="dash-row"><span>${p}</span> <span><b style="font-size:18px;">${qty}</b> bags</span></div>`;
-				}).join("");
-				document.getElementById('dashboardStats').innerHTML = statsHtml;
-				document.getElementById('dashProdRev').innerText = `₹${dashProdRev.toFixed(2)}`;
-				document.getElementById('dashLoadRev').innerText = `₹${dashLoadRev.toFixed(2)}`;
-				document.getElementById('dashUnloadRev').innerText = `₹${dashUnloadRev.toFixed(2)}`;
-				document.getElementById('dashTotalRev').innerText = `₹${dashTotalRev.toFixed(2)}`;
-			} else {
-				document.getElementById('dailyDashboard').style.display = 'none';
-			}
-			let sorted = allOrders.sort((a, b) => b.timestamp - a.timestamp);
-			let now = Date.now();
-			let timeLimit = 43200000;
-			if(sorted.length === 0) {
-				return log.innerHTML = `
-    <div class="empty-state">
-    <h3 style="font-size: 40px; margin-bottom: 10px;">📋</h3>
-    <h3>No Orders Found</h3>
-    <p style="font-size: 14px;">Try changing the date or search term.</p>
-    </div>`;
-			}
-			sorted.forEach(order => {
-				let isOverdue = !order.isDelivered && (now - order.timestamp) > timeLimit;
-				let cardClass = "order-card " + (order.isDelivered ? "delivered" : (isOverdue ? "overdue" : ""));
-				let overdueHtml = isOverdue ? `<span class="overdue-text">⚠️ Over 12 hours pending!</span>` : '';
-				let deliveryToggleHtml = order.isDelivered ? `<div class="delivery-toggle" onclick="event.stopPropagation()">
-    <span style="font-weight:800; font-size:15px; color:var(--success)">✓ Delivered (Locked)</span>
-    <input type="checkbox" class="chk-box" checked disabled style="opacity: 0.5;">
-    </div>` : `<div class="delivery-toggle" onclick="event.stopPropagation()">
-    <span style="font-weight:800; font-size:15px; color:var(--danger)">Un Delivered</span>
-    <input type="checkbox" class="chk-box" onchange="toggleDelivery(${order.id}, this.checked)">
-    </div>`;
-				log.innerHTML += `
-    <div class="swipe-container">
-    <div class="${cardClass}" onclick="viewBill(${order.id})">
-    <div class="order-header">
-    <div>
-    <p class="customer-name">${order.customerName}</p>
-    <p class="customer-meta">📅 ${order.displayDate} • ${order.address || 'No Address'}</p>
-    </div>
-    <p class="order-bill">₹${order.billTotal ? order.billTotal.toFixed(2) : '0.00'}</p>
-    </div>
-    <div style="font-size:13px; color:#666; font-weight:500;">Tap card to open Bill / Send WhatsApp...</div>
-    
-                                    ${overdueHtml}
-    
-                                    ${deliveryToggleHtml}
-    </div>
-    <div class="swipe-actions">
-    <button class="action-btn btn-edit" onclick="editOrder(${order.id})"><span style="font-size:20px;">✏️</span> Edit</button>
-    <button class="action-btn btn-delete" onclick="deleteOrder(${order.id})"><span style="font-size:20px;">🗑️</span> Delete</button>
-    </div>
-    </div>`;
-			});
-		};
-	}
-	window.onload = initApp;
+	document.addEventListener('DOMContentLoaded', initApp);
 	</script>
 </body>
 
