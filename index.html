@@ -8,6 +8,10 @@
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<meta name="apple-mobile-web-app-title" content="Baba Store">
+	
+	<!-- PDF Generator Library added here -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 	<style>
 	:root {
 		--primary: #007aff;
@@ -797,7 +801,10 @@
 		<div class="modal-content">
 			<div id="modalBody" style="background: white; padding: 0;"></div>
 			<button class="modal-btn btn-whatsapp no-print" id="whatsappBtn">💬 Send on WhatsApp</button>
-			<button class="modal-btn btn-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+			
+			<!-- CHANGED: Replaced window.print() with downloadBill() -->
+			<button class="modal-btn btn-print no-print" onclick="downloadBill()">🖨️ Download PDF</button>
+			
 			<button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
 		</div>
 	</div>
@@ -1125,11 +1132,12 @@
 			};
 			let loadSub = o.loadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.loadRate} × ${o.totalBags} bags)</span>` : "";
 			let unloadSub = o.unloadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.unloadRate} × ${o.totalBags} bags)</span>` : "";
+			
 			// ============================================================
-			// CLEAN COMPACT BILL - matches screenshot, no empty space
+			// CHANGED: Added id="bill" to the main wrapper here
 			// ============================================================
 			let html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; padding: 20px;">
+    <div id="bill" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; padding: 20px;">
     <!-- Store Header -->
     <div style="text-align: center; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1.5px solid #e0e0e0;">
     <h1 style="margin: 0 0 2px 0; font-size: 22px; color: #000; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">BABA STORE</h1>
@@ -1198,6 +1206,33 @@
 			document.getElementById('printArea').innerHTML = html;
 			document.getElementById('billModal').style.display = 'flex';
 		};
+	}
+
+	// ============================================================
+	// NEW FUNCTION: Programmatically generate and download PDF
+	// ============================================================
+	function downloadBill() {
+		triggerHaptic();
+		const btn = document.querySelector('.btn-print');
+		const originalText = btn.innerText;
+		btn.innerText = "⏳ Generating PDF...";
+
+		const element = document.getElementById('bill');
+
+		html2pdf().set({
+			margin: 10,
+			filename: 'Baba_Store_Bill.pdf',
+			image: { type: 'jpeg', quality: 1 },
+			html2canvas: { scale: 2, useCORS: true },
+			jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+		}).from(element).save().then(() => {
+			btn.innerText = originalText;
+			showToast("PDF Downloaded!", "success");
+		}).catch(err => {
+			console.error(err);
+			btn.innerText = originalText;
+			showToast("Error generating PDF.", "error");
+		});
 	}
 
 	function openSettings() {
