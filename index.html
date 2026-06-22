@@ -12,7 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- PREMIUM NATIVE iOS STYLING --- */
         :root {
             --primary: #007aff; --primary-gradient: linear-gradient(135deg, #007aff, #005bb5);
             --success: #25D366; --danger: #ff3b30; --danger-bg: #ffeceb;
@@ -22,31 +21,20 @@
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--background); margin: 0; padding: 0; color: var(--text-main); padding-bottom: 60px;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--background); margin: 0; padding: 0; color: var(--text-main); padding-bottom: 60px; }
 
-        .header {
-            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            position: sticky; top: 0; z-index: 100; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-        }
+        .header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
         .header h1 { margin: 0; font-size: 26px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px;}
         .settings-btn { background: #f2f2f7; border: none; font-size: 20px; cursor: pointer; color: var(--primary); height: 40px; width: 40px; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s;}
         .settings-btn:active { transform: scale(0.9); }
 
         .container { padding: 16px; max-width: 600px; margin: 0 auto; }
-
         .section { background: var(--card-bg); border-radius: 20px; padding: 24px 20px; margin-bottom: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
         .section-title { font-weight: 800; font-size: 19px; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid var(--background); padding-bottom: 10px; color: #000;}
 
         .input-group { margin-bottom: 18px; width: 100%; }
         label { display: block; font-size: 13px; margin-bottom: 8px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
-        input[type="text"], input[type="date"], input[type="number"], input[type="search"] {
-            -webkit-appearance: none; width: 100%; padding: 16px; border: 1.5px solid var(--border-color); border-radius: 14px; 
-            font-size: 16px; font-weight: 500; background-color: #fafafa; display: block; font-family: inherit; transition: all 0.3s;
-        }
+        input[type="text"], input[type="date"], input[type="number"], input[type="search"] { -webkit-appearance: none; width: 100%; padding: 16px; border: 1.5px solid var(--border-color); border-radius: 14px; font-size: 16px; font-weight: 500; background-color: #fafafa; display: block; font-family: inherit; transition: all 0.3s; }
         input:focus { border-color: var(--primary); outline: none; background-color: #fff; box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1); }
 
         .labor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background: #fffaf0; padding: 16px; border-radius: 16px; border: 1px solid #ffebb3;}
@@ -55,7 +43,6 @@
 
         .product-list { max-height: 450px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px;}
         .product-row { padding: 18px 0; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px;}
-        .product-row:last-child { border-bottom: none; }
         .product-name { font-size: 16px; font-weight: 700; color: #222;}
         .controls-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         
@@ -63,22 +50,20 @@
         .rate-box:focus-within { border-color: var(--primary); background: #fff;}
         .rate-box span { color: var(--text-muted); font-weight: 700; font-size: 18px;}
         .rate-box input { border: none; background: transparent; padding: 14px 8px; width: 100%; font-size: 16px; font-weight: 700; color: var(--primary); }
-        .rate-box input:focus { box-shadow: none; }
 
         .stepper { display: flex; align-items: center; gap: 12px; background: var(--background); border-radius: 24px; padding: 4px; border: 1px solid var(--border-color);}
         .btn-step { width: 38px; height: 38px; border-radius: 19px; border: none; background: var(--card-bg); color: var(--primary); font-size: 24px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.08); transition: transform 0.1s;}
         .btn-step:active { transform: scale(0.9); }
         .qty-val { font-size: 18px; font-weight: 800; min-width: 28px; text-align: center; transition: all 0.15s ease;}
-        
         .pop-anim { transform: scale(1.5); color: var(--primary); }
-
         .item-total { font-size: 16px; font-weight: 800; color: var(--text-muted); width: 85px; text-align: right;}
 
         .bill-summary { background: #f0f8ff; padding: 20px; border-radius: 16px; margin-top: 20px; border: 1px solid #d6eaff;}
-        .bill-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; color: #444; font-weight: 600;}
+        .bill-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 15px; color: #444; font-weight: 600;}
+        .bill-row span:last-child { text-align: right; }
         .bill-row.grand { border-top: 2px dashed #bce0fd; padding-top: 15px; margin-top: 15px; font-size: 22px; font-weight: 900; color: var(--primary); }
 
-        .btn-submit { width: 100%; background: var(--primary-gradient); color: white; border: none; padding: 18px; border-radius: 16px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 20px; box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3); transition: transform 0.2s; letter-spacing: 0.5px;}
+        .btn-submit { width: 100%; background: var(--primary-gradient); color: white; border: none; padding: 18px; border-radius: 16px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 20px; box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3); transition: transform 0.2s;}
         .btn-submit:active { transform: scale(0.96); }
 
         .search-area { background: white; padding: 16px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.04);}
@@ -89,11 +74,9 @@
 
         .swipe-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: 16px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.06);}
         .swipe-container::-webkit-scrollbar { display: none; }
-        
         .order-card { width: 100%; flex: 0 0 100%; scroll-snap-align: start; background: var(--card-bg); padding: 20px; border-left: 8px solid #ffcc00; position: relative;}
         .order-card.overdue { border-left-color: var(--danger); background-color: #fff9f9; }
         .order-card.delivered { border-left-color: var(--success); opacity: 0.8; background-color: #fafafa; }
-        
         .swipe-actions { flex: 0 0 160px; scroll-snap-align: end; display: flex; }
         .action-btn { flex: 1; border: none; color: white; font-weight: bold; font-size: 15px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: 8px; cursor: pointer;}
         .btn-edit { background: #ff9500; }
@@ -103,7 +86,6 @@
         .customer-name { font-size: 20px; font-weight: 800; margin: 0; color: #111;}
         .customer-meta { font-size: 14px; color: var(--text-muted); font-weight: 600; margin: 6px 0 0 0; }
         .order-bill { font-size: 20px; font-weight: 900; color: var(--primary); margin: 0; background: #f0f8ff; padding: 6px 12px; border-radius: 10px;}
-        
         .delivery-toggle { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f2f2f7;}
         .chk-box { width: 32px; height: 32px; accent-color: var(--success); cursor: pointer; transform: scale(1.1);}
         .overdue-text { color: var(--danger); font-size: 13px; font-weight: 800; margin-top: 10px; display: inline-block; background: #ffeceb; padding: 4px 8px; border-radius: 6px;}
@@ -114,7 +96,6 @@
         .modal-btn { border: none; padding: 16px; border-radius: 14px; width: 100%; font-weight: 800; margin-top: 12px; cursor: pointer; font-size: 16px; transition: transform 0.2s;}
         .modal-btn:active { transform: scale(0.97); }
         .btn-whatsapp { background: var(--success); color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);}
-        .btn-print { background: var(--primary-gradient); color: white; box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);}
         .btn-close { background: #e5e5ea; color: black; margin-top: 20px;}
         .btn-backup { background: #ffcc00; color: black; margin-top: 15px;}
         .btn-excel { background: #107c41; color: white; margin-top: 15px; box-shadow: 0 4px 15px rgba(16, 124, 65, 0.3);}
@@ -127,20 +108,10 @@
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
         .empty-state h3 { font-size: 20px; color: #333; margin-bottom: 5px;}
 
-        #monthlyReportPrint { display: none; }
-
+        /* Hide specific elements when printing */
         @media print {
-            @page { margin: 10mm; size: auto; }
-            body { background: white !important; margin: 0; padding: 0; color: black; }
-            .header, .container, .no-print { display: none !important; }
-            
-            #billModal { display: block !important; position: static !important; background: white !important; height: auto !important; width: 100% !important; padding: 0 !important; box-sizing: border-box;}
-            .modal-content { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; overflow: visible !important; padding: 0 !important;}
-            
-            #monthlyReportPrint { display: block !important; width: 100%; }
-            .print-only { display: block !important; }
+            .no-print { display: none !important; }
         }
-        .print-only { display: none; }
     </style>
 </head>
 <body>
@@ -189,8 +160,8 @@
             <div class="bill-summary">
                 <div class="bill-row"><span>Products Total:</span> <span id="displayItemTotal">₹0.00</span></div>
                 <div class="bill-row"><span>Total Bags:</span> <span id="displayTotalBags">0</span></div>
-                <div class="bill-row"><span>Loading Total:</span> <span id="displayLoadTotal" style="color:var(--text-muted); font-size:13px;">₹0.00</span></div>
-                <div class="bill-row"><span>Unloading Total:</span> <span id="displayUnloadTotal" style="color:var(--text-muted); font-size:13px;">₹0.00</span></div>
+                <div class="bill-row"><span>Loading Total:</span> <span id="displayLoadTotal" style="color:#333;">₹0.00</span></div>
+                <div class="bill-row"><span>Unloading Total:</span> <span id="displayUnloadTotal" style="color:#333;">₹0.00</span></div>
                 <div class="bill-row grand"><span>Grand Total:</span> <span id="displayGrandTotal">₹0.00</span></div>
             </div>
 
@@ -229,9 +200,7 @@
     <div id="billModal" class="modal">
         <div class="modal-content">
             <div id="modalBody" style="background: white; padding: 10px;"></div>
-            
             <button class="modal-btn btn-whatsapp no-print" id="whatsappBtn" onclick="shareBillPDF()">💬 Share PDF on WhatsApp</button>
-            <button class="modal-btn btn-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
             <button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
         </div>
     </div>
@@ -240,8 +209,8 @@
         <div class="modal-content" style="text-align: center;">
             <h2 style="margin-top:0; color:var(--primary); font-weight: 900;">Business Settings</h2>
             
-            <button class="modal-btn btn-excel" style="background: #34c759;" onclick="exportMonthlyPDF()">🖨️ Print / Save Monthly PDF</button>
-            <p style="color:var(--text-muted); font-size:13px; margin-bottom:24px; margin-top:8px;">Generates a clean PDF table of all orders.</p>
+            <button class="modal-btn btn-excel" id="monthlyPdfBtn" style="background: #34c759;" onclick="exportMonthlyPDF()">🖨️ Download Monthly PDF</button>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:24px; margin-top:8px;">Downloads a clean PDF table of all orders to send to your CA.</p>
             
             <hr style="border: 0; border-top: 2px dashed #eee; margin: 24px 0;">
             
@@ -257,8 +226,6 @@
             <button class="modal-btn btn-close" onclick="closeModals()">Close Settings</button>
         </div>
     </div>
-
-    <div id="monthlyReportPrint"></div>
 
     <script>
         const products = [
@@ -339,13 +306,9 @@
             document.getElementById('displayItemTotal').innerText = `₹${itemsTotal.toFixed(2)}`;
             document.getElementById('displayTotalBags').innerText = totalQty;
             
-            if(totalQty > 0 && loadRate > 0) {
-                document.getElementById('displayLoadTotal').innerHTML = `<span style="color:black;">₹${loadTotal.toFixed(2)}</span> <br>(₹${loadRate} x ${totalQty} Bags)`;
-            } else { document.getElementById('displayLoadTotal').innerText = `₹0.00`; }
-
-            if(totalQty > 0 && unloadRate > 0) {
-                document.getElementById('displayUnloadTotal').innerHTML = `<span style="color:black;">₹${unloadTotal.toFixed(2)}</span> <br>(₹${unloadRate} x ${totalQty} Bags)`;
-            } else { document.getElementById('displayUnloadTotal').innerText = `₹0.00`; }
+            // FIX: Single line summary for perfect UI fitting
+            document.getElementById('displayLoadTotal').innerText = loadTotal > 0 ? `₹${loadTotal.toFixed(2)} (₹${loadRate}x${totalQty})` : `₹0.00`;
+            document.getElementById('displayUnloadTotal').innerText = unloadTotal > 0 ? `₹${unloadTotal.toFixed(2)} (₹${unloadRate}x${totalQty})` : `₹0.00`;
             
             document.getElementById('displayGrandTotal').innerText = `₹${finalTotal.toFixed(2)}`;
 
@@ -510,86 +473,85 @@
             };
         }
 
-        // --- THE NEW BULLETPROOF PDF SHARING ENGINE ---
-        async function shareBillPDF() {
+        // --- BULLETPROOF PDF SHARING METHOD ---
+        function shareBillPDF() {
             const btn = document.getElementById('whatsappBtn');
             btn.innerText = "⏳ Generating PDF...";
 
-            try {
-                // If the library didn't load (offline/blocked), throw an error immediately
-                if (typeof html2pdf === 'undefined') throw new Error("PDF Library missing");
-
-                const element = document.getElementById('modalBody');
-                const opt = {
-                    margin:       0.2,
-                    filename:     currentBillFilename,
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2 },
-                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-                };
-
-                // Create the PDF Blob
-                const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
-                const file = new File([pdfBlob], currentBillFilename, { type: 'application/pdf' });
-
-                // Try Apple's Native Web Share first
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Baba Store Invoice'
-                    });
-                    btn.innerText = "💬 Share PDF on WhatsApp";
-                } else {
-                    // IF SHARING IS BLOCKED: Download the file and force open WhatsApp
-                    html2pdf().set(opt).from(element).save();
-                    btn.innerText = "💬 Share PDF on WhatsApp";
-                    
-                    // Delay required to bypass iOS popup blocker after a download
-                    setTimeout(() => {
-                        alert("Your phone prevents direct PDF sharing from Safari.\n\nThe PDF has been downloaded to your phone. We are opening WhatsApp now—please attach the downloaded file!");
-                        window.location.href = `whatsapp://send?text=Please find your Baba Store bill attached.`;
-                    }, 500);
-                }
-            } catch (err) {
-                console.error(err);
-                alert("Error: Please make sure you are connected to the internet the first time you generate a PDF!");
+            if (typeof html2pdf === 'undefined') {
+                alert("PDF Engine is loading. Please check your internet connection.");
                 btn.innerText = "💬 Share PDF on WhatsApp";
+                return;
             }
+
+            const element = document.getElementById('modalBody');
+            const opt = {
+                margin:       0.2,
+                filename:     currentBillFilename,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Download the PDF directly, then prompt the user to open WhatsApp
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerText = "💬 Share PDF on WhatsApp";
+                
+                // Small delay so the download completes before alert
+                setTimeout(() => {
+                    let confirmShare = confirm("✅ PDF Downloaded successfully!\n\nDue to Apple security rules, we cannot auto-attach files.\n\nWould you like to open WhatsApp now to send the downloaded file?");
+                    if (confirmShare) {
+                        window.location.href = `whatsapp://send?text=Please find your Baba Store bill attached.`;
+                    }
+                }, 500);
+            });
         }
 
         function openSettings() { triggerHaptic(); document.getElementById('settingsModal').style.display = 'flex'; }
         function closeModals() { triggerHaptic(); document.getElementById('billModal').style.display = 'none'; document.getElementById('settingsModal').style.display = 'none'; }
 
+        // --- NEW: HTML2PDF implementation for the Monthly Report ---
         function exportMonthlyPDF() {
+            const btn = document.getElementById('monthlyPdfBtn');
+            btn.innerText = "⏳ Generating Report...";
+
             db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
                 let allOrders = e.target.result;
-                if (allOrders.length === 0) return alert("No orders to export.");
+                if (allOrders.length === 0) {
+                    btn.innerText = "🖨️ Download Monthly PDF";
+                    return alert("No orders to export.");
+                }
                 
+                // Build a temporary container for the report
+                let reportContainer = document.createElement('div');
+                reportContainer.style.padding = '20px';
+                reportContainer.style.backgroundColor = 'white';
+                reportContainer.style.color = 'black';
+
                 let html = `
-                    <h1 style="text-align:center; color:#007aff;">Baba Store - Monthly Sales Report</h1>
-                    <p style="text-align:center;">Generated on: ${new Date().toLocaleDateString()}</p>
+                    <h1 style="text-align:center; color:#007aff; margin-bottom:5px;">Baba Store - Monthly Sales Report</h1>
+                    <p style="text-align:center; margin-top:0;">Generated on: ${new Date().toLocaleDateString()}</p>
                     <table style="width:100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;">
                         <tr style="background:#f2f2f7; text-align:left;">
                             <th style="padding:10px; border:1px solid #ddd;">Date</th>
                             <th style="padding:10px; border:1px solid #ddd;">Customer</th>
-                            <th style="padding:10px; border:1px solid #ddd;">Bags</th>
+                            <th style="padding:10px; border:1px solid #ddd;">Loading (₹)</th>
+                            <th style="padding:10px; border:1px solid #ddd;">Unload (₹)</th>
                             <th style="padding:10px; border:1px solid #ddd;">Grand Total</th>
-                            <th style="padding:10px; border:1px solid #ddd;">Status</th>
                         </tr>
                 `;
                 
                 let totalRevenue = 0; let totalBagsSold = 0;
 
                 allOrders.sort((a,b) => new Date(a.filterDate) - new Date(b.filterDate)).forEach(o => {
-                    let status = o.isDelivered ? "<span style='color:green'>Delivered</span>" : "<span style='color:red'>Pending</span>";
                     totalRevenue += o.billTotal; totalBagsSold += o.totalBags;
                     html += `
                         <tr>
                             <td style="padding:10px; border:1px solid #ddd;">${o.displayDate}</td>
                             <td style="padding:10px; border:1px solid #ddd;">${o.customerName}</td>
-                            <td style="padding:10px; border:1px solid #ddd;">${o.totalBags}</td>
-                            <td style="padding:10px; border:1px solid #ddd;">₹${o.billTotal.toFixed(2)}</td>
-                            <td style="padding:10px; border:1px solid #ddd;">${status}</td>
+                            <td style="padding:10px; border:1px solid #ddd;">₹${(o.loadTotal || 0).toFixed(2)}</td>
+                            <td style="padding:10px; border:1px solid #ddd;">₹${(o.unloadTotal || 0).toFixed(2)}</td>
+                            <td style="padding:10px; border:1px solid #ddd; font-weight:bold;">₹${o.billTotal.toFixed(2)}</td>
                         </tr>
                     `;
                 });
@@ -602,10 +564,24 @@
                     </div>
                 `;
 
-                document.getElementById('monthlyReportPrint').innerHTML = html;
-                closeModals();
-                window.print(); 
-                setTimeout(() => { document.getElementById('monthlyReportPrint').innerHTML = ""; }, 1000);
+                reportContainer.innerHTML = html;
+
+                const opt = {
+                    margin:       0.5,
+                    filename:     `BabaStore_Monthly_Sales_${new Date().toISOString().split('T')[0]}.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2 },
+                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' } // Landscape gives more space for table
+                };
+
+                html2pdf().set(opt).from(reportContainer).save().then(() => {
+                    btn.innerText = "🖨️ Download Monthly PDF";
+                    alert("✅ Monthly Sales PDF Downloaded Successfully!");
+                    closeModals();
+                }).catch(err => {
+                    alert("Error generating PDF. Check internet connection.");
+                    btn.innerText = "🖨️ Download Monthly PDF";
+                });
             };
         }
 
@@ -648,7 +624,9 @@
                 
                 customerMemory = {}; 
                 allOrders.forEach(o => { 
-                    if(o.customerName && o.address) customerMemory[o.customerName] = o.address;
+                    if(o.customerName && o.address) {
+                        customerMemory[o.customerName] = o.address;
+                    } 
                 });
                 document.getElementById('customerNamesList').innerHTML = Object.keys(customerMemory).map(n => `<option value="${n}">`).join("");
 
@@ -658,7 +636,6 @@
                 if (selectedFilter) allOrders = allOrders.filter(o => o.filterDate === selectedFilter);
                 if (searchQuery) allOrders = allOrders.filter(o => o.customerName.toLowerCase().includes(searchQuery));
 
-                // --- UPGRADED DAILY DASHBOARD STATS ---
                 if (selectedFilter && !searchQuery && allOrders.length > 0) {
                     document.getElementById('dailyDashboard').style.display = 'block';
                     document.getElementById('dashboardTitle').innerText = `📊 Summary for ${selectedFilter}`;
@@ -683,7 +660,6 @@
                     
                     document.getElementById('dashboardStats').innerHTML = statsHtml;
                     
-                    // Assigning separated revenues to the Dashboard
                     document.getElementById('dashProdRev').innerText = `₹${dashProdRev.toFixed(2)}`;
                     document.getElementById('dashLoadRev').innerText = `₹${dashLoadRev.toFixed(2)}`;
                     document.getElementById('dashUnloadRev').innerText = `₹${dashUnloadRev.toFixed(2)}`;
