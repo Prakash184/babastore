@@ -7,90 +7,186 @@
     
     <!-- PWA Meta Tags for iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Baba Store">
     
     <style>
+        /* --- BEAUTIFUL iOS-STYLE CSS --- */
         :root {
             --primary: #007aff;
+            --primary-hover: #005bb5;
             --success: #34c759;
+            --danger: #ff3b30;
+            --danger-bg: #ffeceb;
             --background: #f2f2f7;
             --card-bg: #ffffff;
-            --text: #000000;
+            --text-main: #1c1c1e;
+            --text-muted: #8e8e93;
         }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--background);
             margin: 0;
-            padding: 16px;
-            color: var(--text);
+            padding: 0;
+            color: var(--text-main);
+            padding-bottom: 40px;
         }
-        h1, h2 { text-align: center; margin-bottom: 20px; }
+
+        /* Sticky Header */
+        .header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 16px;
+            text-align: center;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        .header h1 { margin: 0; font-size: 22px; font-weight: 700; color: var(--primary); }
+
+        .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+        /* Beautiful Cards */
         .section {
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
         }
-        .section-title { font-weight: bold; color: var(--primary); margin-top: 0; margin-bottom: 12px; }
-        .input-group { margin-bottom: 12px; }
-        label { display: block; font-size: 14px; margin-bottom: 4px; font-weight: 500; }
+        
+        .section-title { 
+            font-weight: 700; font-size: 18px; color: var(--text-main); 
+            margin-top: 0; margin-bottom: 16px; border-bottom: 2px solid var(--background); padding-bottom: 8px;
+        }
+
+        /* Inputs */
+        .input-group { margin-bottom: 16px; }
+        label { display: block; font-size: 13px; margin-bottom: 6px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
         input[type="text"], input[type="date"] {
-            width: 100%; padding: 10px; border: 1px solid #d1d1d6; border-radius: 8px; box-sizing: border-box; font-size: 16px;
+            width: 100%; padding: 14px; border: 1.5px solid #e5e5ea; border-radius: 12px; 
+            font-size: 16px; background-color: #fafafa; transition: border 0.3s;
         }
+        input[type="text"]:focus, input[type="date"]:focus {
+            border-color: var(--primary); outline: none; background-color: #fff;
+        }
+
+        /* Product Steppers */
         .product-row {
-            display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e5e5ea;
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 14px 0; border-bottom: 1px solid #f2f2f7;
         }
         .product-row:last-child { border-bottom: none; }
-        .stepper { display: flex; align-items: center; gap: 12px; }
+        .product-name { font-size: 16px; font-weight: 500; }
+        
+        .stepper { 
+            display: flex; align-items: center; gap: 16px; 
+            background: var(--background); border-radius: 20px; padding: 4px;
+        }
         .btn-step {
-            width: 32px; height: 32px; border-radius: 16px; border: 1px solid var(--primary);
-            background: none; color: var(--primary); font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px; border-radius: 18px; border: none;
+            background: var(--card-bg); color: var(--primary); font-size: 22px; 
+            font-weight: 500; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer;
         }
-        .qty-val { font-size: 16px; font-weight: 600; min-width: 20px; text-align: center; }
+        .btn-step:active { transform: scale(0.95); background: #e5e5ea; }
+        .qty-val { font-size: 18px; font-weight: 700; min-width: 24px; text-align: center; }
+
+        /* Submit Button */
         .btn-submit {
-            width: 100%; background-color: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;
+            width: 100%; background-color: var(--primary); color: white; border: none; 
+            padding: 16px; border-radius: 14px; font-size: 18px; font-weight: bold; 
+            cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            transition: transform 0.2s;
         }
+        .btn-submit:active { transform: scale(0.98); background-color: var(--primary-hover); }
+
+        /* Order Cards */
         .order-card {
-            background: var(--card-bg); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #ffcc00;
+            background: var(--card-bg); border-radius: 14px; padding: 16px; margin-bottom: 12px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 6px solid #ffcc00;
+            transition: all 0.3s ease;
         }
-        .order-card.delivered { border-left-color: var(--success); opacity: 0.7; }
-        .order-details p { margin: 2px 0; }
-        .chk-box { width: 24px; height: 24px; accent-color: var(--success); }
+        
+        /* The Red Warning for Late Orders */
+        .order-card.overdue {
+            border-left-color: var(--danger);
+            background-color: var(--danger-bg);
+        }
+        
+        /* The Green Success for Delivered */
+        .order-card.delivered { 
+            border-left-color: var(--success); opacity: 0.6; background-color: #f9f9f9;
+        }
+        
+        .order-details p { margin: 4px 0; }
+        .customer-name { font-size: 17px; font-weight: 700; color: var(--text-main); }
+        .customer-address { font-size: 14px; color: var(--text-muted); }
+        .order-items { font-size: 13px; font-weight: 500; color: var(--primary); margin-top: 8px !important; }
+        .overdue-text { color: var(--danger); font-size: 12px; font-weight: bold; display: none; margin-top: 4px;}
+        .order-card.overdue .overdue-text { display: block; }
+
+        /* Beautiful Checkbox */
+        .chk-box { 
+            width: 32px; height: 32px; accent-color: var(--success); cursor: pointer; 
+            transform: scale(1.2);
+        }
+
+        /* Setup Notification Button */
+        .btn-notify {
+            background: #ffeceb; color: var(--danger); border: none; padding: 10px; 
+            border-radius: 8px; width: 100%; font-weight: bold; margin-bottom: 16px;
+            display: none; cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Baba Store</h1>
-
-    <!-- Order Placement Section -->
-    <div class="section">
-        <div class="section-title">New Order</div>
-        <div class="input-group">
-            <label>Delivery Date</label>
-            <input type="date" id="orderDate">
-        </div>
-        <div class="input-group">
-            <label>Customer Name</label>
-            <input type="text" id="custName" placeholder="Enter name during call">
-        </div>
-        <div class="input-group">
-            <label>Address</label>
-            <input type="text" id="custAddress" placeholder="Enter delivery address">
-        </div>
+    <div class="header">
+        <h1>Baba Store</h1>
     </div>
 
-    <!-- Inventory / Stepper Section -->
-    <div class="section">
-        <div class="section-title">Products</div>
-        <div id="productList"></div>
-        <button class="btn-submit" onclick="submitOrder()" style="margin-top: 15px;">Submit Live Order</button>
-    </div>
+    <div class="container">
+        <!-- Notification Setup (Only shows if permissions are needed) -->
+        <button id="notifyBtn" class="btn-notify" onclick="requestNotificationPermission()">
+            ⚠️ Tap here to turn on Order Reminders
+        </button>
 
-    <!-- Active Deliveries Log -->
-    <h2>Active Delivery Log</h2>
-    <div id="orderLog"></div>
+        <!-- Order Placement Section -->
+        <div class="section">
+            <h2 class="section-title">Customer Details</h2>
+            <div class="input-group">
+                <label>Delivery Date</label>
+                <input type="date" id="orderDate">
+            </div>
+            <div class="input-group">
+                <label>Customer Name</label>
+                <input type="text" id="custName" placeholder="e.g. Rahul Kumar">
+            </div>
+            <div class="input-group">
+                <label>Address / Location</label>
+                <input type="text" id="custAddress" placeholder="e.g. Main Market Shop">
+            </div>
+        </div>
+
+        <!-- Inventory / Stepper Section -->
+        <div class="section">
+            <h2 class="section-title">Select Items</h2>
+            <div id="productList"></div>
+            <button class="btn-submit" onclick="submitOrder()">Save Order</button>
+        </div>
+
+        <!-- Active Deliveries Log -->
+        <h2 style="font-size: 20px; font-weight: 700; margin-left: 5px;">Delivery Board</h2>
+        <div id="orderLog"></div>
+    </div>
 
     <script>
         const products = [
@@ -99,7 +195,6 @@
         let currentQuantities = {};
         let db;
 
-        // Initialize Products and Quantities
         function initApp() {
             document.getElementById('orderDate').valueAsDate = new Date();
             const container = document.getElementById('productList');
@@ -107,7 +202,7 @@
                 currentQuantities[p] = 0;
                 container.innerHTML += `
                     <div class="product-row">
-                        <span>${p}</span>
+                        <span class="product-name">${p}</span>
                         <div class="stepper">
                             <button class="btn-step" onclick="updateQty('${p}', -1)">-</button>
                             <span class="qty-val" id="qty-${btoa(p)}">0</span>
@@ -116,7 +211,7 @@
                     </div>`;
             });
             initDatabase();
-            requestNotificationPermission();
+            checkNotificationStatus();
         }
 
         function updateQty(product, change) {
@@ -124,7 +219,6 @@
             document.getElementById(`qty-${btoa(product)}`).innerText = currentQuantities[product];
         }
 
-        // IndexedDB Configuration for Browser Storage
         function initDatabase() {
             let request = indexedDB.open("BabaStoreDB", 1);
             request.onupgradeneeded = e => {
@@ -134,12 +228,32 @@
             request.onsuccess = e => { db = e.target.result; renderOrders(); };
         }
 
-        function requestNotificationPermission() {
-            if ("Notification" in window) {
-                Notification.requestPermission();
+        // --- NOTIFICATION LOGIC ---
+        function checkNotificationStatus() {
+            if ("Notification" in window && Notification.permission !== "granted") {
+                document.getElementById("notifyBtn").style.display = "block";
             }
         }
 
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        document.getElementById("notifyBtn").style.display = "none";
+                        alert("Reminders activated! You will be alerted for orders older than 3 hours.");
+                    }
+                });
+            }
+        }
+
+        // Scans for late orders every time the app is opened
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'visible' && db) {
+                renderOrders(); // Re-rendering automatically checks for overdue orders
+            }
+        });
+
+        // --- ORDER SUBMISSION ---
         function submitOrder() {
             const name = document.getElementById('custName').value.trim();
             const address = document.getElementById('custAddress').value.trim();
@@ -148,7 +262,15 @@
             if (!name) return alert("Please enter a customer name.");
 
             let orderItems = {};
-            products.forEach(p => { if(currentQuantities[p] > 0) orderItems[p] = currentQuantities[p]; });
+            let totalItems = 0;
+            products.forEach(p => { 
+                if(currentQuantities[p] > 0) {
+                    orderItems[p] = currentQuantities[p]; 
+                    totalItems++;
+                }
+            });
+
+            if (totalItems === 0) return alert("Please add at least 1 product quantity.");
 
             let transaction = db.transaction(["orders"], "readwrite");
             let store = transaction.objectStore("orders");
@@ -162,32 +284,16 @@
                 items: orderItems
             };
 
-            let addRequest = store.add(newOrder);
-            addRequest.onsuccess = (e) => {
-                const generatedId = e.target.result;
-                scheduleReminder(generatedId, name);
-                
-                // Reset fields
+            store.add(newOrder).onsuccess = () => {
+                // Reset form
                 document.getElementById('custName').value = "";
                 document.getElementById('custAddress').value = "";
                 products.forEach(p => { currentQuantities[p] = 0; document.getElementById(`qty-${btoa(p)}`).innerText = 0; });
                 renderOrders();
+                
+                // Set the immediate browser timer just in case the app stays open
+                setTimeout(() => { renderOrders(); }, 10800000); 
             };
-        }
-
-        // 3-Hour Web Notification Logic
-        let activeTimers = {};
-        function scheduleReminder(orderId, customerName) {
-            // 3 hours = 10,800,000 milliseconds
-            const threeHours = 10800000; 
-            activeTimers[orderId] = setTimeout(() => {
-                if (Notification.permission === "granted") {
-                    new Notification("⚠️ Undelivered Order Alert", {
-                        body: `Order for ${customerName} has crossed 3 hours and is still pending!`,
-                        icon: 'https://cdn-icons-png.flaticon.com/512/888/888879.png'
-                    });
-                }
-            }, threeHours);
         }
 
         function toggleDelivery(id, isChecked) {
@@ -199,15 +305,11 @@
                 let data = getRequest.result;
                 data.isDelivered = isChecked;
                 store.put(data);
-                
-                if (isChecked && activeTimers[id]) {
-                    clearTimeout(activeTimers[id]);
-                    delete activeTimers[id];
-                }
                 renderOrders();
             };
         }
 
+        // --- RENDER & CHECK LATE ORDERS ---
         function renderOrders() {
             let transaction = db.transaction(["orders"], "readonly");
             let store = transaction.objectStore("orders");
@@ -216,19 +318,38 @@
             request.onsuccess = () => {
                 const log = document.getElementById('orderLog');
                 log.innerHTML = "";
-                // Sort by newest first
-                let sortedOrders = request.result.sort((a,b) => b.timestamp - a.timestamp);
                 
+                let sortedOrders = request.result.sort((a,b) => b.timestamp - a.timestamp);
+                let now = Date.now();
+                let threeHours = 10800000; // 3 hours in milliseconds
+
                 sortedOrders.forEach(order => {
-                    let itemsSummary = Object.entries(order.items).map(([p, q]) => `${p}: ${q}`).join(", ");
-                    if (!itemsSummary) itemsSummary = "No items selected";
+                    let itemsSummary = Object.entries(order.items).map(([p, q]) => `${q}x ${p}`).join(", ");
                     
+                    // Check if order is over 3 hours old AND not delivered
+                    let isOverdue = false;
+                    if (!order.isDelivered && (now - order.timestamp) > threeHours) {
+                        isOverdue = true;
+                        // Fire a push notification if they just opened the app
+                        if (Notification.permission === "granted" && document.visibilityState === 'visible') {
+                            new Notification("⚠️ Late Delivery!", {
+                                body: `${order.customerName}'s order is over 3 hours late!`,
+                            });
+                        }
+                    }
+
+                    // Build Card HTML
+                    let cardClass = "order-card";
+                    if (order.isDelivered) cardClass += " delivered";
+                    else if (isOverdue) cardClass += " overdue";
+
                     log.innerHTML += `
-                        <div class="order-card ${order.isDelivered ? 'delivered' : ''}">
+                        <div class="${cardClass}">
                             <div class="order-details">
-                                <p><strong>${order.customerName}</strong></p>
-                                <p style="font-size:13px; color:#666;">${order.address || 'No Address'}</p>
-                                <p style="font-size:12px; font-style:italic;">${itemsSummary}</p>
+                                <p class="customer-name">${order.customerName}</p>
+                                <p class="customer-address">${order.address || 'No Address'}</p>
+                                <p class="order-items">${itemsSummary}</p>
+                                <p class="overdue-text">⚠️ Over 3 hours pending!</p>
                             </div>
                             <div>
                                 <input type="checkbox" class="chk-box" onchange="toggleDelivery(${order.id}, this.checked)" ${order.isDelivered ? 'checked' : ''}>
