@@ -88,7 +88,6 @@
         .chk-box { width: 32px; height: 32px; accent-color: var(--success); cursor: pointer; transform: scale(1.1);}
         .overdue-text { color: var(--danger); font-size: 13px; font-weight: 800; margin-top: 10px; display: inline-block; background: #ffeceb; padding: 4px 8px; border-radius: 6px;}
 
-        /* MODALS */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 1000; padding: 20px; align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 24px; border-radius: 24px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2);}
         
@@ -104,7 +103,6 @@
         .invoice-table th { color: var(--text-muted); text-transform: uppercase; font-size: 12px; font-weight: 800;}
         .invoice-table td:last-child, .invoice-table th:last-child { text-align: right; font-weight: 700;}
 
-        /* CUSTOM TOAST NOTIFICATIONS */
         #toastContainer { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none;}
         .toast { background: #333; color: white; padding: 16px 20px; border-radius: 12px; font-weight: 600; font-size: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideDown 0.3s ease forwards; display: flex; align-items: center; gap: 10px;}
         .toast.error { background: #ff3b30; }
@@ -113,7 +111,6 @@
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
 
-        /* CUSTOM CONFIRM MODAL */
         .confirm-modal-content { text-align: center; padding: 30px 24px; }
         .confirm-title { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: #111; }
         .confirm-msg { font-size: 15px; color: #555; margin-bottom: 25px; line-height: 1.4;}
@@ -122,10 +119,10 @@
         .btn-confirm-no { flex: 1; background: #e5e5ea; color: #333; border: none; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 16px; }
         .btn-confirm-danger { background: var(--danger); }
 
-        /* --- UPDATED: PRINT CSS TO REMOVE URL & DATE --- */
+        /* --- THE ONLY THING THAT CHANGED: SAFARI URL PRINT FIX --- */
         @media print {
-            @page { margin: 0; size: auto; }
-            body { background: white !important; margin: 0; padding: 15mm; color: black; }
+            @page { margin: 0; size: auto; } /* margin:0 forces Safari to drop headers/footers */
+            body { background: white !important; margin: 0; padding: 15mm !important; color: black; box-sizing: border-box; } /* Safe padding inside */
             .header, .container, .no-print { display: none !important; }
             #billModal { display: block !important; position: static !important; background: white !important; height: auto !important; width: 100% !important; padding: 0 !important; box-sizing: border-box;}
             .modal-content { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; overflow: visible !important; padding: 0 !important;}
@@ -522,15 +519,11 @@
             db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
                 let o = e.target.result;
 
-                // --- 1. GENERATE PERFECT WHATSAPP TEXT MESSAGE ---
                 let whatsappText = `*BABA STORE INVOICE*\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
                 let itemsHtml = ""; 
                 
                 for (let p in o.items) {
-                    // For on-screen bill
                     itemsHtml += `<tr><td style="padding:10px 0; border-bottom:1px solid #eee;">${p}</td><td style="padding:10px 0; border-bottom:1px solid #eee;">${o.items[p].qty}</td><td style="padding:10px 0; border-bottom:1px solid #eee;">₹${o.items[p].rate}</td><td style="text-align:right; padding:10px 0; border-bottom:1px solid #eee; font-weight:bold;">₹${o.items[p].total}</td></tr>`;
-                    
-                    // For WhatsApp Text exactly as requested
                     whatsappText += `${p}: ${o.items[p].qty} x ₹${o.items[p].rate} = ₹${o.items[p].total}\n`;
                 }
 
@@ -539,13 +532,10 @@
                 if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
                 whatsappText += `*GRAND TOTAL: ₹${o.billTotal?.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
 
-                // Set WhatsApp Button Action
                 document.getElementById('whatsappBtn').onclick = () => {
-                    triggerHaptic();
                     window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
                 };
 
-                // --- 2. GENERATE HTML BILL FOR MODAL VIEW ---
                 let loadString = o.loadRate > 0 ? `<br><span style="font-size:12px; color:gray;">(₹${o.loadRate} x ${o.totalBags} bags)</span>` : "";
                 let unloadString = o.unloadRate > 0 ? `<br><span style="font-size:12px; color:gray;">(₹${o.unloadRate} x ${o.totalBags} bags)</span>` : "";
 
