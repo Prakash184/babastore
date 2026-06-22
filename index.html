@@ -10,10 +10,10 @@
     <meta name="apple-mobile-web-app-title" content="Baba Store">
     
     <style>
-        /* --- BEAUTIFUL iOS-STYLE CSS --- */
+        /* --- PREMIUM NATIVE iOS STYLING --- */
         :root {
-            --primary: #007aff; --primary-hover: #005bb5;
-            --success: #34c759; --danger: #ff3b30; --danger-bg: #ffeceb;
+            --primary: #007aff; --primary-gradient: linear-gradient(135deg, #007aff, #005bb5);
+            --success: #25D366; --danger: #ff3b30; --danger-bg: #ffeceb;
             --background: #f2f2f7; --card-bg: #ffffff;
             --text-main: #1c1c1e; --text-muted: #8e8e93; --border-color: #e5e5ea;
         }
@@ -22,151 +22,174 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--background); margin: 0; padding: 0; color: var(--text-main); padding-bottom: 50px;
+            background-color: var(--background); margin: 0; padding: 0; color: var(--text-main); padding-bottom: 60px;
         }
 
+        /* Header */
         .header {
-            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            position: sticky; top: 0; z-index: 100; padding: 16px; text-align: center;
-            border-bottom: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            position: sticky; top: 0; z-index: 100; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 20px rgba(0,0,0,0.03);
         }
-        .header h1 { margin: 0; font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px;}
+        .header h1 { margin: 0; font-size: 26px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px;}
+        .settings-btn { background: #f2f2f7; border: none; font-size: 20px; cursor: pointer; color: var(--primary); height: 40px; width: 40px; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s;}
+        .settings-btn:active { transform: scale(0.9); }
 
         .container { padding: 16px; max-width: 600px; margin: 0 auto; }
 
-        .section { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
-        .section-title { font-weight: 700; font-size: 18px; margin-top: 0; margin-bottom: 16px; border-bottom: 2px solid var(--background); padding-bottom: 8px;}
+        /* Cards & Sections */
+        .section { background: var(--card-bg); border-radius: 20px; padding: 24px 20px; margin-bottom: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+        .section-title { font-weight: 800; font-size: 19px; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid var(--background); padding-bottom: 10px; color: #000;}
 
-        .input-group { margin-bottom: 16px; width: 100%; }
-        label { display: block; font-size: 13px; margin-bottom: 6px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;}
-        input[type="text"], input[type="date"], input[type="number"] {
-            -webkit-appearance: none; width: 100%; padding: 14px; border: 1.5px solid var(--border-color); border-radius: 12px; 
-            font-size: 16px; background-color: #fafafa; display: block;
+        /* Inputs (Number only where needed) */
+        .input-group { margin-bottom: 18px; width: 100%; }
+        label { display: block; font-size: 13px; margin-bottom: 8px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
+        input[type="text"], input[type="date"], input[type="number"], input[type="search"] {
+            -webkit-appearance: none; width: 100%; padding: 16px; border: 1.5px solid var(--border-color); border-radius: 14px; 
+            font-size: 16px; font-weight: 500; background-color: #fafafa; display: block; font-family: inherit; transition: all 0.3s;
         }
-        input:focus { border-color: var(--primary); outline: none; background-color: #fff; }
+        input:focus { border-color: var(--primary); outline: none; background-color: #fff; box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1); }
 
-        /* Labor Rates Grid */
-        .labor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; background: #fff5e6; padding: 15px; border-radius: 12px;}
+        /* Labor Grid */
+        .labor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background: #fffaf0; padding: 16px; border-radius: 16px; border: 1px solid #ffebb3;}
         .labor-grid .input-group { margin-bottom: 0;}
-        .labor-grid input { border-color: #ffcc00; }
+        .labor-grid input { border-color: #ffcc00; background: white; font-weight: bold;}
 
-        /* Product Steppers */
-        .product-list { max-height: 400px; overflow-y: auto; padding-right: 5px; }
-        .product-row { padding: 16px 0; border-bottom: 1px solid var(--border-color); }
-        .product-name { font-size: 16px; font-weight: 600; margin-bottom: 10px; display: block;}
-        .controls-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        /* Product List */
+        .product-list { max-height: 450px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px;}
+        .product-row { padding: 18px 0; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px;}
+        .product-row:last-child { border-bottom: none; }
+        .product-name { font-size: 16px; font-weight: 700; color: #222;}
+        .controls-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         
-        .rate-box { display: flex; align-items: center; background: #f9f9f9; border-radius: 10px; border: 1px solid var(--border-color); padding: 0 10px; width: 110px;}
-        .rate-box span { color: var(--text-muted); font-weight: 600; }
-        .rate-box input { border: none; background: transparent; padding: 10px 5px; width: 100%; font-size: 16px; font-weight: 600; color: var(--primary); }
+        .rate-box { display: flex; align-items: center; background: #f4f4f5; border-radius: 12px; border: 1px solid var(--border-color); padding: 0 12px; width: 120px; transition: border 0.2s;}
+        .rate-box:focus-within { border-color: var(--primary); background: #fff;}
+        .rate-box span { color: var(--text-muted); font-weight: 700; font-size: 18px;}
+        .rate-box input { border: none; background: transparent; padding: 14px 8px; width: 100%; font-size: 16px; font-weight: 700; color: var(--primary); }
+        .rate-box input:focus { box-shadow: none; }
 
-        .stepper { display: flex; align-items: center; gap: 12px; background: var(--background); border-radius: 20px; padding: 4px; }
-        .btn-step { width: 36px; height: 36px; border-radius: 18px; border: none; background: var(--card-bg); color: var(--primary); font-size: 22px; cursor: pointer;}
-        .qty-val { font-size: 18px; font-weight: 700; min-width: 24px; text-align: center; }
-        .item-total { font-size: 15px; font-weight: 700; color: var(--text-muted); width: 80px; text-align: right;}
+        .stepper { display: flex; align-items: center; gap: 12px; background: var(--background); border-radius: 24px; padding: 4px; border: 1px solid var(--border-color);}
+        .btn-step { width: 38px; height: 38px; border-radius: 19px; border: none; background: var(--card-bg); color: var(--primary); font-size: 24px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.08); transition: transform 0.1s;}
+        .btn-step:active { transform: scale(0.9); }
+        .qty-val { font-size: 18px; font-weight: 800; min-width: 28px; text-align: center; }
+        .item-total { font-size: 16px; font-weight: 800; color: var(--text-muted); width: 85px; text-align: right;}
 
         /* Billing Summary */
-        .bill-summary { background: #eef7ff; padding: 16px; border-radius: 12px; margin-top: 20px; }
-        .bill-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 15px; color: #555; font-weight: 500;}
-        .bill-row.grand { border-top: 2px solid #bce0fd; padding-top: 10px; margin-top: 10px; font-size: 20px; font-weight: 800; color: var(--primary); }
+        .bill-summary { background: #f0f8ff; padding: 20px; border-radius: 16px; margin-top: 20px; border: 1px solid #d6eaff;}
+        .bill-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; color: #444; font-weight: 600;}
+        .bill-row.grand { border-top: 2px dashed #bce0fd; padding-top: 15px; margin-top: 15px; font-size: 22px; font-weight: 900; color: var(--primary); }
 
-        .btn-submit { width: 100%; background-color: var(--primary); color: white; border: none; padding: 16px; border-radius: 14px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .btn-submit { width: 100%; background: var(--primary-gradient); color: white; border: none; padding: 18px; border-radius: 16px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 20px; box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3); transition: transform 0.2s; letter-spacing: 0.5px;}
+        .btn-submit:active { transform: scale(0.96); }
 
-        /* Swipe-to-Delete Container */
-        .swipe-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: 14px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);}
+        /* Dashboard & Search */
+        .search-area { background: white; padding: 16px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.04);}
+        .dashboard-box { background: var(--primary-gradient); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; display: none; box-shadow: 0 8px 24px rgba(0,122,255,0.25);}
+        .dashboard-box h3 { margin: 0 0 15px 0; font-size: 20px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 10px; display: flex; align-items: center; gap: 8px;}
+        .dash-row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 8px; font-weight: 500;}
+        .dash-grand { font-size: 24px; font-weight: 900; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 15px; }
+
+        /* Swipe Container */
+        .swipe-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: 16px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.06);}
         .swipe-container::-webkit-scrollbar { display: none; }
         
-        .order-card { width: 100%; flex: 0 0 100%; scroll-snap-align: start; background: var(--card-bg); padding: 16px; border-left: 6px solid #ffcc00; }
-        .order-card.overdue { border-left-color: var(--danger); background-color: var(--danger-bg); }
-        .order-card.delivered { border-left-color: var(--success); opacity: 0.7; background-color: #f9f9f9; }
+        .order-card { width: 100%; flex: 0 0 100%; scroll-snap-align: start; background: var(--card-bg); padding: 20px; border-left: 8px solid #ffcc00; position: relative;}
+        .order-card.overdue { border-left-color: var(--danger); background-color: #fff9f9; }
+        .order-card.delivered { border-left-color: var(--success); opacity: 0.8; background-color: #fafafa; }
         
-        .swipe-actions { flex: 0 0 140px; scroll-snap-align: end; display: flex; }
-        .action-btn { flex: 1; border: none; color: white; font-weight: bold; font-size: 15px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: 5px; cursor: pointer;}
-        .btn-edit { background: var(--primary); }
-        .btn-delete { background: var(--danger); border-radius: 0 14px 14px 0;}
+        .swipe-actions { flex: 0 0 160px; scroll-snap-align: end; display: flex; }
+        .action-btn { flex: 1; border: none; color: white; font-weight: bold; font-size: 15px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: 8px; cursor: pointer;}
+        .btn-edit { background: #ff9500; }
+        .btn-delete { background: var(--danger); border-radius: 0 16px 16px 0;}
 
         /* Order Info */
-        .order-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f2f2f7; padding-bottom: 10px; margin-bottom: 10px;}
-        .customer-name { font-size: 18px; font-weight: 700; margin: 0;}
-        .customer-meta { font-size: 13px; color: var(--text-muted); font-weight: 500; margin: 4px 0; }
-        .order-bill { font-size: 18px; font-weight: 800; color: var(--primary); margin: 0; }
+        .order-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f2f2f7; padding-bottom: 12px; margin-bottom: 12px;}
+        .customer-name { font-size: 20px; font-weight: 800; margin: 0; color: #111;}
+        .customer-meta { font-size: 14px; color: var(--text-muted); font-weight: 600; margin: 6px 0 0 0; }
+        .order-bill { font-size: 20px; font-weight: 900; color: var(--primary); margin: 0; background: #f0f8ff; padding: 6px 12px; border-radius: 10px;}
         
-        .delivery-toggle { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f2f2f7;}
-        .chk-box { width: 28px; height: 28px; accent-color: var(--success); }
-        .overdue-text { color: var(--danger); font-size: 12px; font-weight: bold; margin-top: 8px;}
+        .delivery-toggle { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f2f2f7;}
+        .chk-box { width: 32px; height: 32px; accent-color: var(--success); cursor: pointer; transform: scale(1.1);}
+        .overdue-text { color: var(--danger); font-size: 13px; font-weight: 800; margin-top: 10px; display: inline-block; background: #ffeceb; padding: 4px 8px; border-radius: 6px;}
 
-        /* Modal Bill */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; padding: 20px; align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 24px; border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;}
+        /* Modals */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 1000; padding: 20px; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 24px; border-radius: 24px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2);}
         
-        .modal-close { background: #e5e5ea; border: none; padding: 10px; border-radius: 8px; width: 100%; font-weight: bold; margin-top: 15px; cursor: pointer;}
-        .modal-print { background: var(--success); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-weight: bold; margin-top: 10px; cursor: pointer; font-size: 16px;}
-        .invoice-table { width: 100%; border-collapse: collapse; margin-top: 15px;}
-        .invoice-table th, .invoice-table td { padding: 8px 0; border-bottom: 1px solid #eee; text-align: left; font-size: 14px;}
-        .invoice-table th { color: var(--text-muted); }
-        .invoice-table td:last-child, .invoice-table th:last-child { text-align: right; }
+        .modal-btn { border: none; padding: 16px; border-radius: 14px; width: 100%; font-weight: 800; margin-top: 12px; cursor: pointer; font-size: 16px; transition: transform 0.2s;}
+        .modal-btn:active { transform: scale(0.97); }
+        .btn-whatsapp { background: var(--success); color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);}
+        .btn-print { background: var(--primary-gradient); color: white; box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);}
+        .btn-close { background: #e5e5ea; color: black; margin-top: 20px;}
+        .btn-backup { background: #ffcc00; color: black; margin-top: 15px;}
+        .btn-excel { background: #107c41; color: white; margin-top: 15px; box-shadow: 0 4px 15px rgba(16, 124, 65, 0.3);}
 
-        /* --- PERFECT PRINT SETTINGS --- */
+        .invoice-table { width: 100%; border-collapse: collapse; margin-top: 20px;}
+        .invoice-table th, .invoice-table td { padding: 10px 0; border-bottom: 1px solid #eee; text-align: left; font-size: 15px;}
+        .invoice-table th { color: var(--text-muted); text-transform: uppercase; font-size: 12px; font-weight: 800;}
+        .invoice-table td:last-child, .invoice-table th:last-child { text-align: right; font-weight: 700;}
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .empty-state h3 { font-size: 20px; color: #333; margin-bottom: 5px;}
+
         @media print {
-            /* Removes the default browser URL and Page Number from top/bottom */
             @page { margin: 0; size: auto; }
-            
-            /* Hides everything except the Bill itself */
             body { background: white !important; margin: 0; padding: 0; }
             .header, .container, .no-print { display: none !important; }
-            
-            /* Makes the Bill take up the full paper perfectly */
             #billModal { display: block !important; position: static !important; background: white !important; height: auto !important; width: 100% !important; padding: 15mm 15mm !important; box-sizing: border-box;}
             .modal-content { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; overflow: visible !important; padding: 0 !important;}
-            
-            /* Show Print-Only Elements (Headers/Footers) */
             .print-only { display: block !important; }
         }
-        
-        .print-only { display: none; } /* Hidden on normal screen */
-        
+        .print-only { display: none; }
     </style>
 </head>
 <body>
 
     <div class="header no-print">
         <h1>Baba Store</h1>
+        <button class="settings-btn" onclick="openSettings()">⚙️</button>
     </div>
+
+    <datalist id="customerNamesList"></datalist>
 
     <div class="container no-print">
         
+        <!-- ORDER ENTRY FORM -->
         <div class="section">
-            <h2 class="section-title" id="formTitle">New Order</h2>
+            <h2 class="section-title" id="formTitle">📝 New Order</h2>
             <div class="input-group">
                 <label>Order Date</label>
                 <input type="date" id="orderDate">
             </div>
             <div class="input-group">
                 <label>Customer Name</label>
-                <input type="text" id="custName" placeholder="e.g. Rahul Kumar">
+                <!-- oninput triggers the auto-fill logic -->
+                <input type="text" id="custName" list="customerNamesList" placeholder="Enter Customer name..." oninput="autoFillAddress()">
             </div>
             <div class="input-group">
                 <label>Address / Location</label>
-                <input type="text" id="custAddress" placeholder="e.g. Main Market Shop">
+                <input type="text" id="custAddress" placeholder="Enter Address...">
             </div>
         </div>
 
         <div class="section">
-            <h2 class="section-title">Labor Rates (Per Bag)</h2>
+            <h2 class="section-title">💼 Labor Rates (Per Bag)</h2>
             <div class="labor-grid">
                 <div class="input-group">
                     <label>Loading (₹)</label>
-                    <input type="number" id="loadingRate" placeholder="0" oninput="calculateGrandTotal()">
+                    <!-- Strict Number Input -->
+                    <input type="number" inputmode="decimal" pattern="[0-9]*" id="loadingRate" placeholder="0" oninput="calculateGrandTotal()">
                 </div>
                 <div class="input-group">
                     <label>Unloading (₹)</label>
-                    <input type="number" id="unloadingRate" placeholder="0" oninput="calculateGrandTotal()">
+                    <!-- Strict Number Input -->
+                    <input type="number" inputmode="decimal" pattern="[0-9]*" id="unloadingRate" placeholder="0" oninput="calculateGrandTotal()">
                 </div>
             </div>
 
-            <h2 class="section-title">Products</h2>
-            <div class="product-list" id="productList">
-                </div>
+            <h2 class="section-title">📦 Products</h2>
+            <div class="product-list" id="productList"></div>
             
             <div class="bill-summary">
                 <div class="bill-row"><span>Products Total:</span> <span id="displayItemTotal">₹0.00</span></div>
@@ -179,38 +202,85 @@
             <button class="btn-submit" id="submitBtn" onclick="submitOrder()">Save Order</button>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
-            <h2 style="font-size: 20px; font-weight: 800; margin: 0; margin-left: 5px;">Delivery Board <br><span style="font-size:12px; color:gray; font-weight:normal;">(Swipe left to Edit/Delete)</span></h2>
+        <!-- DASHBOARD & FILTERS -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; margin-top: 30px;">
+            <h2 style="font-size: 22px; font-weight: 900; margin: 0; margin-left: 5px;">📋 Delivery Board</h2>
         </div>
         
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <input type="date" id="filterDate" onchange="renderOrders()" style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
-            <button onclick="clearFilter()" style="padding:10px; border-radius:8px; border:none; font-weight:bold;">Show All</button>
+        <div class="search-area">
+            <div class="input-group" style="margin-bottom: 12px;">
+                <input type="search" id="searchName" placeholder="🔍 Search by Customer Name..." oninput="renderOrders()">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <input type="date" id="filterDate" onchange="renderOrders()" style="flex:1;">
+                <button onclick="clearFilter()" style="padding:14px 20px; border-radius:14px; border:none; font-weight:bold; background:#e5e5ea; color: #333;">Clear</button>
+            </div>
+        </div>
+
+        <!-- End of Day Sales Dashboard -->
+        <div id="dailyDashboard" class="dashboard-box">
+            <h3 id="dashboardTitle">📊 Daily Summary</h3>
+            <div id="dashboardStats"></div>
+            <div class="dash-row dash-grand"><span>Expected Revenue:</span> <span id="dashTotalRev">₹0</span></div>
         </div>
 
         <div id="orderLog"></div>
     </div>
 
+    <!-- INVOICE MODAL -->
     <div id="billModal" class="modal">
         <div class="modal-content">
             <div id="modalBody"></div>
-            <button class="modal-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
-            <button class="modal-close no-print" onclick="closeBill()">Close</button>
+            <button class="modal-btn btn-whatsapp no-print" id="whatsappBtn" onclick="">💬 Send on WhatsApp</button>
+            <button class="modal-btn btn-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+            <button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settingsModal" class="modal no-print">
+        <div class="modal-content" style="text-align: center;">
+            <h2 style="margin-top:0; color:var(--primary); font-weight: 900;">Business Settings</h2>
+            
+            <button class="modal-btn btn-excel" onclick="exportToExcel()">📊 Export Monthly Sales to Excel</button>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:24px; margin-top:8px;">Downloads all orders as a CSV file for your CA.</p>
+            
+            <hr style="border: 0; border-top: 2px dashed #eee; margin: 24px 0;">
+            
+            <p style="color:var(--text-muted); font-size:14px; margin-bottom:12px; font-weight: bold;">Protect your business data by saving it to your phone.</p>
+            <button class="modal-btn btn-backup" onclick="exportData()">💾 Download Backup File</button>
+            
+            <div style="margin-top:24px; padding-top:24px; border-top:2px dashed #eee; text-align: left;">
+                <label style="font-size:14px; font-weight:800; display:block; margin-bottom:10px; color:#333;">Restore from Backup</label>
+                <input type="file" id="backupFile" accept=".json" style="margin-bottom:12px; width:100%; padding: 10px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
+                <button class="modal-btn" style="background:#ff3b30; color:white; margin-top: 0;" onclick="importData()">📂 Restore Data</button>
+            </div>
+            
+            <button class="modal-btn btn-close" onclick="closeModals()">Close Settings</button>
         </div>
     </div>
 
     <script>
+        // "Corn Darra" is removed.
         const products = [
             "Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar",
-            "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Shujji", "Sujji 47 Kg", "Sujji 48 Kg",
-            "Darra", "Corn Darra", "Milk More", "Doodh Virdi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"
+            "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Sujji", "Sujji 47 Kg", "Sujji 48 Kg",
+            "Darra", "Milk More", "Doodh Virdi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"
         ];
         
         let currentItems = {};
         let db;
         let editingOrderId = null; 
+        let customerMemory = {}; // Stores Name -> Address for Auto-fill
 
         function safeId(str) { return str.replace(/[^a-zA-Z0-9]/g, ''); }
+
+        // Haptic Feedback function (Vibration)
+        function triggerHaptic() {
+            if ("vibrate" in navigator) {
+                navigator.vibrate(40); // 40ms premium vibration feel
+            }
+        }
 
         function initApp() {
             let today = new Date().toISOString().split('T')[0];
@@ -221,13 +291,13 @@
             products.forEach(p => {
                 currentItems[p] = { qty: 0, rate: "" };
                 let sId = safeId(p);
+                // Number Only Keypad added to Rate input: inputmode="decimal" pattern="[0-9]*"
                 container.innerHTML += `
                     <div class="product-row">
                         <span class="product-name">${p}</span>
                         <div class="controls-row">
                             <div class="rate-box">
-                                <span>₹</span>
-                                <input type="number" id="rate-${sId}" placeholder="Rate" oninput="calculateItem('${p}')">
+                                <span>₹</span><input type="number" inputmode="decimal" pattern="[0-9]*" id="rate-${sId}" placeholder="Rate" oninput="calculateItem('${p}')">
                             </div>
                             <div class="stepper">
                                 <button class="btn-step" onclick="updateQty('${p}', -1)">-</button>
@@ -242,6 +312,7 @@
         }
 
         function updateQty(product, change) {
+            triggerHaptic(); 
             currentItems[product].qty = Math.max(0, currentItems[product].qty + change);
             document.getElementById(`qty-${safeId(product)}`).innerText = currentItems[product].qty;
             calculateItem(product);
@@ -255,21 +326,15 @@
         }
 
         function calculateGrandTotal() {
-            let totalQty = 0;
-            let itemsTotal = 0;
-            
+            let totalQty = 0; let itemsTotal = 0;
             products.forEach(p => {
-                let q = currentItems[p].qty;
-                let r = currentItems[p].rate || 0;
-                totalQty += q;
-                itemsTotal += (q * r);
+                let q = currentItems[p].qty; let r = currentItems[p].rate || 0;
+                totalQty += q; itemsTotal += (q * r);
             });
-
             let loadRate = parseFloat(document.getElementById('loadingRate').value) || 0;
             let unloadRate = parseFloat(document.getElementById('unloadingRate').value) || 0;
             
-            let loadTotal = totalQty * loadRate;
-            let unloadTotal = totalQty * unloadRate;
+            let loadTotal = totalQty * loadRate; let unloadTotal = totalQty * unloadRate;
             let finalTotal = itemsTotal + loadTotal + unloadTotal;
 
             document.getElementById('displayItemTotal').innerText = `₹${itemsTotal.toFixed(2)}`;
@@ -282,7 +347,7 @@
         }
 
         function initDatabase() {
-            let request = indexedDB.open("BabaStoreDB", 3);
+            let request = indexedDB.open("BabaStoreDB", 4);
             request.onupgradeneeded = e => {
                 db = e.target.result;
                 if (!db.objectStoreNames.contains("orders")) db.createObjectStore("orders", { keyPath: "id", autoIncrement: true });
@@ -290,19 +355,32 @@
             request.onsuccess = e => { db = e.target.result; renderOrders(); };
         }
 
-        function clearFilter() { document.getElementById('filterDate').value = ''; renderOrders(); }
+        function clearFilter() { 
+            triggerHaptic();
+            document.getElementById('filterDate').value = ''; 
+            document.getElementById('searchName').value = ''; 
+            renderOrders(); 
+        }
+
+        // Auto-Fill Address based on Memory
+        function autoFillAddress() {
+            let name = document.getElementById('custName').value.trim();
+            if (customerMemory[name]) {
+                document.getElementById('custAddress').value = customerMemory[name];
+            }
+        }
 
         function submitOrder() {
+            triggerHaptic();
             const name = document.getElementById('custName').value.trim();
             const address = document.getElementById('custAddress').value.trim();
             const rawDate = document.getElementById('orderDate').value;
             
             if (!name) return alert("Please enter a customer name.");
-
-            let orderItems = {};
             let totals = calculateGrandTotal();
             if (totals.totalQty === 0) return alert("Please add at least 1 product quantity.");
 
+            let orderItems = {};
             products.forEach(p => { 
                 if(currentItems[p].qty > 0) orderItems[p] = { qty: currentItems[p].qty, rate: currentItems[p].rate || 0, total: currentItems[p].qty * (currentItems[p].rate || 0) };
             });
@@ -330,9 +408,9 @@
 
         function resetForm() {
             editingOrderId = null;
-            document.getElementById('formTitle').innerText = "New Order";
+            document.getElementById('formTitle').innerText = "📝 New Order";
             document.getElementById('submitBtn').innerText = "Save Order";
-            document.getElementById('submitBtn').style.backgroundColor = "var(--primary)";
+            document.getElementById('submitBtn').style.background = "var(--primary-gradient)";
             
             document.getElementById('custName').value = ""; document.getElementById('custAddress').value = "";
             document.getElementById('loadingRate').value = ""; document.getElementById('unloadingRate').value = "";
@@ -347,41 +425,39 @@
         }
 
         function editOrder(id) {
-            let store = db.transaction(["orders"], "readonly").objectStore("orders");
-            store.get(id).onsuccess = (e) => {
+            triggerHaptic();
+            db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
                 let order = e.target.result;
                 editingOrderId = order.id;
-                
-                document.getElementById('formTitle').innerText = "Editing Order...";
+                document.getElementById('formTitle').innerText = "✏️ Editing Order...";
                 document.getElementById('submitBtn').innerText = "Update Existing Order";
-                document.getElementById('submitBtn').style.backgroundColor = "#ff9500"; 
+                document.getElementById('submitBtn').style.background = "#ff9500"; 
 
                 document.getElementById('orderDate').value = order.filterDate;
                 document.getElementById('custName').value = order.customerName;
-                document.getElementById('custAddress').value = order.address;
+                document.getElementById('custAddress').value = order.address || "";
                 document.getElementById('loadingRate').value = order.loadRate || "";
                 document.getElementById('unloadingRate').value = order.unloadRate || "";
 
                 products.forEach(p => { currentItems[p] = { qty: 0, rate: "" }; });
-                
                 for (let p in order.items) {
                     currentItems[p] = { qty: order.items[p].qty, rate: order.items[p].rate };
                     document.getElementById(`qty-${safeId(p)}`).innerText = currentItems[p].qty;
                     document.getElementById(`rate-${safeId(p)}`).value = currentItems[p].rate || "";
                 }
-                
-                products.forEach(calculateItem);
-                window.scrollTo(0,0);
+                products.forEach(calculateItem); window.scrollTo(0,0);
             };
         }
 
         function deleteOrder(id) {
+            triggerHaptic();
             if(confirm("Are you sure you want to completely DELETE this order?")) {
                 db.transaction(["orders"], "readwrite").objectStore("orders").delete(id).onsuccess = renderOrders;
             }
         }
 
         function toggleDelivery(id, isChecked) {
+            triggerHaptic(); 
             let store = db.transaction(["orders"], "readwrite").objectStore("orders");
             store.get(id).onsuccess = e => {
                 let data = e.target.result; data.isDelivered = isChecked;
@@ -390,69 +466,169 @@
         }
 
         function viewBill(id) {
+            triggerHaptic();
             db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
                 let o = e.target.result;
-                let itemsHtml = "";
+                let itemsHtml = ""; let whatsappText = `*BABA STORE INVOICE*\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
+                
                 for (let p in o.items) {
                     itemsHtml += `<tr><td>${p}</td><td>${o.items[p].qty}</td><td>₹${o.items[p].rate}</td><td>₹${o.items[p].total}</td></tr>`;
+                    whatsappText += `${p}: ${o.items[p].qty} x ₹${o.items[p].rate} = ₹${o.items[p].total}\n`;
                 }
+
+                whatsappText += `-----------------\nProducts Total: ₹${o.itemsTotal?.toFixed(2)}\n`;
+                if(o.loadTotal > 0) whatsappText += `Loading (${o.totalBags}x): ₹${o.loadTotal?.toFixed(2)}\n`;
+                if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
+                whatsappText += `*GRAND TOTAL: ₹${o.billTotal?.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
+
+                document.getElementById('whatsappBtn').onclick = () => {
+                    window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
+                };
 
                 let html = `
                     <div style="text-align: center; margin-bottom: 20px;">
                         <h1 style="margin:0; font-size: 28px; color: black; font-weight:900;">BABA STORE</h1>
-                        <p style="margin:0; font-size: 14px; color: #555;">Official Invoice</p>
                     </div>
-                    
                     <div style="margin-bottom: 20px; border-bottom: 2px solid #eee; border-top: 2px solid #eee; padding: 15px 0;">
                         <p style="margin:4px 0; font-size: 16px;"><strong>Customer:</strong> ${o.customerName}</p>
                         <p style="margin:4px 0; font-size: 14px; color: #555;"><strong>Address:</strong> ${o.address || 'N/A'}</p>
                         <p style="margin:4px 0; font-size: 14px; color: #555;"><strong>Date:</strong> ${o.displayDate}</p>
                     </div>
-                    
-                    <table class="invoice-table">
-                        <tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr>
-                        ${itemsHtml}
-                    </table>
-                    
+                    <table class="invoice-table"><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr>${itemsHtml}</table>
                     <div style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Products Total:</span><span>₹${o.itemsTotal?.toFixed(2) || '0.00'}</span></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Loading (${o.totalBags} @ ₹${o.loadRate}):</span><span>₹${o.loadTotal?.toFixed(2) || '0.00'}</span></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Unloading (${o.totalBags} @ ₹${o.unloadRate}):</span><span>₹${o.unloadTotal?.toFixed(2) || '0.00'}</span></div>
-                        <div style="display:flex; justify-content:space-between; margin-top:15px; padding-top:10px; border-top: 2px dashed #ccc; font-size: 20px; font-weight:bold; color:var(--primary);">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Products Total:</span><span>₹${o.itemsTotal?.toFixed(2) || '0.00'}</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Loading:</span><span>₹${o.loadTotal?.toFixed(2) || '0.00'}</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Unloading:</span><span>₹${o.unloadTotal?.toFixed(2) || '0.00'}</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-top:15px; padding-top:15px; border-top: 2px dashed #ccc; font-size: 22px; font-weight:900; color:var(--primary);">
                             <span>Grand Total:</span><span>₹${o.billTotal?.toFixed(2) || '0.00'}</span>
                         </div>
                     </div>
-                    
-                    <div class="print-only" style="text-align: center; margin-top: 40px; font-size: 14px; font-weight: bold; border-top: 1px dashed #ccc; padding-top: 15px; color: #888;">
-                        Generated by Baba Store
-                    </div>
+                    <div class="print-only" style="text-align: center; margin-top: 40px; font-size: 14px; font-weight: bold; border-top: 1px dashed #ccc; padding-top: 15px; color: #888;">Generated by Baba Store</div>
                 `;
                 document.getElementById('modalBody').innerHTML = html;
                 document.getElementById('billModal').style.display = 'flex';
             };
         }
 
-        function closeBill() { document.getElementById('billModal').style.display = 'none'; }
+        function openSettings() { triggerHaptic(); document.getElementById('settingsModal').style.display = 'flex'; }
+        function closeModals() { triggerHaptic(); document.getElementById('billModal').style.display = 'none'; document.getElementById('settingsModal').style.display = 'none'; }
+
+        // --- BACKUP, RESTORE & EXCEL LOGIC ---
+        function exportData() {
+            triggerHaptic();
+            db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
+                let data = JSON.stringify(e.target.result);
+                let blob = new Blob([data], { type: "application/json" });
+                let a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `BabaStore_Backup_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+            };
+        }
+
+        function importData() {
+            triggerHaptic();
+            let file = document.getElementById('backupFile').files[0];
+            if (!file) return alert("Please select a backup file first.");
+            
+            let reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    let data = JSON.parse(e.target.result);
+                    let store = db.transaction(["orders"], "readwrite").objectStore("orders");
+                    store.clear().onsuccess = () => {
+                        data.forEach(order => store.add(order));
+                        alert("Data Restored Successfully!");
+                        closeModals(); renderOrders();
+                    };
+                } catch (err) { alert("Invalid Backup File!"); }
+            };
+            reader.readAsText(file);
+        }
+
+        function exportToExcel() {
+            triggerHaptic();
+            db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
+                let allOrders = e.target.result;
+                if (allOrders.length === 0) return alert("No orders to export.");
+                
+                let csvContent = "Date,Customer Name,Address,Total Bags,Loading Cost,Unloading Cost,Grand Total,Status\n";
+                
+                allOrders.forEach(o => {
+                    let status = o.isDelivered ? "Delivered" : "Pending";
+                    let row = `"${o.displayDate}","${o.customerName}","${o.address || ''}",${o.totalBags},${o.loadTotal || 0},${o.unloadTotal || 0},${o.billTotal},${status}\n`;
+                    csvContent += row;
+                });
+
+                let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                let a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `BabaStore_Sales_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+            };
+        }
 
         function renderOrders() {
-            let request = db.transaction(["orders"], "readonly").objectStore("orders").getAll();
-            request.onsuccess = () => {
+            db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
                 const log = document.getElementById('orderLog'); log.innerHTML = "";
+                let allOrders = e.target.result;
+                
+                // Populate Memory DataLists (Customer Auto-Fill)
+                customerMemory = {}; 
+                allOrders.forEach(o => { 
+                    if(o.customerName && o.address) {
+                        customerMemory[o.customerName] = o.address;
+                    } 
+                });
+                document.getElementById('customerNamesList').innerHTML = Object.keys(customerMemory).map(n => `<option value="${n}">`).join("");
+
                 let selectedFilter = document.getElementById('filterDate').value;
-                let allOrders = request.result;
+                let searchQuery = document.getElementById('searchName').value.toLowerCase();
 
+                // Apply Filters
                 if (selectedFilter) allOrders = allOrders.filter(o => o.filterDate === selectedFilter);
-                let sorted = allOrders.sort((a,b) => b.timestamp - a.timestamp);
-                let now = Date.now(); let timeLimit = 43200000; // 12 Hours
+                if (searchQuery) allOrders = allOrders.filter(o => o.customerName.toLowerCase().includes(searchQuery));
 
-                if (sorted.length === 0) return log.innerHTML = "<p style='text-align:center;'>No orders found.</p>";
+                // --- DAILY DASHBOARD LOGIC ---
+                if (selectedFilter && !searchQuery && allOrders.length > 0) {
+                    document.getElementById('dailyDashboard').style.display = 'block';
+                    document.getElementById('dashboardTitle').innerText = `📊 Summary for ${selectedFilter}`;
+                    let totalDailyRev = 0;
+                    let bagCounts = {};
+
+                    allOrders.forEach(o => {
+                        totalDailyRev += (o.billTotal || 0);
+                        for (let p in o.items) {
+                            bagCounts[p] = (bagCounts[p] || 0) + o.items[p].qty;
+                        }
+                    });
+
+                    let statsHtml = Object.entries(bagCounts).map(([p, qty]) => {
+                        return `<div class="dash-row"><span>${p}</span> <span><b style="font-size:18px;">${qty}</b> bags</span></div>`;
+                    }).join("");
+                    
+                    document.getElementById('dashboardStats').innerHTML = statsHtml;
+                    document.getElementById('dashTotalRev').innerText = `₹${totalDailyRev.toFixed(2)}`;
+                } else {
+                    document.getElementById('dailyDashboard').style.display = 'none';
+                }
+
+                let sorted = allOrders.sort((a,b) => b.timestamp - a.timestamp);
+                let now = Date.now(); let timeLimit = 43200000; 
+
+                if (sorted.length === 0) {
+                    return log.innerHTML = `
+                        <div class="empty-state">
+                            <h3 style="font-size: 40px; margin-bottom: 10px;">📋</h3>
+                            <h3>No Orders Found</h3>
+                            <p style="font-size: 14px;">Try changing the date or search term.</p>
+                        </div>`;
+                }
 
                 sorted.forEach(order => {
                     let isOverdue = !order.isDelivered && (now - order.timestamp) > timeLimit;
                     let cardClass = "order-card " + (order.isDelivered ? "delivered" : (isOverdue ? "overdue" : ""));
-                    
-                    // Only insert the warning HTML block if it is ACTUALLY overdue (Prevents CSS bugs)
-                    let overdueWarningHtml = isOverdue ? `<p class="overdue-text">⚠️ Over 12 hours pending!</p>` : '';
+                    let overdueHtml = isOverdue ? `<span class="overdue-text">⚠️ Over 12 hours pending!</span>` : '';
 
                     log.innerHTML += `
                         <div class="swipe-container">
@@ -464,20 +640,18 @@
                                     </div>
                                     <p class="order-bill">₹${order.billTotal ? order.billTotal.toFixed(2) : '0.00'}</p>
                                 </div>
-                                <div style="font-size:13px; color:#666;">Tap card to view full bill / print PDF...</div>
-                                
-                                ${overdueWarningHtml}
-                                
+                                <div style="font-size:13px; color:#666; font-weight:500;">Tap card to open Bill / Send WhatsApp...</div>
+                                ${overdueHtml}
                                 <div class="delivery-toggle" onclick="event.stopPropagation()">
-                                    <span style="font-weight:bold; color:${order.isDelivered?'var(--success)':'var(--danger)'}">
-                                        ${order.isDelivered ? "Delivered ✓" : "Un Delivered"}
+                                    <span style="font-weight:800; font-size:15px; color:${order.isDelivered?'var(--success)':'var(--danger)'}">
+                                        ${order.isDelivered ? "✓ Delivered" : "Un Delivered"}
                                     </span>
                                     <input type="checkbox" class="chk-box" onchange="toggleDelivery(${order.id}, this.checked)" ${order.isDelivered ? 'checked' : ''}>
                                 </div>
                             </div>
                             <div class="swipe-actions">
-                                <button class="action-btn btn-edit" onclick="editOrder(${order.id})">✏️<br>Edit</button>
-                                <button class="action-btn btn-delete" onclick="deleteOrder(${order.id})">🗑️<br>Delete</button>
+                                <button class="action-btn btn-edit" onclick="editOrder(${order.id})"><span style="font-size:20px;">✏️</span> Edit</button>
+                                <button class="action-btn btn-delete" onclick="deleteOrder(${order.id})"><span style="font-size:20px;">🗑️</span> Delete</button>
                             </div>
                         </div>`;
                 });
