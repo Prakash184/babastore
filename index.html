@@ -9,8 +9,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Baba Store">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
     <style>
         :root {
             --primary: #007aff; --primary-gradient: linear-gradient(135deg, #007aff, #005bb5);
@@ -106,9 +104,6 @@
         .invoice-table th { color: var(--text-muted); text-transform: uppercase; font-size: 12px; font-weight: 800;}
         .invoice-table td:last-child, .invoice-table th:last-child { text-align: right; font-weight: 700;}
 
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
-        .empty-state h3 { font-size: 20px; color: #333; margin-bottom: 5px;}
-
         /* CUSTOM TOAST NOTIFICATIONS */
         #toastContainer { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none;}
         .toast { background: #333; color: white; padding: 16px 20px; border-radius: 12px; font-weight: 600; font-size: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideDown 0.3s ease forwards; display: flex; align-items: center; gap: 10px;}
@@ -127,9 +122,10 @@
         .btn-confirm-no { flex: 1; background: #e5e5ea; color: #333; border: none; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 16px; }
         .btn-confirm-danger { background: var(--danger); }
 
+        /* --- UPDATED: PRINT CSS TO REMOVE URL & DATE --- */
         @media print {
-            @page { margin: 10mm; size: auto; }
-            body { background: white !important; margin: 0; padding: 0; color: black; }
+            @page { margin: 0; size: auto; }
+            body { background: white !important; margin: 0; padding: 15mm; color: black; }
             .header, .container, .no-print { display: none !important; }
             #billModal { display: block !important; position: static !important; background: white !important; height: auto !important; width: 100% !important; padding: 0 !important; box-sizing: border-box;}
             .modal-content { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; overflow: visible !important; padding: 0 !important;}
@@ -227,7 +223,7 @@
         <div class="modal-content">
             <div id="modalBody" style="background: white; padding: 10px;"></div>
             
-            <button class="modal-btn btn-whatsapp no-print" id="whatsappBtn" onclick="shareBillPDF()">💬 Share PDF on WhatsApp</button>
+            <button class="modal-btn btn-whatsapp no-print" id="whatsappBtn">💬 Send on WhatsApp</button>
             <button class="modal-btn btn-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
             <button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
         </div>
@@ -272,8 +268,6 @@
         let db;
         let editingOrderId = null; 
         let customerMemory = {}; 
-        let currentBillFilename = "BabaStore_Bill.pdf";
-        let currentInvoiceHTML = ""; // Stores clean HTML for PDF
 
         function safeId(str) { return str.replace(/[^a-zA-Z0-9]/g, ''); }
 
@@ -527,13 +521,31 @@
             triggerHaptic();
             db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
                 let o = e.target.result;
-                currentBillFilename = `BabaStore_Invoice_${o.customerName.replace(/ /g, "_")}.pdf`;
 
+                // --- 1. GENERATE PERFECT WHATSAPP TEXT MESSAGE ---
+                let whatsappText = `*BABA STORE INVOICE*\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
                 let itemsHtml = ""; 
+                
                 for (let p in o.items) {
+                    // For on-screen bill
                     itemsHtml += `<tr><td style="padding:10px 0; border-bottom:1px solid #eee;">${p}</td><td style="padding:10px 0; border-bottom:1px solid #eee;">${o.items[p].qty}</td><td style="padding:10px 0; border-bottom:1px solid #eee;">₹${o.items[p].rate}</td><td style="text-align:right; padding:10px 0; border-bottom:1px solid #eee; font-weight:bold;">₹${o.items[p].total}</td></tr>`;
+                    
+                    // For WhatsApp Text exactly as requested
+                    whatsappText += `${p}: ${o.items[p].qty} x ₹${o.items[p].rate} = ₹${o.items[p].total}\n`;
                 }
 
+                whatsappText += `-----------------\nProducts Total: ₹${o.itemsTotal?.toFixed(2)}\n`;
+                if(o.loadTotal > 0) whatsappText += `Loading (${o.totalBags}x): ₹${o.loadTotal?.toFixed(2)}\n`;
+                if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
+                whatsappText += `*GRAND TOTAL: ₹${o.billTotal?.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
+
+                // Set WhatsApp Button Action
+                document.getElementById('whatsappBtn').onclick = () => {
+                    triggerHaptic();
+                    window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
+                };
+
+                // --- 2. GENERATE HTML BILL FOR MODAL VIEW ---
                 let loadString = o.loadRate > 0 ? `<br><span style="font-size:12px; color:gray;">(₹${o.loadRate} x ${o.totalBags} bags)</span>` : "";
                 let unloadString = o.unloadRate > 0 ? `<br><span style="font-size:12px; color:gray;">(₹${o.unloadRate} x ${o.totalBags} bags)</span>` : "";
 
@@ -569,55 +581,8 @@
                 `;
                 
                 document.getElementById('modalBody').innerHTML = html;
-                currentInvoiceHTML = html; // Save pristine HTML for A4 PDF generator
                 document.getElementById('billModal').style.display = 'flex';
             };
-        }
-
-        // --- NEW BULLETPROOF PDF GENERATOR ---
-        async function shareBillPDF() {
-            const btn = document.getElementById('whatsappBtn');
-            btn.innerText = "⏳ Generating PDF...";
-
-            if (typeof html2pdf === 'undefined') {
-                showToast("PDF Engine is loading. Check internet.", "error");
-                btn.innerText = "💬 Share PDF on WhatsApp";
-                return;
-            }
-
-            // Create a perfect A4-sized hidden container to prevent the "Page inside a page" bug
-            let hiddenArea = document.createElement('div');
-            hiddenArea.style.position = 'absolute';
-            hiddenArea.style.left = '-9999px';
-            hiddenArea.style.top = '0';
-            hiddenArea.style.width = '800px'; 
-            hiddenArea.style.backgroundColor = 'white';
-            hiddenArea.style.padding = '40px'; 
-            hiddenArea.innerHTML = currentInvoiceHTML;
-            document.body.appendChild(hiddenArea);
-
-            const opt = {
-                margin:       0.2,
-                filename:     currentBillFilename,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(hiddenArea).save().then(() => {
-                btn.innerText = "💬 Share PDF on WhatsApp";
-                document.body.removeChild(hiddenArea); 
-                
-                setTimeout(() => {
-                    showConfirm("Share via WhatsApp", "PDF successfully downloaded!\n\nWould you like to open WhatsApp now to attach and send the file?", false, 
-                        () => { window.location.href = `whatsapp://send?text=Please find your Baba Store bill attached.`; }
-                    );
-                }, 500);
-            }).catch(err => {
-                document.body.removeChild(hiddenArea);
-                showToast("Error generating PDF.", "error");
-                btn.innerText = "💬 Share PDF on WhatsApp";
-            });
         }
 
         function openSettings() { triggerHaptic(); document.getElementById('settingsModal').style.display = 'flex'; }
