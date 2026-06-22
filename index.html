@@ -8,8 +8,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Baba Store">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         :root {
@@ -99,7 +97,6 @@
         .btn-print { background: var(--primary-gradient); color: white; box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);}
         .btn-close { background: #e5e5ea; color: black; margin-top: 20px;}
         .btn-backup { background: #ffcc00; color: black; margin-top: 15px;}
-        .btn-excel { background: #107c41; color: white; margin-top: 15px; box-shadow: 0 4px 15px rgba(16, 124, 65, 0.3);}
 
         .invoice-table { width: 100%; border-collapse: collapse; margin-top: 20px;}
         .invoice-table th, .invoice-table td { padding: 10px 0; border-bottom: 1px solid #eee; text-align: left; font-size: 15px;}
@@ -204,6 +201,7 @@
         <div id="orderLog"></div>
     </div>
 
+    <!-- INVOICE MODAL -->
     <div id="billModal" class="modal">
         <div class="modal-content">
             <div id="modalBody" style="background: white; padding: 10px;"></div>
@@ -214,14 +212,10 @@
         </div>
     </div>
 
+    <!-- SETTINGS MODAL -->
     <div id="settingsModal" class="modal no-print">
         <div class="modal-content" style="text-align: center;">
             <h2 style="margin-top:0; color:var(--primary); font-weight: 900;">Business Settings</h2>
-            
-            <button class="modal-btn btn-excel" id="monthlyPdfBtn" style="background: #34c759;" onclick="exportMonthlyPDF()">🖨️ Download Monthly PDF</button>
-            <p style="color:var(--text-muted); font-size:13px; margin-bottom:24px; margin-top:8px;">Downloads a clean PDF table of all orders to send to your CA.</p>
-            
-            <hr style="border: 0; border-top: 2px dashed #eee; margin: 24px 0;">
             
             <p style="color:var(--text-muted); font-size:14px; margin-bottom:12px; font-weight: bold;">Protect your business data by saving it to your phone.</p>
             <button class="modal-btn btn-backup" onclick="exportData()">💾 Download Backup File</button>
@@ -314,7 +308,6 @@
             document.getElementById('displayItemTotal').innerText = `₹${itemsTotal.toFixed(2)}`;
             document.getElementById('displayTotalBags').innerText = totalQty;
             
-            // FIX: Single line summary for perfect UI fitting
             document.getElementById('displayLoadTotal').innerText = loadTotal > 0 ? `₹${loadTotal.toFixed(2)} (₹${loadRate}x${totalQty})` : `₹0.00`;
             document.getElementById('displayUnloadTotal').innerText = unloadTotal > 0 ? `₹${unloadTotal.toFixed(2)} (₹${unloadRate}x${totalQty})` : `₹0.00`;
             
@@ -432,13 +425,25 @@
             }
         }
 
+        // --- UPDATED: DELIVERY LOCK LOGIC ---
         function toggleDelivery(id, isChecked) {
-            triggerHaptic(); 
-            let store = db.transaction(["orders"], "readwrite").objectStore("orders");
-            store.get(id).onsuccess = e => {
-                let data = e.target.result; data.isDelivered = isChecked;
-                store.put(data).onsuccess = renderOrders;
-            };
+            triggerHaptic();
+            if (isChecked) {
+                let conf = confirm("Are you sure you want to mark this order as Delivered? Once marked, it cannot be undone.");
+                if (!conf) {
+                    renderOrders(); // Revert the checkbox visual change
+                    return;
+                }
+                let store = db.transaction(["orders"], "readwrite").objectStore("orders");
+                store.get(id).onsuccess = e => {
+                    let data = e.target.result; 
+                    data.isDelivered = true;
+                    store.put(data).onsuccess = () => {
+                        alert("✅ Order has been successfully locked as Delivered!");
+                        renderOrders();
+                    };
+                };
+            }
         }
 
         function viewBill(id) {
@@ -446,7 +451,6 @@
             db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
                 let o = e.target.result;
 
-                // --- TEXT BASED WHATSAPP GENERATION ---
                 let whatsappText = `*BABA STORE INVOICE*\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
                 let itemsHtml = ""; 
                 
@@ -464,7 +468,6 @@
                     window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
                 };
 
-                // Visual Bill for Modal
                 let loadString = o.loadRate > 0 ? `<br><span style="font-size:12px; color:gray;">(₹${o.loadRate} x ${o.totalBags} bags)</span>` : "";
                 let unloadString = o.unloadRate > 0 ? `<br><span style="font-size:12px; color:gray;">(₹${o.unloadRate} x ${o.totalBags} bags)</span>` : "";
 
@@ -495,87 +498,6 @@
 
         function openSettings() { triggerHaptic(); document.getElementById('settingsModal').style.display = 'flex'; }
         function closeModals() { triggerHaptic(); document.getElementById('billModal').style.display = 'none'; document.getElementById('settingsModal').style.display = 'none'; }
-
-        // --- NEW MONTHLY PDF GENERATION FIX ---
-        function exportMonthlyPDF() {
-            const btn = document.getElementById('monthlyPdfBtn');
-            btn.innerText = "⏳ Generating Report...";
-
-            db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
-                let allOrders = e.target.result;
-                if (allOrders.length === 0) {
-                    btn.innerText = "🖨️ Download Monthly PDF";
-                    return alert("No orders to export.");
-                }
-                
-                // Creates a hidden container attached to the document body so html2pdf can physically "see" it
-                let reportContainer = document.createElement('div');
-                reportContainer.style.padding = '20px';
-                reportContainer.style.backgroundColor = 'white';
-                reportContainer.style.color = 'black';
-                reportContainer.style.width = '1000px'; 
-                reportContainer.style.position = 'absolute';
-                reportContainer.style.left = '-9999px'; // Hides it off-screen!
-                reportContainer.style.top = '0';
-
-                let html = `
-                    <h1 style="text-align:center; color:#007aff; margin-bottom:5px; font-family: sans-serif;">Baba Store - Monthly Sales Report</h1>
-                    <p style="text-align:center; margin-top:0; font-family: sans-serif;">Generated on: ${new Date().toLocaleDateString()}</p>
-                    <table style="width:100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; font-family: sans-serif;">
-                        <tr style="background:#f2f2f7; text-align:left;">
-                            <th style="padding:10px; border:1px solid #ddd;">Date</th>
-                            <th style="padding:10px; border:1px solid #ddd;">Customer</th>
-                            <th style="padding:10px; border:1px solid #ddd;">Loading (₹)</th>
-                            <th style="padding:10px; border:1px solid #ddd;">Unload (₹)</th>
-                            <th style="padding:10px; border:1px solid #ddd;">Grand Total</th>
-                        </tr>
-                `;
-                
-                let totalRevenue = 0; let totalBagsSold = 0;
-
-                allOrders.sort((a,b) => new Date(a.filterDate) - new Date(b.filterDate)).forEach(o => {
-                    totalRevenue += o.billTotal; totalBagsSold += o.totalBags;
-                    html += `
-                        <tr>
-                            <td style="padding:10px; border:1px solid #ddd;">${o.displayDate}</td>
-                            <td style="padding:10px; border:1px solid #ddd;">${o.customerName}</td>
-                            <td style="padding:10px; border:1px solid #ddd;">₹${(o.loadTotal || 0).toFixed(2)}</td>
-                            <td style="padding:10px; border:1px solid #ddd;">₹${(o.unloadTotal || 0).toFixed(2)}</td>
-                            <td style="padding:10px; border:1px solid #ddd; font-weight:bold;">₹${o.billTotal.toFixed(2)}</td>
-                        </tr>
-                    `;
-                });
-
-                html += `
-                    </table>
-                    <div style="margin-top:20px; padding: 15px; background: #eef7ff; border:1px solid #bce0fd; border-radius: 8px; font-family: sans-serif;">
-                        <h3 style="margin:0;">Total Bags Sold: ${totalBagsSold}</h3>
-                        <h2 style="margin:5px 0 0 0; color:#007aff;">Total Revenue: ₹${totalRevenue.toFixed(2)}</h2>
-                    </div>
-                `;
-
-                reportContainer.innerHTML = html;
-                document.body.appendChild(reportContainer); // Add to DOM so html2pdf works correctly
-
-                const opt = {
-                    margin:       0.5,
-                    filename:     `BabaStore_Monthly_Sales_${new Date().toISOString().split('T')[0]}.pdf`,
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true },
-                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
-                };
-
-                html2pdf().set(opt).from(reportContainer).save().then(() => {
-                    btn.innerText = "🖨️ Download Monthly PDF";
-                    document.body.removeChild(reportContainer); // Clean up
-                    closeModals();
-                }).catch(err => {
-                    alert("Error generating PDF. Check internet connection.");
-                    document.body.removeChild(reportContainer);
-                    btn.innerText = "🖨️ Download Monthly PDF";
-                });
-            };
-        }
 
         function exportData() {
             triggerHaptic();
@@ -677,6 +599,21 @@
                     let cardClass = "order-card " + (order.isDelivered ? "delivered" : (isOverdue ? "overdue" : ""));
                     let overdueHtml = isOverdue ? `<span class="overdue-text">⚠️ Over 12 hours pending!</span>` : '';
 
+                    // --- UPDATED: RENDER LOCKED STATE FOR DELIVERED ITEMS ---
+                    let deliveryToggleHtml = order.isDelivered 
+                        ? `<div class="delivery-toggle" onclick="event.stopPropagation()">
+                            <span style="font-weight:800; font-size:15px; color:var(--success)">
+                                ✓ Delivered (Locked)
+                            </span>
+                            <input type="checkbox" class="chk-box" checked disabled style="opacity: 0.5;">
+                           </div>`
+                        : `<div class="delivery-toggle" onclick="event.stopPropagation()">
+                            <span style="font-weight:800; font-size:15px; color:var(--danger)">
+                                Un Delivered
+                            </span>
+                            <input type="checkbox" class="chk-box" onchange="toggleDelivery(${order.id}, this.checked)">
+                           </div>`;
+
                     log.innerHTML += `
                         <div class="swipe-container">
                             <div class="${cardClass}" onclick="viewBill(${order.id})">
@@ -689,12 +626,7 @@
                                 </div>
                                 <div style="font-size:13px; color:#666; font-weight:500;">Tap card to open Bill / Send WhatsApp...</div>
                                 ${overdueHtml}
-                                <div class="delivery-toggle" onclick="event.stopPropagation()">
-                                    <span style="font-weight:800; font-size:15px; color:${order.isDelivered?'var(--success)':'var(--danger)'}">
-                                        ${order.isDelivered ? "✓ Delivered" : "Un Delivered"}
-                                    </span>
-                                    <input type="checkbox" class="chk-box" onchange="toggleDelivery(${order.id}, this.checked)" ${order.isDelivered ? 'checked' : ''}>
-                                </div>
+                                ${deliveryToggleHtml}
                             </div>
                             <div class="swipe-actions">
                                 <button class="action-btn btn-edit" onclick="editOrder(${order.id})"><span style="font-size:20px;">✏️</span> Edit</button>
