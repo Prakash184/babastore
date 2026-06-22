@@ -21,6 +21,7 @@
             --card-bg: #ffffff;
             --text-main: #1c1c1e;
             --text-muted: #8e8e93;
+            --border-color: #e5e5ea;
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -28,33 +29,20 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--background);
-            margin: 0;
-            padding: 0;
-            color: var(--text-main);
-            padding-bottom: 40px;
+            margin: 0; padding: 0; color: var(--text-main); padding-bottom: 50px;
         }
 
         .header {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            padding: 16px;
-            text-align: center;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 100; padding: 16px; text-align: center;
+            border-bottom: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 10px rgba(0,0,0,0.02);
         }
-        .header h1 { margin: 0; font-size: 22px; font-weight: 700; color: var(--primary); }
+        .header h1 { margin: 0; font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px;}
 
         .container { padding: 16px; max-width: 600px; margin: 0 auto; }
 
         .section {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 24px;
+            background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 24px;
             box-shadow: 0 4px 14px rgba(0,0,0,0.05);
         }
         
@@ -63,27 +51,34 @@
             margin-top: 0; margin-bottom: 16px; border-bottom: 2px solid var(--background); padding-bottom: 8px;
         }
 
-        .input-group { margin-bottom: 16px; }
-        label { display: block; font-size: 13px; margin-bottom: 6px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
-        input[type="text"], input[type="date"] {
-            width: 100%; padding: 14px; border: 1.5px solid #e5e5ea; border-radius: 12px; 
+        /* Fixed Mobile Inputs */
+        .input-group { margin-bottom: 16px; width: 100%; }
+        label { display: block; font-size: 13px; margin-bottom: 6px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;}
+        
+        input[type="text"], input[type="date"], input[type="number"] {
+            -webkit-appearance: none; /* Fixes iOS native styling bugs */
+            width: 100%; padding: 14px; border: 1.5px solid var(--border-color); border-radius: 12px; 
             font-size: 16px; background-color: #fafafa; transition: border 0.3s;
+            display: block; box-sizing: border-box; font-family: inherit;
         }
-        input[type="text"]:focus, input[type="date"]:focus {
+        input[type="text"]:focus, input[type="date"]:focus, input[type="number"]:focus {
             border-color: var(--primary); outline: none; background-color: #fff;
         }
 
-        .product-row {
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 14px 0; border-bottom: 1px solid #f2f2f7;
-        }
+        /* Product List Grid */
+        .product-list { max-height: 450px; overflow-y: auto; padding-right: 5px; }
+        .product-row { padding: 16px 0; border-bottom: 1px solid var(--border-color); }
         .product-row:last-child { border-bottom: none; }
-        .product-name { font-size: 16px; font-weight: 500; }
+        .product-name { font-size: 16px; font-weight: 600; margin-bottom: 10px; display: block; color: #333;}
         
-        .stepper { 
-            display: flex; align-items: center; gap: 16px; 
-            background: var(--background); border-radius: 20px; padding: 4px;
-        }
+        .controls-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        
+        .rate-box { display: flex; align-items: center; background: #f9f9f9; border-radius: 10px; border: 1px solid var(--border-color); padding: 0 10px; width: 110px;}
+        .rate-box span { color: var(--text-muted); font-weight: 600; }
+        .rate-box input { border: none; background: transparent; padding: 10px 5px; width: 100%; font-size: 16px; font-weight: 600; color: var(--primary); }
+        .rate-box input:focus { outline: none; border: none; }
+
+        .stepper { display: flex; align-items: center; gap: 12px; background: var(--background); border-radius: 20px; padding: 4px; }
         .btn-step {
             width: 36px; height: 36px; border-radius: 18px; border: none;
             background: var(--card-bg); color: var(--primary); font-size: 22px; 
@@ -93,46 +88,58 @@
         .btn-step:active { transform: scale(0.95); background: #e5e5ea; }
         .qty-val { font-size: 18px; font-weight: 700; min-width: 24px; text-align: center; }
 
+        .item-total { font-size: 15px; font-weight: 700; color: var(--text-muted); width: 80px; text-align: right;}
+
+        /* Billing Summary */
+        .bill-summary { background: #eef7ff; padding: 16px; border-radius: 12px; margin-top: 20px; text-align: right; }
+        .bill-summary span { font-size: 16px; color: var(--text-muted); font-weight: 600; }
+        .bill-summary .grand-total { font-size: 24px; font-weight: 800; color: var(--primary); margin-left: 10px; display: inline-block; }
+
         .btn-submit {
             width: 100%; background-color: var(--primary); color: white; border: none; 
             padding: 16px; border-radius: 14px; font-size: 18px; font-weight: bold; 
-            cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            cursor: pointer; margin-top: 15px; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
             transition: transform 0.2s;
         }
         .btn-submit:active { transform: scale(0.98); background-color: var(--primary-hover); }
 
+        /* Filter Section */
+        .filter-box { display: flex; gap: 10px; margin-bottom: 15px; align-items: flex-end;}
+        .filter-box .input-group { margin-bottom: 0; flex: 1; }
+        .btn-clear { background: #e5e5ea; color: var(--text-main); border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 14px; white-space: nowrap; height: 50px; }
+
+        /* Order Cards */
         .order-card {
             background: var(--card-bg); border-radius: 14px; padding: 16px; margin-bottom: 12px; 
-            display: flex; justify-content: space-between; align-items: center; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 6px solid #ffcc00;
             transition: all 0.3s ease;
         }
         
-        .order-card.overdue {
-            border-left-color: var(--danger);
-            background-color: var(--danger-bg);
-        }
+        .order-card.overdue { border-left-color: var(--danger); background-color: var(--danger-bg); }
+        .order-card.delivered { border-left-color: var(--success); opacity: 0.7; background-color: #f9f9f9; }
         
-        .order-card.delivered { 
-            border-left-color: var(--success); opacity: 0.6; background-color: #f9f9f9;
-        }
+        .order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; border-bottom: 1px solid #f2f2f7; padding-bottom: 10px;}
+        .customer-name { font-size: 18px; font-weight: 700; color: var(--text-main); margin: 0;}
+        .order-bill { font-size: 18px; font-weight: 800; color: var(--primary); margin: 0; }
         
-        .order-details p { margin: 4px 0; }
-        .customer-name { font-size: 17px; font-weight: 700; color: var(--text-main); }
-        .customer-meta { font-size: 14px; color: var(--text-muted); font-weight: 500; }
-        .order-items { font-size: 13px; font-weight: 500; color: var(--primary); margin-top: 8px !important; line-height: 1.4;}
-        .overdue-text { color: var(--danger); font-size: 12px; font-weight: bold; display: none; margin-top: 4px;}
+        .customer-meta { font-size: 13px; color: var(--text-muted); font-weight: 500; margin: 4px 0; }
+        .order-items { font-size: 14px; font-weight: 500; color: #444; margin-top: 8px !important; line-height: 1.5; background: #f9f9f9; padding: 8px; border-radius: 8px;}
+        
+        .overdue-text { color: var(--danger); font-size: 12px; font-weight: bold; display: none; margin-top: 8px;}
         .order-card.overdue .overdue-text { display: block; }
 
-        .chk-box { 
-            width: 32px; height: 32px; accent-color: var(--success); cursor: pointer; 
-            transform: scale(1.2);
-        }
+        /* Delivery Toggle */
+        .delivery-toggle { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f2f2f7;}
+        .status-text { font-size: 15px; font-weight: 700; }
+        .status-undelivered { color: var(--danger); }
+        .status-delivered { color: var(--success); }
+        
+        .chk-box { width: 28px; height: 28px; accent-color: var(--success); cursor: pointer; }
 
         .btn-notify {
-            background: #ffeceb; color: var(--danger); border: none; padding: 10px; 
-            border-radius: 8px; width: 100%; font-weight: bold; margin-bottom: 16px;
-            display: none; cursor: pointer;
+            background: #ffeceb; color: var(--danger); border: none; padding: 12px; 
+            border-radius: 12px; width: 100%; font-weight: bold; margin-bottom: 16px;
+            display: none; font-size: 15px;
         }
     </style>
 </head>
@@ -148,51 +155,90 @@
         </button>
 
         <div class="section">
-            <h2 class="section-title">Customer Details</h2>
+            <h2 class="section-title">New Order</h2>
             <div class="input-group">
-                <label>Delivery Date</label>
+                <label>Order Date</label>
                 <input type="date" id="orderDate">
             </div>
             <div class="input-group">
                 <label>Customer Name</label>
-                <input type="text" id="custName" placeholder="e.g. Raman Jha">
+                <input type="text" id="custName" placeholder="Enter Customer Name.....">
             </div>
             <div class="input-group">
                 <label>Address / Location</label>
-                <input type="text" id="custAddress" placeholder="e.g. Enter Address.....">
+                <input type="text" id="custAddress" placeholder="Enter Address.....">
             </div>
         </div>
 
         <div class="section">
-            <h2 class="section-title">Select Items</h2>
-            <div id="productList"></div>
-            <button class="btn-submit" onclick="submitOrder()">Save Order</button>
+            <h2 class="section-title">Products & Billing</h2>
+            <div class="product-list" id="productList">
+                </div>
+            
+            <div class="bill-summary">
+                <span>Grand Total:</span>
+                <div class="grand-total" id="displayGrandTotal">₹0.00</div>
+            </div>
+
+            <button class="btn-submit" onclick="submitOrder()">Save Complete Order</button>
         </div>
 
-        <h2 style="font-size: 20px; font-weight: 700; margin-left: 5px;">Delivery Board</h2>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
+            <h2 style="font-size: 20px; font-weight: 800; margin: 0; margin-left: 5px;">Delivery Board</h2>
+        </div>
+        
+        <div class="filter-box">
+            <div class="input-group">
+                <label>Filter by Date</label>
+                <input type="date" id="filterDate" onchange="renderOrders()">
+            </div>
+            <button class="btn-clear" onclick="clearFilter()">Show All</button>
+        </div>
+
         <div id="orderLog"></div>
     </div>
 
     <script>
+        // Updated Master Product List
         const products = [
-            "Kapila pasu aahar", "Kashyap pasu aahar", "Choker", "Maida", "Shujji", "Darra", "Corn darra","Milk More","Doodh Virdi","Bi-Pro","Kishan Pasu Aahar"
+            "Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar",
+            "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Shujji", "Sujji 47 Kg", "Sujji 48 Kg",
+            "Darra", "Corn Darra", "Milk More", "Doodh Virdi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"
         ];
-        let currentQuantities = {};
+        
+        let currentItems = {};
         let db;
-        let notifiedOrders = new Set(); // Prevents spamming notifications
+        let notifiedOrders = new Set(); 
+
+        // Generates safe IDs without spaces
+        function safeId(str) { return str.replace(/[^a-zA-Z0-9]/g, ''); }
 
         function initApp() {
-            document.getElementById('orderDate').valueAsDate = new Date();
+            // Set default dates to today
+            let today = new Date().toISOString().split('T')[0];
+            document.getElementById('orderDate').value = today;
+            document.getElementById('filterDate').value = today;
+
             const container = document.getElementById('productList');
+            
             products.forEach(p => {
-                currentQuantities[p] = 0;
+                currentItems[p] = { qty: 0, rate: "" };
+                let sId = safeId(p);
+                
                 container.innerHTML += `
                     <div class="product-row">
                         <span class="product-name">${p}</span>
-                        <div class="stepper">
-                            <button class="btn-step" onclick="updateQty('${p}', -1)">-</button>
-                            <span class="qty-val" id="qty-${btoa(p)}">0</span>
-                            <button class="btn-step" onclick="updateQty('${p}', 1)">+</button>
+                        <div class="controls-row">
+                            <div class="rate-box">
+                                <span>₹</span>
+                                <input type="number" inputmode="decimal" id="rate-${sId}" placeholder="Rate" oninput="calculateItem('${p}')">
+                            </div>
+                            <div class="stepper">
+                                <button class="btn-step" onclick="updateQty('${p}', -1)">-</button>
+                                <span class="qty-val" id="qty-${sId}">0</span>
+                                <button class="btn-step" onclick="updateQty('${p}', 1)">+</button>
+                            </div>
+                            <div class="item-total" id="total-${sId}">₹0</div>
                         </div>
                     </div>`;
             });
@@ -200,84 +246,109 @@
             checkNotificationStatus();
         }
 
+        // Calculation Logic
         function updateQty(product, change) {
-            currentQuantities[product] = Math.max(0, currentQuantities[product] + change);
-            document.getElementById(`qty-${btoa(product)}`).innerText = currentQuantities[product];
+            currentItems[product].qty = Math.max(0, currentItems[product].qty + change);
+            document.getElementById(`qty-${safeId(product)}`).innerText = currentItems[product].qty;
+            calculateItem(product);
         }
 
+        function calculateItem(product) {
+            let sId = safeId(product);
+            let rateInput = document.getElementById(`rate-${sId}`).value;
+            let rate = rateInput === "" ? 0 : parseFloat(rateInput);
+            
+            currentItems[product].rate = rate;
+            let total = currentItems[product].qty * rate;
+            
+            document.getElementById(`total-${sId}`).innerText = `₹${total.toFixed(0)}`;
+            calculateGrandTotal();
+        }
+
+        function calculateGrandTotal() {
+            let grandTotal = 0;
+            products.forEach(p => {
+                let r = currentItems[p].rate === "" ? 0 : parseFloat(currentItems[p].rate);
+                grandTotal += (currentItems[p].qty * r);
+            });
+            document.getElementById('displayGrandTotal').innerText = `₹${grandTotal.toFixed(2)}`;
+            return grandTotal;
+        }
+
+        // Database & Rendering
         function initDatabase() {
-            let request = indexedDB.open("BabaStoreDB", 1);
+            let request = indexedDB.open("BabaStoreDB", 2); // Version bump for new data structure
             request.onupgradeneeded = e => {
                 db = e.target.result;
-                db.createObjectStore("orders", { keyPath: "id", autoIncrement: true });
+                if (!db.objectStoreNames.contains("orders")) {
+                    db.createObjectStore("orders", { keyPath: "id", autoIncrement: true });
+                }
             };
             request.onsuccess = e => { db = e.target.result; renderOrders(); };
         }
 
-        function checkNotificationStatus() {
-            if ("Notification" in window && Notification.permission !== "granted") {
-                document.getElementById("notifyBtn").style.display = "block";
-            }
+        function clearFilter() {
+            document.getElementById('filterDate').value = '';
+            renderOrders();
         }
-
-        function requestNotificationPermission() {
-            if ("Notification" in window) {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        document.getElementById("notifyBtn").style.display = "none";
-                        alert("Reminders activated! You will be alerted for orders older than 30 seconds.");
-                    }
-                });
-            }
-        }
-
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === 'visible' && db) {
-                renderOrders(); 
-            }
-        });
 
         function submitOrder() {
             const name = document.getElementById('custName').value.trim();
             const address = document.getElementById('custAddress').value.trim();
-            const date = document.getElementById('orderDate').value;
+            const rawDate = document.getElementById('orderDate').value;
             
             if (!name) return alert("Please enter a customer name.");
 
             let orderItems = {};
-            let totalItems = 0;
+            let totalItemsCount = 0;
+            
             products.forEach(p => { 
-                if(currentQuantities[p] > 0) {
-                    orderItems[p] = currentQuantities[p]; 
-                    totalItems++;
+                if(currentItems[p].qty > 0) {
+                    orderItems[p] = {
+                        qty: currentItems[p].qty,
+                        rate: currentItems[p].rate || 0,
+                        total: currentItems[p].qty * (currentItems[p].rate || 0)
+                    };
+                    totalItemsCount++;
                 }
             });
 
-            if (totalItems === 0) return alert("Please add at least 1 product quantity.");
+            if (totalItemsCount === 0) return alert("Please add at least 1 product quantity.");
+
+            let grandTotal = calculateGrandTotal();
 
             let transaction = db.transaction(["orders"], "readwrite");
             let store = transaction.objectStore("orders");
             
-            // Format the date for better reading (e.g. 2024-05-12)
-            let formattedDate = new Date(date).toLocaleDateString('en-GB');
+            // Reformat date for reading (e.g. 12/05/2026)
+            let dateObj = new Date(rawDate);
+            let formattedDate = `${dateObj.getDate()}/${dateObj.getMonth()+1}/${dateObj.getFullYear()}`;
 
             let newOrder = {
                 customerName: name,
                 address: address,
-                deliveryDate: formattedDate, // Saving formatted date
+                filterDate: rawDate, // YYYY-MM-DD for accurate filtering
+                displayDate: formattedDate,
                 timestamp: Date.now(),
                 isDelivered: false,
-                items: orderItems
+                items: orderItems,
+                billTotal: grandTotal
             };
 
             store.add(newOrder).onsuccess = () => {
+                // Reset form completely
                 document.getElementById('custName').value = "";
                 document.getElementById('custAddress').value = "";
-                products.forEach(p => { currentQuantities[p] = 0; document.getElementById(`qty-${btoa(p)}`).innerText = 0; });
+                products.forEach(p => { 
+                    currentItems[p].qty = 0; 
+                    currentItems[p].rate = "";
+                    let sId = safeId(p);
+                    document.getElementById(`qty-${sId}`).innerText = 0; 
+                    document.getElementById(`rate-${sId}`).value = ""; 
+                    document.getElementById(`total-${sId}`).innerText = "₹0"; 
+                });
+                calculateGrandTotal();
                 renderOrders();
-                
-                // TEST MODE TIMER: 30,000 milliseconds (30 seconds)
-                setTimeout(() => { renderOrders(); }, 30000); 
             };
         }
 
@@ -303,54 +374,92 @@
                 const log = document.getElementById('orderLog');
                 log.innerHTML = "";
                 
-                let sortedOrders = request.result.sort((a,b) => b.timestamp - a.timestamp);
+                let selectedFilterDate = document.getElementById('filterDate').value;
+                let allOrders = request.result;
+
+                // Apply Date Filter
+                if (selectedFilterDate) {
+                    allOrders = allOrders.filter(o => o.filterDate === selectedFilterDate);
+                }
+                
+                let sortedOrders = allOrders.sort((a,b) => b.timestamp - a.timestamp);
                 let now = Date.now();
                 
-                // TEST MODE LIMIT: 30,000 milliseconds (30 seconds)
-                let timeLimit = 30000; 
+                // --- 12 HOUR TIMER (43,200,000 milliseconds) ---
+                let timeLimit = 43200000; 
+
+                if (sortedOrders.length === 0) {
+                    log.innerHTML = "<p style='text-align:center; color:#8e8e93; font-weight:bold; margin-top:30px;'>No orders found for this date.</p>";
+                    return;
+                }
 
                 sortedOrders.forEach(order => {
-                    let itemsSummary = Object.entries(order.items).map(([p, q]) => `${q}x ${p}`).join(", ");
+                    // Generate Item List with math
+                    let itemsHtml = Object.entries(order.items).map(([p, details]) => {
+                        return `<div><b>${details.qty}x</b> ${p} @ ₹${details.rate} = <b>₹${details.total}</b></div>`;
+                    }).join("");
                     
                     let isOverdue = false;
                     if (!order.isDelivered && (now - order.timestamp) > timeLimit) {
                         isOverdue = true;
-                        
-                        // SAFE NOTIFICATION WRAPPER to prevent iPhone crashes
                         try {
                             if ("Notification" in window && Notification.permission === "granted" && document.visibilityState === 'visible' && !notifiedOrders.has(order.id)) {
-                                new Notification("⚠️ Late Delivery!", {
-                                    body: `${order.customerName}'s order is over 30 seconds late!`,
-                                });
-                                notifiedOrders.add(order.id); // Mark as notified so it doesn't beep 100 times
+                                new Notification("⚠️ Late Delivery!", { body: `${order.customerName}'s order is over 12 hours late!` });
+                                notifiedOrders.add(order.id); 
                             }
-                        } catch (error) {
-                            console.log("iPhone blocked the background notification, but app will not crash.");
-                        }
+                        } catch (e) { console.log("Notification prevented by OS"); }
                     }
 
                     let cardClass = "order-card";
                     if (order.isDelivered) cardClass += " delivered";
                     else if (isOverdue) cardClass += " overdue";
 
-                    // Displaying Date alongside Address
-                    let addressDisplay = order.address ? order.address : 'No Address';
+                    let statusText = order.isDelivered ? "Delivered ✓" : "Un Delivered";
+                    let statusClass = order.isDelivered ? "status-delivered" : "status-undelivered";
 
                     log.innerHTML += `
                         <div class="${cardClass}">
-                            <div class="order-details">
-                                <p class="customer-name">${order.customerName}</p>
-                                <p class="customer-meta">📅 ${order.deliveryDate} • ${addressDisplay}</p>
-                                <p class="order-items">${itemsSummary}</p>
-                                <p class="overdue-text">⚠️ Over 30 seconds pending!</p>
+                            <div class="order-header">
+                                <div>
+                                    <p class="customer-name">${order.customerName}</p>
+                                    <p class="customer-meta">📅 ${order.displayDate} • ${order.address || 'No Address'}</p>
+                                </div>
+                                <p class="order-bill">₹${order.billTotal ? order.billTotal.toFixed(2) : '0.00'}</p>
                             </div>
-                            <div>
+                            
+                            <div class="order-items">${itemsHtml}</div>
+                            <p class="overdue-text">⚠️ Over 12 hours pending!</p>
+                            
+                            <div class="delivery-toggle">
+                                <span class="status-text ${statusClass}">${statusText}</span>
                                 <input type="checkbox" class="chk-box" onchange="toggleDelivery(${order.id}, this.checked)" ${order.isDelivered ? 'checked' : ''}>
                             </div>
                         </div>`;
                 });
             };
         }
+
+        // Notifications
+        function checkNotificationStatus() {
+            if ("Notification" in window && Notification.permission !== "granted") {
+                document.getElementById("notifyBtn").style.display = "block";
+            }
+        }
+
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        document.getElementById("notifyBtn").style.display = "none";
+                        alert("Reminders activated for 12 hours.");
+                    }
+                });
+            }
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'visible' && db) renderOrders(); 
+        });
 
         window.onload = initApp;
     </script>
