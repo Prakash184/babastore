@@ -9,8 +9,7 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<meta name="apple-mobile-web-app-title" content="Baba Store">
 	
-	<!-- PDF Generator Library added here -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 	<style>
 	:root {
@@ -494,8 +493,8 @@
 		padding: 4px 8px;
 		border-radius: 6px;
 	}
+
 	/* MODALS */
-	
 	.modal {
 		display: none;
 		position: fixed;
@@ -562,8 +561,8 @@
 		color: black;
 		margin-top: 15px;
 	}
+
 	/* CUSTOM TOAST NOTIFICATIONS */
-	
 	#toastContainer {
 		position: fixed;
 		top: 20px;
@@ -625,8 +624,8 @@
 			transform: translateY(-20px);
 		}
 	}
+
 	/* CUSTOM CONFIRM MODAL */
-	
 	.confirm-modal-content {
 		text-align: center;
 		padding: 30px 24px;
@@ -676,64 +675,10 @@
 	.btn-confirm-danger {
 		background: var(--danger);
 	}
-	/* =============================================
-    
-               PRINT STYLES - KEY FIX FOR URL HIDING
-    
-               ============================================= */
-	
-	#printArea {
-		display: none;
-	}
-	
-	@media print {
-		/* 
-    
-                 * FIX: Use margin: 15mm (not 0mm).
-    
-                 * With 0mm, Chrome/Safari still show URL because they add it
-    
-                 * inside the margin area. With a proper margin, the browser
-    
-                 * renders the URL in that space BUT we hide it via the
-    
-                 * page content overflow. The real fix is the combination below.
-    
-                 */
-		@page {
-			size: A4 portrait;
-			margin: 15mm 15mm 15mm 15mm;
-			/* These properties hide header/footer in supported browsers */
-			marks: none;
-		}
-		html,
-		body {
-			width: 100% !important;
-			margin: 0 !important;
-			padding: 0 !important;
-			background-color: #ffffff !important;
-			-webkit-print-color-adjust: exact !important;
-			print-color-adjust: exact !important;
-		}
-		/* Hide EVERYTHING on the page except our print area */
-		body > *:not(#printArea) {
-			display: none !important;
-			visibility: hidden !important;
-		}
-		#printArea {
-			display: block !important;
-			visibility: visible !important;
-			position: static !important;
-			width: 100% !important;
-			margin: 0 !important;
-			padding: 0 !important;
-		}
-	}
 	</style>
 </head>
 
 <body>
-	<div id="printArea"></div>
 	<div id="toastContainer"></div>
 	<div class="header no-print">
 		<h1>Baba Store</h1>
@@ -796,19 +741,18 @@
 		</div>
 		<div id="orderLog"></div>
 	</div>
-	<!-- INVOICE MODAL -->
+	
 	<div id="billModal" class="modal no-print">
 		<div class="modal-content">
 			<div id="modalBody" style="background: white; padding: 0;"></div>
 			<button class="modal-btn btn-whatsapp no-print" id="whatsappBtn">💬 Send on WhatsApp</button>
 			
-			<!-- CHANGED: Replaced window.print() with downloadBill() -->
-			<button class="modal-btn btn-print no-print" onclick="downloadBill()">🖨️ Download PDF</button>
+			<button class="modal-btn btn-print no-print" onclick="downloadBill()">🖨️ Print / Save PDF</button>
 			
 			<button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
 		</div>
 	</div>
-	<!-- SETTINGS MODAL -->
+	
 	<div id="settingsModal" class="modal no-print">
 		<div class="modal-content" style="text-align: center;">
 			<h2 style="margin-top:0; color:var(--primary); font-weight: 900;">Business Settings</h2>
@@ -822,7 +766,7 @@
 			<button class="modal-btn btn-close" onclick="closeModals()">Close Settings</button>
 		</div>
 	</div>
-	<!-- CUSTOM CONFIRM MODAL -->
+	
 	<div id="confirmModal" class="modal no-print" style="z-index: 3000;">
 		<div class="modal-content confirm-modal-content">
 			<div class="confirm-title" id="confirmTitle">Confirm Action</div>
@@ -833,12 +777,15 @@
 			</div>
 		</div>
 	</div>
+	
 	<script>
-	const products = ["Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar", "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Sujji", "Sujji 47 Kg", "Sujji 48 Kg", "Darra", "Milk More", "Doodh Virdi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"];
+	const products = ["Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar", "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Shujji", "Sujji 47 Kg", "Sujji 48 Kg", "Darra", "Milk More", "Doodh Virdi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"];
 	let currentItems = {};
 	let db;
 	let editingOrderId = null;
 	let customerMemory = {};
+    let currentBillFilename = "BabaStore_Bill.pdf";
+    let currentInvoiceHTML = "";
 
 	function safeId(str) {
 		return str.replace(/[^a-zA-Z0-9]/g, '');
@@ -1111,6 +1058,10 @@
 		triggerHaptic();
 		db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
 			let o = e.target.result;
+            
+            // Set dynamic filename based on customer
+            currentBillFilename = `BabaStore_Invoice_${o.customerName.replace(/ /g, "_")}.pdf`;
+
 			let whatsappText = `*BABA STORE INVOICE*\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
 			let itemsHtml = "";
 			for(let p in o.items) {
@@ -1126,25 +1077,25 @@
 			if(o.loadTotal > 0) whatsappText += `Loading (${o.totalBags}x): ₹${o.loadTotal?.toFixed(2)}\n`;
 			if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
 			whatsappText += `*GRAND TOTAL: ₹${o.billTotal?.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
-			document.getElementById('whatsappBtn').onclick = () => {
+			
+            document.getElementById('whatsappBtn').onclick = () => {
 				triggerHaptic();
 				window.location.href = `whatsapp://send?text=${encodeURIComponent(whatsappText)}`;
 			};
+
 			let loadSub = o.loadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.loadRate} × ${o.totalBags} bags)</span>` : "";
 			let unloadSub = o.unloadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.unloadRate} × ${o.totalBags} bags)</span>` : "";
 			
 			// ============================================================
-			// CHANGED: Added id="bill" to the main wrapper here
+			// HTML FOR MODAL AND PDF GENERATOR
 			// ============================================================
 			let html = `
-    <div id="bill" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; padding: 20px;">
-    <!-- Store Header -->
-    <div style="text-align: center; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1.5px solid #e0e0e0;">
+    <div id="bill" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; padding: 20px; box-sizing: border-box;">
+        <div style="text-align: center; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1.5px solid #e0e0e0;">
     <h1 style="margin: 0 0 2px 0; font-size: 22px; color: #000; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">BABA STORE</h1>
     <p style="margin: 0; font-size: 11px; color: #999; font-weight: 600; letter-spacing: 0.5px;">INVOICE</p>
     </div>
-    <!-- Customer Info -->
-    <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #ebebeb;">
+        <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #ebebeb;">
     <table style="width:100%; font-size:13px; border-collapse:collapse;">
     <tr>
     <td style="padding: 3px 0; color:#777; font-weight:700; width:70px;">Customer</td>
@@ -1160,8 +1111,7 @@
     </tr>
     </table>
     </div>
-    <!-- Products Table -->
-    <table style="width:100%; border-collapse:collapse; margin-bottom: 16px;">
+        <table style="width:100%; border-collapse:collapse; margin-bottom: 16px;">
     <thead>
     <tr style="border-bottom: 2px solid #e0e0e0;">
     <th style="text-align:left; color:#999; text-transform:uppercase; font-size:10px; padding-bottom:8px; font-weight:800; letter-spacing:0.5px;">Item</th>
@@ -1175,8 +1125,7 @@
                                     ${itemsHtml}
     </tbody>
     </table>
-    <!-- Totals Section -->
-    <div style="border-top: 1px solid #e0e0e0; padding-top: 12px;">
+        <div style="border-top: 1px solid #e0e0e0; padding-top: 12px;">
     <div style="display:flex; justify-content:space-between; margin-bottom:7px; font-size:13px; font-weight:600; color:#444;">
     <span>Products Total</span>
     <span>₹${o.itemsTotal?.toFixed(2) || '0.00'}</span>
@@ -1189,21 +1138,22 @@
     <span>Unloading${unloadSub}</span>
     <span>₹${o.unloadTotal?.toFixed(2) || '0.00'}</span>
     </div>
-    <!-- Grand Total -->
-    <div style="border-top: 2px dashed #ccc; padding-top: 12px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="border-top: 2px dashed #ccc; padding-top: 12px; display:flex; justify-content:space-between; align-items:center;">
     <span style="font-size:18px; font-weight:900; color:#007aff;">Grand Total</span>
     <span style="font-size:20px; font-weight:900; color:#007aff;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
     </div>
     </div>
-    <!-- Footer -->
-    <div style="margin-top: 20px; padding-top: 12px; border-top: 1px dashed #ddd; text-align:center;">
+        <div style="margin-top: 20px; padding-top: 12px; border-top: 1px dashed #ddd; text-align:center;">
     <p style="margin:0; font-size:10px; color:#ccc; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;">Thank you for shopping at Baba Store</p>
     </div>
     </div>
     
                     `;
+            
+            // Save clean HTML for the PDF generator
+            currentInvoiceHTML = html;
+
 			document.getElementById('modalBody').innerHTML = html;
-			document.getElementById('printArea').innerHTML = html;
 			document.getElementById('billModal').style.display = 'flex';
 		};
 	}
@@ -1215,24 +1165,40 @@
 		triggerHaptic();
 		const btn = document.querySelector('.btn-print');
 		const originalText = btn.innerText;
-		btn.innerText = "⏳ Generating PDF...";
+		btn.innerText = "⏳ Generating...";
 
-		const element = document.getElementById('bill');
+        // Clone the content into a temporary hidden wrapper so html2canvas can read it properly
+        const pdfWrapper = document.createElement('div');
+        pdfWrapper.innerHTML = currentInvoiceHTML; 
+        
+        // STYLING HACK: Keep it on screen so the browser paints it, 
+        // but hide it behind the dark modal overlay using z-index
+        pdfWrapper.style.position = 'absolute';
+        pdfWrapper.style.top = '0';
+        pdfWrapper.style.left = '0';
+        pdfWrapper.style.width = '800px'; 
+        pdfWrapper.style.backgroundColor = 'white';
+        pdfWrapper.style.zIndex = '-1000'; 
+        document.body.appendChild(pdfWrapper);
 
-		html2pdf().set({
-			margin: 10,
-			filename: 'Baba_Store_Bill.pdf',
-			image: { type: 'jpeg', quality: 1 },
-			html2canvas: { scale: 2, useCORS: true },
-			jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-		}).from(element).save().then(() => {
-			btn.innerText = originalText;
-			showToast("PDF Downloaded!", "success");
-		}).catch(err => {
-			console.error(err);
-			btn.innerText = originalText;
-			showToast("Error generating PDF.", "error");
-		});
+        const opt = {
+            margin:       10, 
+            filename:     currentBillFilename,
+            image:        { type: 'jpeg', quality: 1 },
+            html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(pdfWrapper).save().then(() => {
+            btn.innerText = "🖨️ Print / Save PDF";
+            document.body.removeChild(pdfWrapper); 
+            showToast("PDF Downloaded!", "success");
+        }).catch(err => {
+            console.error(err);
+            btn.innerText = "🖨️ Print / Save PDF";
+            if (document.body.contains(pdfWrapper)) document.body.removeChild(pdfWrapper);
+            showToast("Error generating PDF.", "error");
+        });
 	}
 
 	function openSettings() {
@@ -1244,6 +1210,7 @@
 		triggerHaptic();
 		document.getElementById('billModal').style.display = 'none';
 		document.getElementById('settingsModal').style.display = 'none';
+		document.getElementById('confirmModal').style.display = 'none';
 	}
 
 	function exportData() {
@@ -1263,20 +1230,24 @@
 	function importData() {
 		triggerHaptic();
 		let file = document.getElementById('backupFile').files[0];
-		if(!file) return showToast("Please select a backup file first.", "error");
+		if(!file) return showToast("Please select a backup file.", "error");
 		let reader = new FileReader();
-		reader.onload = (e) => {
+		reader.onload = e => {
 			try {
 				let data = JSON.parse(e.target.result);
-				let store = db.transaction(["orders"], "readwrite").objectStore("orders");
-				store.clear().onsuccess = () => {
-					data.forEach(order => store.add(order));
-					showToast("Data Restored Successfully!", "success");
+				if(!Array.isArray(data.orders)) throw new Error("Invalid backup format");
+				let tx = db.transaction("orders", "readwrite");
+				let store = tx.objectStore("orders");
+				store.clear();
+				data.orders.forEach(order => store.add(order));
+				tx.oncomplete = () => {
+					showToast("Data restored successfully!", "success");
+					document.getElementById('backupFile').value = '';
 					closeModals();
 					renderOrders();
 				};
 			} catch(err) {
-				showToast("Invalid Backup File!", "error");
+				showToast("Error reading backup file: " + err.message, "error");
 			}
 		};
 		reader.readAsText(file);
@@ -1293,7 +1264,7 @@
 			});
 			document.getElementById('customerNamesList').innerHTML = Object.keys(customerMemory).map(n => `<option value="${n}">`).join("");
 			let selectedFilter = document.getElementById('filterDate').value;
-			let searchQuery = document.getElementById('searchName').value.toLowerCase();
+			let searchQuery = document.getElementById('searchName').value.toLowerCase().trim();
 			if(selectedFilter) allOrders = allOrders.filter(o => o.filterDate === selectedFilter);
 			if(searchQuery) allOrders = allOrders.filter(o => o.customerName.toLowerCase().includes(searchQuery));
 			if(selectedFilter && !searchQuery && allOrders.length > 0) {
