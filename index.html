@@ -34,10 +34,7 @@
 
         .container { padding: 16px; max-width: 600px; margin: 0 auto; }
 
-        .section {
-            background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-        }
-        
+        .section { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
         .section-title { font-weight: 700; font-size: 18px; margin-top: 0; margin-bottom: 16px; border-bottom: 2px solid var(--background); padding-bottom: 8px;}
 
         .input-group { margin-bottom: 16px; width: 100%; }
@@ -96,12 +93,12 @@
         
         .delivery-toggle { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f2f2f7;}
         .chk-box { width: 28px; height: 28px; accent-color: var(--success); }
+        .overdue-text { color: var(--danger); font-size: 12px; font-weight: bold; margin-top: 8px;}
 
         /* Modal Bill */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; padding: 20px; align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 24px; border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;}
-        .modal-header { text-align: center; border-bottom: 2px dashed #ccc; padding-bottom: 15px; margin-bottom: 15px;}
-        .modal-header h2 { margin: 0; color: var(--primary); }
+        
         .modal-close { background: #e5e5ea; border: none; padding: 10px; border-radius: 8px; width: 100%; font-weight: bold; margin-top: 15px; cursor: pointer;}
         .modal-print { background: var(--success); color: white; border: none; padding: 14px; border-radius: 8px; width: 100%; font-weight: bold; margin-top: 10px; cursor: pointer; font-size: 16px;}
         .invoice-table { width: 100%; border-collapse: collapse; margin-top: 15px;}
@@ -109,14 +106,25 @@
         .invoice-table th { color: var(--text-muted); }
         .invoice-table td:last-child, .invoice-table th:last-child { text-align: right; }
 
-        /* Print Settings */
+        /* --- PERFECT PRINT SETTINGS --- */
         @media print {
-            body * { visibility: hidden; }
-            #billModal, #billModal * { visibility: visible; }
-            #billModal { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 0;}
-            .modal-content { box-shadow: none; max-width: 100%; }
-            .no-print { display: none !important; }
+            /* Removes the default browser URL and Page Number from top/bottom */
+            @page { margin: 0; size: auto; }
+            
+            /* Hides everything except the Bill itself */
+            body { background: white !important; margin: 0; padding: 0; }
+            .header, .container, .no-print { display: none !important; }
+            
+            /* Makes the Bill take up the full paper perfectly */
+            #billModal { display: block !important; position: static !important; background: white !important; height: auto !important; width: 100% !important; padding: 15mm 15mm !important; box-sizing: border-box;}
+            .modal-content { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; overflow: visible !important; padding: 0 !important;}
+            
+            /* Show Print-Only Elements (Headers/Footers) */
+            .print-only { display: block !important; }
         }
+        
+        .print-only { display: none; } /* Hidden on normal screen */
+        
     </style>
 </head>
 <body>
@@ -135,11 +143,11 @@
             </div>
             <div class="input-group">
                 <label>Customer Name</label>
-                <input type="text" id="custName" placeholder="Enter Customer Name.....">
+                <input type="text" id="custName" placeholder="e.g. Rahul Kumar">
             </div>
             <div class="input-group">
                 <label>Address / Location</label>
-                <input type="text" id="custAddress" placeholder="Enter Address.....">
+                <input type="text" id="custAddress" placeholder="e.g. Main Market Shop">
             </div>
         </div>
 
@@ -185,10 +193,6 @@
 
     <div id="billModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>Baba Store</h2>
-                <p style="margin:5px 0 0 0; color:#555; font-size:14px;">Invoice / Bill of Supply</p>
-            </div>
             <div id="modalBody"></div>
             <button class="modal-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
             <button class="modal-close no-print" onclick="closeBill()">Close</button>
@@ -204,7 +208,7 @@
         
         let currentItems = {};
         let db;
-        let editingOrderId = null; // Tracks if we are updating
+        let editingOrderId = null; 
 
         function safeId(str) { return str.replace(/[^a-zA-Z0-9]/g, ''); }
 
@@ -316,7 +320,6 @@
 
             let store = db.transaction(["orders"], "readwrite").objectStore("orders");
             
-            // Check if Editing or Adding
             if (editingOrderId) {
                 orderData.id = editingOrderId;
                 store.put(orderData).onsuccess = resetForm;
@@ -351,7 +354,7 @@
                 
                 document.getElementById('formTitle').innerText = "Editing Order...";
                 document.getElementById('submitBtn').innerText = "Update Existing Order";
-                document.getElementById('submitBtn').style.backgroundColor = "#ff9500"; // Orange for edit mode
+                document.getElementById('submitBtn').style.backgroundColor = "#ff9500"; 
 
                 document.getElementById('orderDate').value = order.filterDate;
                 document.getElementById('custName').value = order.customerName;
@@ -359,10 +362,8 @@
                 document.getElementById('loadingRate').value = order.loadRate || "";
                 document.getElementById('unloadingRate').value = order.unloadRate || "";
 
-                // Reset all first
                 products.forEach(p => { currentItems[p] = { qty: 0, rate: "" }; });
                 
-                // Load saved
                 for (let p in order.items) {
                     currentItems[p] = { qty: order.items[p].qty, rate: order.items[p].rate };
                     document.getElementById(`qty-${safeId(p)}`).innerText = currentItems[p].qty;
@@ -388,7 +389,6 @@
             };
         }
 
-        // --- BILL MODAL LOGIC ---
         function viewBill(id) {
             db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
                 let o = e.target.result;
@@ -398,22 +398,33 @@
                 }
 
                 let html = `
-                    <div style="margin-bottom: 15px;">
-                        <strong>Customer:</strong> ${o.customerName}<br>
-                        <strong>Address:</strong> ${o.address || 'N/A'}<br>
-                        <strong>Date:</strong> ${o.displayDate}
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h1 style="margin:0; font-size: 28px; color: black; font-weight:900;">BABA STORE</h1>
+                        <p style="margin:0; font-size: 14px; color: #555;">Official Invoice</p>
                     </div>
+                    
+                    <div style="margin-bottom: 20px; border-bottom: 2px solid #eee; border-top: 2px solid #eee; padding: 15px 0;">
+                        <p style="margin:4px 0; font-size: 16px;"><strong>Customer:</strong> ${o.customerName}</p>
+                        <p style="margin:4px 0; font-size: 14px; color: #555;"><strong>Address:</strong> ${o.address || 'N/A'}</p>
+                        <p style="margin:4px 0; font-size: 14px; color: #555;"><strong>Date:</strong> ${o.displayDate}</p>
+                    </div>
+                    
                     <table class="invoice-table">
                         <tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr>
                         ${itemsHtml}
                     </table>
+                    
                     <div style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
-                        <div style="display:flex; justify-content:space-between;"><span>Products Total:</span><span>₹${o.itemsTotal?.toFixed(2) || '0.00'}</span></div>
-                        <div style="display:flex; justify-content:space-between;"><span>Loading (${o.totalBags} @ ₹${o.loadRate}):</span><span>₹${o.loadTotal?.toFixed(2) || '0.00'}</span></div>
-                        <div style="display:flex; justify-content:space-between;"><span>Unloading (${o.totalBags} @ ₹${o.unloadRate}):</span><span>₹${o.unloadTotal?.toFixed(2) || '0.00'}</span></div>
-                        <div style="display:flex; justify-content:space-between; margin-top:10px; font-size: 18px; font-weight:bold; color:var(--primary);">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Products Total:</span><span>₹${o.itemsTotal?.toFixed(2) || '0.00'}</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Loading (${o.totalBags} @ ₹${o.loadRate}):</span><span>₹${o.loadTotal?.toFixed(2) || '0.00'}</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Unloading (${o.totalBags} @ ₹${o.unloadRate}):</span><span>₹${o.unloadTotal?.toFixed(2) || '0.00'}</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-top:15px; padding-top:10px; border-top: 2px dashed #ccc; font-size: 20px; font-weight:bold; color:var(--primary);">
                             <span>Grand Total:</span><span>₹${o.billTotal?.toFixed(2) || '0.00'}</span>
                         </div>
+                    </div>
+                    
+                    <div class="print-only" style="text-align: center; margin-top: 40px; font-size: 14px; font-weight: bold; border-top: 1px dashed #ccc; padding-top: 15px; color: #888;">
+                        Generated by Baba Store
                     </div>
                 `;
                 document.getElementById('modalBody').innerHTML = html;
@@ -432,13 +443,16 @@
 
                 if (selectedFilter) allOrders = allOrders.filter(o => o.filterDate === selectedFilter);
                 let sorted = allOrders.sort((a,b) => b.timestamp - a.timestamp);
-                let now = Date.now(); let timeLimit = 43200000; 
+                let now = Date.now(); let timeLimit = 43200000; // 12 Hours
 
                 if (sorted.length === 0) return log.innerHTML = "<p style='text-align:center;'>No orders found.</p>";
 
                 sorted.forEach(order => {
                     let isOverdue = !order.isDelivered && (now - order.timestamp) > timeLimit;
                     let cardClass = "order-card " + (order.isDelivered ? "delivered" : (isOverdue ? "overdue" : ""));
+                    
+                    // Only insert the warning HTML block if it is ACTUALLY overdue (Prevents CSS bugs)
+                    let overdueWarningHtml = isOverdue ? `<p class="overdue-text">⚠️ Over 12 hours pending!</p>` : '';
 
                     log.innerHTML += `
                         <div class="swipe-container">
@@ -451,7 +465,8 @@
                                     <p class="order-bill">₹${order.billTotal ? order.billTotal.toFixed(2) : '0.00'}</p>
                                 </div>
                                 <div style="font-size:13px; color:#666;">Tap card to view full bill / print PDF...</div>
-                                <p class="overdue-text">⚠️ Over 12 hours pending!</p>
+                                
+                                ${overdueWarningHtml}
                                 
                                 <div class="delivery-toggle" onclick="event.stopPropagation()">
                                     <span style="font-weight:bold; color:${order.isDelivered?'var(--success)':'var(--danger)'}">
