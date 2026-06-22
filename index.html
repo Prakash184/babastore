@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Baba Store</title>
     
-    <!-- PWA Meta Tags for iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Baba Store">
@@ -120,8 +119,8 @@
         
         .order-details p { margin: 4px 0; }
         .customer-name { font-size: 17px; font-weight: 700; color: var(--text-main); }
-        .customer-address { font-size: 14px; color: var(--text-muted); }
-        .order-items { font-size: 13px; font-weight: 500; color: var(--primary); margin-top: 8px !important; }
+        .customer-meta { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+        .order-items { font-size: 13px; font-weight: 500; color: var(--primary); margin-top: 8px !important; line-height: 1.4;}
         .overdue-text { color: var(--danger); font-size: 12px; font-weight: bold; display: none; margin-top: 4px;}
         .order-card.overdue .overdue-text { display: block; }
 
@@ -144,7 +143,6 @@
     </div>
 
     <div class="container">
-        <!-- Notification Setup -->
         <button id="notifyBtn" class="btn-notify" onclick="requestNotificationPermission()">
             ⚠️ Tap here to turn on Order Reminders
         </button>
@@ -181,6 +179,7 @@
         ];
         let currentQuantities = {};
         let db;
+        let notifiedOrders = new Set(); // Prevents spamming notifications
 
         function initApp() {
             document.getElementById('orderDate').valueAsDate = new Date();
@@ -226,7 +225,6 @@
                 Notification.requestPermission().then(permission => {
                     if (permission === "granted") {
                         document.getElementById("notifyBtn").style.display = "none";
-                        // TEST MODE MESSAGE
                         alert("Reminders activated! You will be alerted for orders older than 30 seconds.");
                     }
                 });
@@ -260,10 +258,13 @@
             let transaction = db.transaction(["orders"], "readwrite");
             let store = transaction.objectStore("orders");
             
+            // Format the date for better reading (e.g. 2024-05-12)
+            let formattedDate = new Date(date).toLocaleDateString('en-GB');
+
             let newOrder = {
                 customerName: name,
                 address: address,
-                deliveryDate: date,
+                deliveryDate: formattedDate, // Saving formatted date
                 timestamp: Date.now(),
                 isDelivered: false,
                 items: orderItems
@@ -314,10 +315,17 @@
                     let isOverdue = false;
                     if (!order.isDelivered && (now - order.timestamp) > timeLimit) {
                         isOverdue = true;
-                        if (Notification.permission === "granted" && document.visibilityState === 'visible') {
-                            new Notification("⚠️ Late Delivery!", {
-                                body: `${order.customerName}'s order is over 30 seconds late!`,
-                            });
+                        
+                        // SAFE NOTIFICATION WRAPPER to prevent iPhone crashes
+                        try {
+                            if ("Notification" in window && Notification.permission === "granted" && document.visibilityState === 'visible' && !notifiedOrders.has(order.id)) {
+                                new Notification("⚠️ Late Delivery!", {
+                                    body: `${order.customerName}'s order is over 30 seconds late!`,
+                                });
+                                notifiedOrders.add(order.id); // Mark as notified so it doesn't beep 100 times
+                            }
+                        } catch (error) {
+                            console.log("iPhone blocked the background notification, but app will not crash.");
                         }
                     }
 
@@ -325,13 +333,15 @@
                     if (order.isDelivered) cardClass += " delivered";
                     else if (isOverdue) cardClass += " overdue";
 
+                    // Displaying Date alongside Address
+                    let addressDisplay = order.address ? order.address : 'No Address';
+
                     log.innerHTML += `
                         <div class="${cardClass}">
                             <div class="order-details">
                                 <p class="customer-name">${order.customerName}</p>
-                                <p class="customer-address">${order.address || 'No Address'}</p>
+                                <p class="customer-meta">📅 ${order.deliveryDate} • ${addressDisplay}</p>
                                 <p class="order-items">${itemsSummary}</p>
-                                <!-- TEST MODE TEXT -->
                                 <p class="overdue-text">⚠️ Over 30 seconds pending!</p>
                             </div>
                             <div>
