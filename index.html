@@ -9,6 +9,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Baba Store">
     
+    <!-- Professional PDF Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         /* --- PREMIUM NATIVE iOS STYLING --- */
         :root {
@@ -25,7 +28,6 @@
             background-color: var(--background); margin: 0; padding: 0; color: var(--text-main); padding-bottom: 60px;
         }
 
-        /* Header */
         .header {
             background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             position: sticky; top: 0; z-index: 100; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
@@ -37,11 +39,9 @@
 
         .container { padding: 16px; max-width: 600px; margin: 0 auto; }
 
-        /* Cards & Sections */
         .section { background: var(--card-bg); border-radius: 20px; padding: 24px 20px; margin-bottom: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
         .section-title { font-weight: 800; font-size: 19px; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid var(--background); padding-bottom: 10px; color: #000;}
 
-        /* Inputs (Number only where needed) */
         .input-group { margin-bottom: 18px; width: 100%; }
         label { display: block; font-size: 13px; margin-bottom: 8px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
         input[type="text"], input[type="date"], input[type="number"], input[type="search"] {
@@ -50,12 +50,10 @@
         }
         input:focus { border-color: var(--primary); outline: none; background-color: #fff; box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1); }
 
-        /* Labor Grid */
         .labor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background: #fffaf0; padding: 16px; border-radius: 16px; border: 1px solid #ffebb3;}
         .labor-grid .input-group { margin-bottom: 0;}
         .labor-grid input { border-color: #ffcc00; background: white; font-weight: bold;}
 
-        /* Product List */
         .product-list { max-height: 450px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px;}
         .product-row { padding: 18px 0; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px;}
         .product-row:last-child { border-bottom: none; }
@@ -71,10 +69,13 @@
         .stepper { display: flex; align-items: center; gap: 12px; background: var(--background); border-radius: 24px; padding: 4px; border: 1px solid var(--border-color);}
         .btn-step { width: 38px; height: 38px; border-radius: 19px; border: none; background: var(--card-bg); color: var(--primary); font-size: 24px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.08); transition: transform 0.1s;}
         .btn-step:active { transform: scale(0.9); }
-        .qty-val { font-size: 18px; font-weight: 800; min-width: 28px; text-align: center; }
+        .qty-val { font-size: 18px; font-weight: 800; min-width: 28px; text-align: center; transition: all 0.15s ease;}
+        
+        /* Visual Haptic Effect */
+        .pop-anim { transform: scale(1.5); color: var(--primary); }
+
         .item-total { font-size: 16px; font-weight: 800; color: var(--text-muted); width: 85px; text-align: right;}
 
-        /* Billing Summary */
         .bill-summary { background: #f0f8ff; padding: 20px; border-radius: 16px; margin-top: 20px; border: 1px solid #d6eaff;}
         .bill-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; color: #444; font-weight: 600;}
         .bill-row.grand { border-top: 2px dashed #bce0fd; padding-top: 15px; margin-top: 15px; font-size: 22px; font-weight: 900; color: var(--primary); }
@@ -82,14 +83,12 @@
         .btn-submit { width: 100%; background: var(--primary-gradient); color: white; border: none; padding: 18px; border-radius: 16px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 20px; box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3); transition: transform 0.2s; letter-spacing: 0.5px;}
         .btn-submit:active { transform: scale(0.96); }
 
-        /* Dashboard & Search */
         .search-area { background: white; padding: 16px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.04);}
         .dashboard-box { background: var(--primary-gradient); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; display: none; box-shadow: 0 8px 24px rgba(0,122,255,0.25);}
         .dashboard-box h3 { margin: 0 0 15px 0; font-size: 20px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 10px; display: flex; align-items: center; gap: 8px;}
         .dash-row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 8px; font-weight: 500;}
         .dash-grand { font-size: 24px; font-weight: 900; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 15px; }
 
-        /* Swipe Container */
         .swipe-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: 16px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.06);}
         .swipe-container::-webkit-scrollbar { display: none; }
         
@@ -102,7 +101,6 @@
         .btn-edit { background: #ff9500; }
         .btn-delete { background: var(--danger); border-radius: 0 16px 16px 0;}
 
-        /* Order Info */
         .order-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f2f2f7; padding-bottom: 12px; margin-bottom: 12px;}
         .customer-name { font-size: 20px; font-weight: 800; margin: 0; color: #111;}
         .customer-meta { font-size: 14px; color: var(--text-muted); font-weight: 600; margin: 6px 0 0 0; }
@@ -112,7 +110,6 @@
         .chk-box { width: 32px; height: 32px; accent-color: var(--success); cursor: pointer; transform: scale(1.1);}
         .overdue-text { color: var(--danger); font-size: 13px; font-weight: 800; margin-top: 10px; display: inline-block; background: #ffeceb; padding: 4px 8px; border-radius: 6px;}
 
-        /* Modals */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 1000; padding: 20px; align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 24px; border-radius: 24px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2);}
         
@@ -129,16 +126,21 @@
         .invoice-table th { color: var(--text-muted); text-transform: uppercase; font-size: 12px; font-weight: 800;}
         .invoice-table td:last-child, .invoice-table th:last-child { text-align: right; font-weight: 700;}
 
-        /* Empty State */
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
         .empty-state h3 { font-size: 20px; color: #333; margin-bottom: 5px;}
 
+        /* MONTHLY REPORT PRINT STYLES */
+        #monthlyReportPrint { display: none; }
+
         @media print {
-            @page { margin: 0; size: auto; }
-            body { background: white !important; margin: 0; padding: 0; }
+            @page { margin: 10mm; size: auto; }
+            body { background: white !important; margin: 0; padding: 0; color: black; }
             .header, .container, .no-print { display: none !important; }
-            #billModal { display: block !important; position: static !important; background: white !important; height: auto !important; width: 100% !important; padding: 15mm 15mm !important; box-sizing: border-box;}
+            
+            #billModal { display: block !important; position: static !important; background: white !important; height: auto !important; width: 100% !important; padding: 0 !important; box-sizing: border-box;}
             .modal-content { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; overflow: visible !important; padding: 0 !important;}
+            
+            #monthlyReportPrint { display: block !important; width: 100%; }
             .print-only { display: block !important; }
         }
         .print-only { display: none; }
@@ -155,7 +157,6 @@
 
     <div class="container no-print">
         
-        <!-- ORDER ENTRY FORM -->
         <div class="section">
             <h2 class="section-title" id="formTitle">📝 New Order</h2>
             <div class="input-group">
@@ -164,12 +165,11 @@
             </div>
             <div class="input-group">
                 <label>Customer Name</label>
-                <!-- oninput triggers the auto-fill logic -->
-                <input type="text" id="custName" list="customerNamesList" placeholder="Enter Customer name..." oninput="autoFillAddress()">
+                <input type="text" id="custName" list="customerNamesList" placeholder="Start typing name..." oninput="autoFillAddress()">
             </div>
             <div class="input-group">
                 <label>Address / Location</label>
-                <input type="text" id="custAddress" placeholder="Enter Address...">
+                <input type="text" id="custAddress" placeholder="Address will auto-fill...">
             </div>
         </div>
 
@@ -178,12 +178,10 @@
             <div class="labor-grid">
                 <div class="input-group">
                     <label>Loading (₹)</label>
-                    <!-- Strict Number Input -->
                     <input type="number" inputmode="decimal" pattern="[0-9]*" id="loadingRate" placeholder="0" oninput="calculateGrandTotal()">
                 </div>
                 <div class="input-group">
                     <label>Unloading (₹)</label>
-                    <!-- Strict Number Input -->
                     <input type="number" inputmode="decimal" pattern="[0-9]*" id="unloadingRate" placeholder="0" oninput="calculateGrandTotal()">
                 </div>
             </div>
@@ -202,7 +200,6 @@
             <button class="btn-submit" id="submitBtn" onclick="submitOrder()">Save Order</button>
         </div>
 
-        <!-- DASHBOARD & FILTERS -->
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; margin-top: 30px;">
             <h2 style="font-size: 22px; font-weight: 900; margin: 0; margin-left: 5px;">📋 Delivery Board</h2>
         </div>
@@ -217,7 +214,6 @@
             </div>
         </div>
 
-        <!-- End of Day Sales Dashboard -->
         <div id="dailyDashboard" class="dashboard-box">
             <h3 id="dashboardTitle">📊 Daily Summary</h3>
             <div id="dashboardStats"></div>
@@ -230,8 +226,10 @@
     <!-- INVOICE MODAL -->
     <div id="billModal" class="modal">
         <div class="modal-content">
-            <div id="modalBody"></div>
-            <button class="modal-btn btn-whatsapp no-print" id="whatsappBtn" onclick="">💬 Send on WhatsApp</button>
+            <!-- This is the area that gets converted to PDF -->
+            <div id="modalBody" style="background: white; padding: 10px;"></div>
+            
+            <button class="modal-btn btn-whatsapp no-print" onclick="shareBillPDF()">💬 Share PDF on WhatsApp</button>
             <button class="modal-btn btn-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
             <button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
         </div>
@@ -242,8 +240,8 @@
         <div class="modal-content" style="text-align: center;">
             <h2 style="margin-top:0; color:var(--primary); font-weight: 900;">Business Settings</h2>
             
-            <button class="modal-btn btn-excel" onclick="exportToExcel()">📊 Export Monthly Sales to Excel</button>
-            <p style="color:var(--text-muted); font-size:13px; margin-bottom:24px; margin-top:8px;">Downloads all orders as a CSV file for your CA.</p>
+            <button class="modal-btn btn-excel" style="background: #34c759;" onclick="exportMonthlyPDF()">🖨️ Print / Save Monthly PDF</button>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:24px; margin-top:8px;">Generates a clean PDF table of all orders.</p>
             
             <hr style="border: 0; border-top: 2px dashed #eee; margin: 24px 0;">
             
@@ -260,27 +258,23 @@
         </div>
     </div>
 
+    <!-- HIDDEN DIV FOR MONTHLY PDF REPORT -->
+    <div id="monthlyReportPrint"></div>
+
     <script>
-        // "Corn Darra" is removed.
         const products = [
             "Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar",
-            "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Sujji", "Sujji 47 Kg", "Sujji 48 Kg",
+            "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Shujji", "Sujji 47 Kg", "Sujji 48 Kg",
             "Darra", "Milk More", "Doodh Virdi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"
         ];
         
         let currentItems = {};
         let db;
         let editingOrderId = null; 
-        let customerMemory = {}; // Stores Name -> Address for Auto-fill
+        let customerMemory = {}; 
+        let currentBillFilename = "BabaStore_Bill.pdf"; // Used for PDF sharing
 
         function safeId(str) { return str.replace(/[^a-zA-Z0-9]/g, ''); }
-
-        // Haptic Feedback function (Vibration)
-        function triggerHaptic() {
-            if ("vibrate" in navigator) {
-                navigator.vibrate(40); // 40ms premium vibration feel
-            }
-        }
 
         function initApp() {
             let today = new Date().toISOString().split('T')[0];
@@ -291,7 +285,6 @@
             products.forEach(p => {
                 currentItems[p] = { qty: 0, rate: "" };
                 let sId = safeId(p);
-                // Number Only Keypad added to Rate input: inputmode="decimal" pattern="[0-9]*"
                 container.innerHTML += `
                     <div class="product-row">
                         <span class="product-name">${p}</span>
@@ -311,10 +304,16 @@
             initDatabase();
         }
 
+        // Added Visual "Pop" Animation instead of iOS Vibration
         function updateQty(product, change) {
-            triggerHaptic(); 
             currentItems[product].qty = Math.max(0, currentItems[product].qty + change);
-            document.getElementById(`qty-${safeId(product)}`).innerText = currentItems[product].qty;
+            let qtyEl = document.getElementById(`qty-${safeId(product)}`);
+            qtyEl.innerText = currentItems[product].qty;
+            
+            // Visual Haptic Pop
+            qtyEl.classList.add('pop-anim');
+            setTimeout(() => qtyEl.classList.remove('pop-anim'), 150);
+
             calculateItem(product);
         }
 
@@ -337,10 +336,22 @@
             let loadTotal = totalQty * loadRate; let unloadTotal = totalQty * unloadRate;
             let finalTotal = itemsTotal + loadTotal + unloadTotal;
 
+            // Updated Summary to show Rates math!
             document.getElementById('displayItemTotal').innerText = `₹${itemsTotal.toFixed(2)}`;
             document.getElementById('displayTotalBags').innerText = totalQty;
-            document.getElementById('displayLoadTotal').innerText = `₹${loadTotal.toFixed(2)}`;
-            document.getElementById('displayUnloadTotal').innerText = `₹${unloadTotal.toFixed(2)}`;
+            
+            if(totalQty > 0 && loadRate > 0) {
+                document.getElementById('displayLoadTotal').innerText = `(₹${loadRate} x ${totalQty}) = ₹${loadTotal.toFixed(2)}`;
+            } else {
+                document.getElementById('displayLoadTotal').innerText = `₹0.00`;
+            }
+
+            if(totalQty > 0 && unloadRate > 0) {
+                document.getElementById('displayUnloadTotal').innerText = `(₹${unloadRate} x ${totalQty}) = ₹${unloadTotal.toFixed(2)}`;
+            } else {
+                document.getElementById('displayUnloadTotal').innerText = `₹0.00`;
+            }
+            
             document.getElementById('displayGrandTotal').innerText = `₹${finalTotal.toFixed(2)}`;
 
             return { itemsTotal, loadTotal, unloadTotal, finalTotal, totalQty, loadRate, unloadRate };
@@ -356,13 +367,11 @@
         }
 
         function clearFilter() { 
-            triggerHaptic();
             document.getElementById('filterDate').value = ''; 
             document.getElementById('searchName').value = ''; 
             renderOrders(); 
         }
 
-        // Auto-Fill Address based on Memory
         function autoFillAddress() {
             let name = document.getElementById('custName').value.trim();
             if (customerMemory[name]) {
@@ -371,7 +380,6 @@
         }
 
         function submitOrder() {
-            triggerHaptic();
             const name = document.getElementById('custName').value.trim();
             const address = document.getElementById('custAddress').value.trim();
             const rawDate = document.getElementById('orderDate').value;
@@ -425,7 +433,6 @@
         }
 
         function editOrder(id) {
-            triggerHaptic();
             db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
                 let order = e.target.result;
                 editingOrderId = order.id;
@@ -450,14 +457,12 @@
         }
 
         function deleteOrder(id) {
-            triggerHaptic();
             if(confirm("Are you sure you want to completely DELETE this order?")) {
                 db.transaction(["orders"], "readwrite").objectStore("orders").delete(id).onsuccess = renderOrders;
             }
         }
 
         function toggleDelivery(id, isChecked) {
-            triggerHaptic(); 
             let store = db.transaction(["orders"], "readwrite").objectStore("orders");
             store.get(id).onsuccess = e => {
                 let data = e.target.result; data.isDelivered = isChecked;
@@ -466,24 +471,18 @@
         }
 
         function viewBill(id) {
-            triggerHaptic();
             db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
                 let o = e.target.result;
-                let itemsHtml = ""; let whatsappText = `*BABA STORE INVOICE*\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
-                
+                currentBillFilename = `BabaStore_Invoice_${o.customerName.replace(/ /g, "_")}.pdf`;
+
+                let itemsHtml = ""; 
                 for (let p in o.items) {
                     itemsHtml += `<tr><td>${p}</td><td>${o.items[p].qty}</td><td>₹${o.items[p].rate}</td><td>₹${o.items[p].total}</td></tr>`;
-                    whatsappText += `${p}: ${o.items[p].qty} x ₹${o.items[p].rate} = ₹${o.items[p].total}\n`;
                 }
 
-                whatsappText += `-----------------\nProducts Total: ₹${o.itemsTotal?.toFixed(2)}\n`;
-                if(o.loadTotal > 0) whatsappText += `Loading (${o.totalBags}x): ₹${o.loadTotal?.toFixed(2)}\n`;
-                if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
-                whatsappText += `*GRAND TOTAL: ₹${o.billTotal?.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
-
-                document.getElementById('whatsappBtn').onclick = () => {
-                    window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
-                };
+                // Displaying Rates in the Bill explicitly
+                let loadString = o.loadRate > 0 ? `<br><span style="font-size:12px; color:gray;">(₹${o.loadRate} x ${o.totalBags} bags)</span>` : "";
+                let unloadString = o.unloadRate > 0 ? `<br><span style="font-size:12px; color:gray;">(₹${o.unloadRate} x ${o.totalBags} bags)</span>` : "";
 
                 let html = `
                     <div style="text-align: center; margin-bottom: 20px;">
@@ -496,9 +495,9 @@
                     </div>
                     <table class="invoice-table"><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr>${itemsHtml}</table>
                     <div style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Products Total:</span><span>₹${o.itemsTotal?.toFixed(2) || '0.00'}</span></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Loading:</span><span>₹${o.loadTotal?.toFixed(2) || '0.00'}</span></div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Unloading:</span><span>₹${o.unloadTotal?.toFixed(2) || '0.00'}</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px; align-items:flex-end;"><span>Products Total:</span><span>₹${o.itemsTotal?.toFixed(2) || '0.00'}</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px; align-items:flex-end;"><span>Loading: ${loadString}</span><span>₹${o.loadTotal?.toFixed(2) || '0.00'}</span></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px; align-items:flex-end;"><span>Unloading: ${unloadString}</span><span>₹${o.unloadTotal?.toFixed(2) || '0.00'}</span></div>
                         <div style="display:flex; justify-content:space-between; margin-top:15px; padding-top:15px; border-top: 2px dashed #ccc; font-size: 22px; font-weight:900; color:var(--primary);">
                             <span>Grand Total:</span><span>₹${o.billTotal?.toFixed(2) || '0.00'}</span>
                         </div>
@@ -510,12 +509,102 @@
             };
         }
 
-        function openSettings() { triggerHaptic(); document.getElementById('settingsModal').style.display = 'flex'; }
-        function closeModals() { triggerHaptic(); document.getElementById('billModal').style.display = 'none'; document.getElementById('settingsModal').style.display = 'none'; }
+        // --- NEW: Generate PDF and Share Directly to WhatsApp ---
+        async function shareBillPDF() {
+            const btn = document.querySelector('.btn-whatsapp');
+            btn.innerText = "⏳ Generating PDF...";
+            
+            const element = document.getElementById('modalBody');
+            const opt = {
+                margin:       0.2,
+                filename:     currentBillFilename,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
 
-        // --- BACKUP, RESTORE & EXCEL LOGIC ---
+            try {
+                const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
+                const file = new File([pdfBlob], currentBillFilename, { type: 'application/pdf' });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    btn.innerText = "💬 Share PDF on WhatsApp";
+                    await navigator.share({
+                        files: [file],
+                        title: 'Baba Store Invoice',
+                        text: 'Here is your bill from Baba Store.'
+                    });
+                } else {
+                    alert("Your browser doesn't support direct PDF sharing. Downloading PDF instead.");
+                    html2pdf().set(opt).from(element).save();
+                    btn.innerText = "💬 Share PDF on WhatsApp";
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error generating PDF. Please use the Print button instead.");
+                btn.innerText = "💬 Share PDF on WhatsApp";
+            }
+        }
+
+        function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
+        function closeModals() { document.getElementById('billModal').style.display = 'none'; document.getElementById('settingsModal').style.display = 'none'; }
+
+        // --- NEW: Export Monthly Sales as PDF instead of CSV ---
+        function exportMonthlyPDF() {
+            db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
+                let allOrders = e.target.result;
+                if (allOrders.length === 0) return alert("No orders to export.");
+                
+                let html = `
+                    <h1 style="text-align:center; color:#007aff;">Baba Store - Monthly Sales Report</h1>
+                    <p style="text-align:center;">Generated on: ${new Date().toLocaleDateString()}</p>
+                    <table style="width:100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;">
+                        <tr style="background:#f2f2f7; text-align:left;">
+                            <th style="padding:10px; border:1px solid #ddd;">Date</th>
+                            <th style="padding:10px; border:1px solid #ddd;">Customer</th>
+                            <th style="padding:10px; border:1px solid #ddd;">Bags</th>
+                            <th style="padding:10px; border:1px solid #ddd;">Grand Total</th>
+                            <th style="padding:10px; border:1px solid #ddd;">Status</th>
+                        </tr>
+                `;
+                
+                let totalRevenue = 0;
+                let totalBagsSold = 0;
+
+                // Sort chronological
+                allOrders.sort((a,b) => new Date(a.filterDate) - new Date(b.filterDate)).forEach(o => {
+                    let status = o.isDelivered ? "<span style='color:green'>Delivered</span>" : "<span style='color:red'>Pending</span>";
+                    totalRevenue += o.billTotal;
+                    totalBagsSold += o.totalBags;
+                    html += `
+                        <tr>
+                            <td style="padding:10px; border:1px solid #ddd;">${o.displayDate}</td>
+                            <td style="padding:10px; border:1px solid #ddd;">${o.customerName}</td>
+                            <td style="padding:10px; border:1px solid #ddd;">${o.totalBags}</td>
+                            <td style="padding:10px; border:1px solid #ddd;">₹${o.billTotal.toFixed(2)}</td>
+                            <td style="padding:10px; border:1px solid #ddd;">${status}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                    </table>
+                    <div style="margin-top:20px; padding: 15px; background: #eef7ff; border:1px solid #bce0fd; border-radius: 8px;">
+                        <h3 style="margin:0;">Total Bags Sold: ${totalBagsSold}</h3>
+                        <h2 style="margin:5px 0 0 0; color:#007aff;">Total Revenue: ₹${totalRevenue.toFixed(2)}</h2>
+                    </div>
+                `;
+
+                document.getElementById('monthlyReportPrint').innerHTML = html;
+                closeModals();
+                window.print(); // Triggers print dialog for the report
+                
+                // Clear after printing
+                setTimeout(() => { document.getElementById('monthlyReportPrint').innerHTML = ""; }, 1000);
+            };
+        }
+
         function exportData() {
-            triggerHaptic();
             db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
                 let data = JSON.stringify(e.target.result);
                 let blob = new Blob([data], { type: "application/json" });
@@ -527,7 +616,6 @@
         }
 
         function importData() {
-            triggerHaptic();
             let file = document.getElementById('backupFile').files[0];
             if (!file) return alert("Please select a backup file first.");
             
@@ -546,34 +634,11 @@
             reader.readAsText(file);
         }
 
-        function exportToExcel() {
-            triggerHaptic();
-            db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
-                let allOrders = e.target.result;
-                if (allOrders.length === 0) return alert("No orders to export.");
-                
-                let csvContent = "Date,Customer Name,Address,Total Bags,Loading Cost,Unloading Cost,Grand Total,Status\n";
-                
-                allOrders.forEach(o => {
-                    let status = o.isDelivered ? "Delivered" : "Pending";
-                    let row = `"${o.displayDate}","${o.customerName}","${o.address || ''}",${o.totalBags},${o.loadTotal || 0},${o.unloadTotal || 0},${o.billTotal},${status}\n`;
-                    csvContent += row;
-                });
-
-                let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                let a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = `BabaStore_Sales_${new Date().toISOString().split('T')[0]}.csv`;
-                a.click();
-            };
-        }
-
         function renderOrders() {
             db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
                 const log = document.getElementById('orderLog'); log.innerHTML = "";
                 let allOrders = e.target.result;
                 
-                // Populate Memory DataLists (Customer Auto-Fill)
                 customerMemory = {}; 
                 allOrders.forEach(o => { 
                     if(o.customerName && o.address) {
@@ -585,11 +650,9 @@
                 let selectedFilter = document.getElementById('filterDate').value;
                 let searchQuery = document.getElementById('searchName').value.toLowerCase();
 
-                // Apply Filters
                 if (selectedFilter) allOrders = allOrders.filter(o => o.filterDate === selectedFilter);
                 if (searchQuery) allOrders = allOrders.filter(o => o.customerName.toLowerCase().includes(searchQuery));
 
-                // --- DAILY DASHBOARD LOGIC ---
                 if (selectedFilter && !searchQuery && allOrders.length > 0) {
                     document.getElementById('dailyDashboard').style.display = 'block';
                     document.getElementById('dashboardTitle').innerText = `📊 Summary for ${selectedFilter}`;
