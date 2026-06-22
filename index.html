@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Baba Store</title>
+    
+    <!-- PWA Meta Tags for iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Baba Store">
+    
+    <style>
+        :root {
+            --primary: #007aff;
+            --success: #34c759;
+            --background: #f2f2f7;
+            --card-bg: #ffffff;
+            --text: #000000;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background);
+            margin: 0;
+            padding: 16px;
+            color: var(--text);
+        }
+        h1, h2 { text-align: center; margin-bottom: 20px; }
+        .section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .section-title { font-weight: bold; color: var(--primary); margin-top: 0; margin-bottom: 12px; }
+        .input-group { margin-bottom: 12px; }
+        label { display: block; font-size: 14px; margin-bottom: 4px; font-weight: 500; }
+        input[type="text"], input[type="date"] {
+            width: 100%; padding: 10px; border: 1px solid #d1d1d6; border-radius: 8px; box-sizing: border-box; font-size: 16px;
+        }
+        .product-row {
+            display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e5e5ea;
+        }
+        .product-row:last-child { border-bottom: none; }
+        .stepper { display: flex; align-items: center; gap: 12px; }
+        .btn-step {
+            width: 32px; height: 32px; border-radius: 16px; border: 1px solid var(--primary);
+            background: none; color: var(--primary); font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center;
+        }
+        .qty-val { font-size: 16px; font-weight: 600; min-width: 20px; text-align: center; }
+        .btn-submit {
+            width: 100%; background-color: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;
+        }
+        .order-card {
+            background: var(--card-bg); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #ffcc00;
+        }
+        .order-card.delivered { border-left-color: var(--success); opacity: 0.7; }
+        .order-details p { margin: 2px 0; }
+        .chk-box { width: 24px; height: 24px; accent-color: var(--success); }
+    </style>
+</head>
+<body>
+
+    <h1>Baba Store</h1>
+
+    <!-- Order Placement Section -->
+    <div class="section">
+        <div class="section-title">New Order</div>
+        <div class="input-group">
+            <label>Delivery Date</label>
+            <input type="date" id="orderDate">
+        </div>
+        <div class="input-group">
+            <label>Customer Name</label>
+            <input type="text" id="custName" placeholder="Enter name during call">
+        </div>
+        <div class="input-group">
+            <label>Address</label>
+            <input type="text" id="custAddress" placeholder="Enter delivery address">
+        </div>
+    </div>
+
+    <!-- Inventory / Stepper Section -->
+    <div class="section">
+        <div class="section-title">Products</div>
+        <div id="productList"></div>
+        <button class="btn-submit" onclick="submitOrder()" style="margin-top: 15px;">Submit Live Order</button>
+    </div>
+
+    <!-- Active Deliveries Log -->
+    <h2>Active Delivery Log</h2>
+    <div id="orderLog"></div>
+
+    <script>
+        const products = [
+            "Kapila pasu aahar", "Kashyap pasu aahar", "Choker", "Maida", "Shujji", "Darra", "Corn darra"
+        ];
+        let currentQuantities = {};
+        let db;
+
+        // Initialize Products and Quantities
+        function initApp() {
+            document.getElementById('orderDate').valueAsDate = new Date();
+            const container = document.getElementById('productList');
+            products.forEach(p => {
+                currentQuantities[p] = 0;
+                container.innerHTML += `
+                    <div class="product-row">
+                        <span>${p}</span>
+                        <div class="stepper">
+                            <button class="btn-step" onclick="updateQty('${p}', -1)">-</button>
+                            <span class="qty-val" id="qty-${btoa(p)}">0</span>
+                            <button class="btn-step" onclick="updateQty('${p}', 1)">+</button>
+                        </div>
+                    </div>`;
+            });
+            initDatabase();
+            requestNotificationPermission();
+        }
+
+        function updateQty(product, change) {
+            currentQuantities[product] = Math.max(0, currentQuantities[product] + change);
+            document.getElementById(`qty-${btoa(product)}`).innerText = currentQuantities[product];
+        }
+
+        // IndexedDB Configuration for Browser Storage
+        function initDatabase() {
+            let request = indexedDB.open("BabaStoreDB", 1);
+            request.onupgradeneeded = e => {
+                db = e.target.result;
+                db.createObjectStore("orders", { keyPath: "id", autoIncrement: true });
+            };
+            request.onsuccess = e => { db = e.target.result; renderOrders(); };
+        }
+
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                Notification.requestPermission();
+            }
+        }
+
+        function submitOrder() {
+            const name = document.getElementById('custName').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const date = document.getElementById('orderDate').value;
+            
+            if (!name) return alert("Please enter a customer name.");
+
+            let orderItems = {};
+            products.forEach(p => { if(currentQuantities[p] > 0) orderItems[p] = currentQuantities[p]; });
+
+            let transaction = db.transaction(["orders"], "readwrite");
+            let store = transaction.objectStore("orders");
+            
+            let newOrder = {
+                customerName: name,
+                address: address,
+                deliveryDate: date,
+                timestamp: Date.now(),
+                isDelivered: false,
+                items: orderItems
+            };
+
+            let addRequest = store.add(newOrder);
+            addRequest.onsuccess = (e) => {
+                const generatedId = e.target.result;
+                scheduleReminder(generatedId, name);
+                
+                // Reset fields
+                document.getElementById('custName').value = "";
+                document.getElementById('custAddress').value = "";
+                products.forEach(p => { currentQuantities[p] = 0; document.getElementById(`qty-${btoa(p)}`).innerText = 0; });
+                renderOrders();
+            };
+        }
+
+        // 3-Hour Web Notification Logic
+        let activeTimers = {};
+        function scheduleReminder(orderId, customerName) {
+            // 3 hours = 10,800,000 milliseconds
+            const threeHours = 10800000; 
+            activeTimers[orderId] = setTimeout(() => {
+                if (Notification.permission === "granted") {
+                    new Notification("⚠️ Undelivered Order Alert", {
+                        body: `Order for ${customerName} has crossed 3 hours and is still pending!`,
+                        icon: 'https://cdn-icons-png.flaticon.com/512/888/888879.png'
+                    });
+                }
+            }, threeHours);
+        }
+
+        function toggleDelivery(id, isChecked) {
+            let transaction = db.transaction(["orders"], "readwrite");
+            let store = transaction.objectStore("orders");
+            let getRequest = store.get(id);
+
+            getRequest.onsuccess = () => {
+                let data = getRequest.result;
+                data.isDelivered = isChecked;
+                store.put(data);
+                
+                if (isChecked && activeTimers[id]) {
+                    clearTimeout(activeTimers[id]);
+                    delete activeTimers[id];
+                }
+                renderOrders();
+            };
+        }
+
+        function renderOrders() {
+            let transaction = db.transaction(["orders"], "readonly");
+            let store = transaction.objectStore("orders");
+            let request = store.getAll();
+
+            request.onsuccess = () => {
+                const log = document.getElementById('orderLog');
+                log.innerHTML = "";
+                // Sort by newest first
+                let sortedOrders = request.result.sort((a,b) => b.timestamp - a.timestamp);
+                
+                sortedOrders.forEach(order => {
+                    let itemsSummary = Object.entries(order.items).map(([p, q]) => `${p}: ${q}`).join(", ");
+                    if (!itemsSummary) itemsSummary = "No items selected";
+                    
+                    log.innerHTML += `
+                        <div class="order-card ${order.isDelivered ? 'delivered' : ''}">
+                            <div class="order-details">
+                                <p><strong>${order.customerName}</strong></p>
+                                <p style="font-size:13px; color:#666;">${order.address || 'No Address'}</p>
+                                <p style="font-size:12px; font-style:italic;">${itemsSummary}</p>
+                            </div>
+                            <div>
+                                <input type="checkbox" class="chk-box" onchange="toggleDelivery(${order.id}, this.checked)" ${order.isDelivered ? 'checked' : ''}>
+                            </div>
+                        </div>`;
+                });
+            };
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
