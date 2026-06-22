@@ -1,201 +1,689 @@
 <!DOCTYPE html>
-    <html lang="en">
+<html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <title>Baba Store</title>
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="Baba Store">
-        <style>
-            :root {
-    
-                --primary: #007aff; --primary-gradient: linear-gradient(135deg, #007aff, #005bb5);
-    
-                --success: #25D366; --danger: #ff3b30; --danger-bg: #ffeceb;
-    
-                --background: #f2f2f7; --card-bg: #ffffff;
-    
-                --text-main: #1c1c1e; --text-muted: #8e8e93; --border-color: #e5e5ea;
-    
-            }
-    
-            * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--background); margin: 0; padding: 0; color: var(--text-main); padding-bottom: 60px; }
-    
-            .header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-    
-            .header h1 { margin: 0; font-size: 26px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px;}
-    
-            .settings-btn { background: #f2f2f7; border: none; font-size: 20px; cursor: pointer; color: var(--primary); height: 40px; width: 40px; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s;}
-    
-            .settings-btn:active { transform: scale(0.9); }
-    
-            .container { padding: 16px; max-width: 600px; margin: 0 auto; }
-    
-            .section { background: var(--card-bg); border-radius: 20px; padding: 24px 20px; margin-bottom: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
-    
-            .section-title { font-weight: 800; font-size: 19px; margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid var(--background); padding-bottom: 10px; color: #000;}
-    
-            .input-group { margin-bottom: 18px; width: 100%; }
-    
-            label { display: block; font-size: 13px; margin-bottom: 8px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
-    
-            input[type="text"], input[type="date"], input[type="number"], input[type="search"] { -webkit-appearance: none; width: 100%; padding: 16px; border: 1.5px solid var(--border-color); border-radius: 14px; font-size: 16px; font-weight: 500; background-color: #fafafa; display: block; font-family: inherit; transition: all 0.3s; }
-    
-            input:focus { border-color: var(--primary); outline: none; background-color: #fff; box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1); }
-    
-            .labor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background: #fffaf0; padding: 16px; border-radius: 16px; border: 1px solid #ffebb3;}
-    
-            .labor-grid .input-group { margin-bottom: 0;}
-    
-            .labor-grid input { border-color: #ffcc00; background: white; font-weight: bold;}
-    
-            .product-list { max-height: 450px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px;}
-    
-            .product-row { padding: 18px 0; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px;}
-    
-            .product-name { font-size: 16px; font-weight: 700; color: #222;}
-    
-            .controls-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    
-            .rate-box { display: flex; align-items: center; background: #f4f4f5; border-radius: 12px; border: 1px solid var(--border-color); padding: 0 12px; width: 120px; transition: border 0.2s;}
-    
-            .rate-box:focus-within { border-color: var(--primary); background: #fff;}
-    
-            .rate-box span { color: var(--text-muted); font-weight: 700; font-size: 18px;}
-    
-            .rate-box input { border: none; background: transparent; padding: 14px 8px; width: 100%; font-size: 16px; font-weight: 700; color: var(--primary); }
-    
-            .stepper { display: flex; align-items: center; gap: 12px; background: var(--background); border-radius: 24px; padding: 4px; border: 1px solid var(--border-color);}
-    
-            .btn-step { width: 38px; height: 38px; border-radius: 19px; border: none; background: var(--card-bg); color: var(--primary); font-size: 24px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.08); transition: transform 0.1s;}
-    
-            .btn-step:active { transform: scale(0.9); }
-    
-            .qty-val { font-size: 18px; font-weight: 800; min-width: 28px; text-align: center; transition: all 0.15s ease;}
-    
-            .pop-anim { transform: scale(1.5); color: var(--primary); }
-    
-            .item-total { font-size: 16px; font-weight: 800; color: var(--text-muted); width: 85px; text-align: right;}
-    
-            .bill-summary { background: #f0f8ff; padding: 20px; border-radius: 16px; margin-top: 20px; border: 1px solid #d6eaff;}
-    
-            .bill-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 15px; color: #444; font-weight: 600;}
-    
-            .bill-row span:last-child { text-align: right; }
-    
-            .bill-row.grand { border-top: 2px dashed #bce0fd; padding-top: 15px; margin-top: 15px; font-size: 22px; font-weight: 900; color: var(--primary); }
-    
-            .btn-submit { width: 100%; background: var(--primary-gradient); color: white; border: none; padding: 18px; border-radius: 16px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 20px; box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3); transition: transform 0.2s;}
-    
-            .btn-submit:active { transform: scale(0.96); }
-    
-            .search-area { background: white; padding: 16px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.04);}
-    
-            .dashboard-box { background: var(--primary-gradient); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; display: none; box-shadow: 0 8px 24px rgba(0,122,255,0.25);}
-    
-            .dashboard-box h3 { margin: 0 0 15px 0; font-size: 20px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 10px; display: flex; align-items: center; gap: 8px;}
-    
-            .dash-row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 8px; font-weight: 500;}
-    
-            .dash-grand { font-size: 22px; font-weight: 900; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 15px; }
-    
-            .swipe-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: 16px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.06);}
-    
-            .swipe-container::-webkit-scrollbar { display: none; }
-    
-            .order-card { width: 100%; flex: 0 0 100%; scroll-snap-align: start; background: var(--card-bg); padding: 20px; border-left: 8px solid #ffcc00; position: relative;}
-    
-            .order-card.overdue { border-left-color: var(--danger); background-color: #fff9f9; }
-    
-            .order-card.delivered { border-left-color: var(--success); opacity: 0.8; background-color: #fafafa; }
-    
-            .swipe-actions { flex: 0 0 160px; scroll-snap-align: end; display: flex; }
-    
-            .action-btn { flex: 1; border: none; color: white; font-weight: bold; font-size: 15px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: 8px; cursor: pointer;}
-    
-            .btn-edit { background: #ff9500; }
-    
-            .btn-delete { background: var(--danger); border-radius: 0 16px 16px 0;}
-    
-            .order-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f2f2f7; padding-bottom: 12px; margin-bottom: 12px;}
-    
-            .customer-name { font-size: 20px; font-weight: 800; margin: 0; color: #111;}
-    
-            .customer-meta { font-size: 14px; color: var(--text-muted); font-weight: 600; margin: 6px 0 0 0; }
-    
-            .order-bill { font-size: 20px; font-weight: 900; color: var(--primary); margin: 0; background: #f0f8ff; padding: 6px 12px; border-radius: 10px;}
-    
-            .delivery-toggle { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f2f2f7;}
-    
-            .chk-box { width: 32px; height: 32px; accent-color: var(--success); cursor: pointer; transform: scale(1.1);}
-    
-            .overdue-text { color: var(--danger); font-size: 13px; font-weight: 800; margin-top: 10px; display: inline-block; background: #ffeceb; padding: 4px 8px; border-radius: 6px;}
-    
-            /* MODALS */
-    
-            .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 1000; padding: 20px; align-items: center; justify-content: center; }
-    
-            .modal-content { background: white; padding: 24px; border-radius: 24px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2);}
-    
-            .modal-btn { border: none; padding: 16px; border-radius: 14px; width: 100%; font-weight: 800; margin-top: 12px; cursor: pointer; font-size: 16px; transition: transform 0.2s;}
-    
-            .modal-btn:active { transform: scale(0.97); }
-    
-            .btn-whatsapp { background: var(--success); color: white; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);}
-    
-            .btn-print { background: var(--primary-gradient); color: white; box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);}
-    
-            .btn-close { background: #e5e5ea; color: black; margin-top: 20px;}
-    
-            .btn-backup { background: #ffcc00; color: black; margin-top: 15px;}
-    
-            /* CUSTOM TOAST NOTIFICATIONS */
-    
-            #toastContainer { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none;}
-    
-            .toast { background: #333; color: white; padding: 16px 20px; border-radius: 12px; font-weight: 600; font-size: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideDown 0.3s ease forwards; display: flex; align-items: center; gap: 10px;}
-    
-            .toast.error { background: #ff3b30; }
-    
-            .toast.success { background: #25D366; }
-    
-            .toast.fade-out { animation: fadeOut 0.3s ease forwards; }
-    
-            @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-    
-            @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
-    
-            /* CUSTOM CONFIRM MODAL */
-    
-            .confirm-modal-content { text-align: center; padding: 30px 24px; }
-    
-            .confirm-title { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: #111; }
-    
-            .confirm-msg { font-size: 15px; color: #555; margin-bottom: 25px; line-height: 1.4;}
-    
-            .confirm-actions { display: flex; gap: 10px; }
-    
-            .btn-confirm-yes { flex: 1; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 16px; }
-    
-            .btn-confirm-no { flex: 1; background: #e5e5ea; color: #333; border: none; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 16px; }
-    
-            .btn-confirm-danger { background: var(--danger); }
-    
-            /* =============================================
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>Baba Store</title>
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="Baba Store">
+	<style>
+	:root {
+		--primary: #007aff;
+		--primary-gradient: linear-gradient(135deg, #007aff, #005bb5);
+		--success: #25D366;
+		--danger: #ff3b30;
+		--danger-bg: #ffeceb;
+		--background: #f2f2f7;
+		--card-bg: #ffffff;
+		--text-main: #1c1c1e;
+		--text-muted: #8e8e93;
+		--border-color: #e5e5ea;
+	}
+	
+	* {
+		box-sizing: border-box;
+		-webkit-tap-highlight-color: transparent;
+	}
+	
+	body {
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+		background-color: var(--background);
+		margin: 0;
+		padding: 0;
+		color: var(--text-main);
+		padding-bottom: 60px;
+	}
+	
+	.header {
+		background: rgba(255, 255, 255, 0.85);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		position: sticky;
+		top: 0;
+		z-index: 100;
+		padding: 16px 20px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+	}
+	
+	.header h1 {
+		margin: 0;
+		font-size: 26px;
+		font-weight: 800;
+		color: var(--primary);
+		letter-spacing: -0.5px;
+	}
+	
+	.settings-btn {
+		background: #f2f2f7;
+		border: none;
+		font-size: 20px;
+		cursor: pointer;
+		color: var(--primary);
+		height: 40px;
+		width: 40px;
+		border-radius: 20px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+		transition: transform 0.2s;
+	}
+	
+	.settings-btn:active {
+		transform: scale(0.9);
+	}
+	
+	.container {
+		padding: 16px;
+		max-width: 600px;
+		margin: 0 auto;
+	}
+	
+	.section {
+		background: var(--card-bg);
+		border-radius: 20px;
+		padding: 24px 20px;
+		margin-bottom: 24px;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+	}
+	
+	.section-title {
+		font-weight: 800;
+		font-size: 19px;
+		margin-top: 0;
+		margin-bottom: 20px;
+		border-bottom: 2px solid var(--background);
+		padding-bottom: 10px;
+		color: #000;
+	}
+	
+	.input-group {
+		margin-bottom: 18px;
+		width: 100%;
+	}
+	
+	label {
+		display: block;
+		font-size: 13px;
+		margin-bottom: 8px;
+		font-weight: 700;
+		color: var(--text-muted);
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+	
+	input[type="text"],
+	input[type="date"],
+	input[type="number"],
+	input[type="search"] {
+		-webkit-appearance: none;
+		width: 100%;
+		padding: 16px;
+		border: 1.5px solid var(--border-color);
+		border-radius: 14px;
+		font-size: 16px;
+		font-weight: 500;
+		background-color: #fafafa;
+		display: block;
+		font-family: inherit;
+		transition: all 0.3s;
+	}
+	
+	input:focus {
+		border-color: var(--primary);
+		outline: none;
+		background-color: #fff;
+		box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+	}
+	
+	.labor-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 15px;
+		margin-bottom: 20px;
+		background: #fffaf0;
+		padding: 16px;
+		border-radius: 16px;
+		border: 1px solid #ffebb3;
+	}
+	
+	.labor-grid .input-group {
+		margin-bottom: 0;
+	}
+	
+	.labor-grid input {
+		border-color: #ffcc00;
+		background: white;
+		font-weight: bold;
+	}
+	
+	.product-list {
+		max-height: 450px;
+		overflow-y: auto;
+		padding-right: 5px;
+		margin-bottom: 10px;
+	}
+	
+	.product-row {
+		padding: 18px 0;
+		border-bottom: 1px solid var(--border-color);
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	
+	.product-name {
+		font-size: 16px;
+		font-weight: 700;
+		color: #222;
+	}
+	
+	.controls-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+	}
+	
+	.rate-box {
+		display: flex;
+		align-items: center;
+		background: #f4f4f5;
+		border-radius: 12px;
+		border: 1px solid var(--border-color);
+		padding: 0 12px;
+		width: 120px;
+		transition: border 0.2s;
+	}
+	
+	.rate-box:focus-within {
+		border-color: var(--primary);
+		background: #fff;
+	}
+	
+	.rate-box span {
+		color: var(--text-muted);
+		font-weight: 700;
+		font-size: 18px;
+	}
+	
+	.rate-box input {
+		border: none;
+		background: transparent;
+		padding: 14px 8px;
+		width: 100%;
+		font-size: 16px;
+		font-weight: 700;
+		color: var(--primary);
+	}
+	
+	.stepper {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		background: var(--background);
+		border-radius: 24px;
+		padding: 4px;
+		border: 1px solid var(--border-color);
+	}
+	
+	.btn-step {
+		width: 38px;
+		height: 38px;
+		border-radius: 19px;
+		border: none;
+		background: var(--card-bg);
+		color: var(--primary);
+		font-size: 24px;
+		font-weight: 500;
+		cursor: pointer;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+		transition: transform 0.1s;
+	}
+	
+	.btn-step:active {
+		transform: scale(0.9);
+	}
+	
+	.qty-val {
+		font-size: 18px;
+		font-weight: 800;
+		min-width: 28px;
+		text-align: center;
+		transition: all 0.15s ease;
+	}
+	
+	.pop-anim {
+		transform: scale(1.5);
+		color: var(--primary);
+	}
+	
+	.item-total {
+		font-size: 16px;
+		font-weight: 800;
+		color: var(--text-muted);
+		width: 85px;
+		text-align: right;
+	}
+	
+	.bill-summary {
+		background: #f0f8ff;
+		padding: 20px;
+		border-radius: 16px;
+		margin-top: 20px;
+		border: 1px solid #d6eaff;
+	}
+	
+	.bill-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 10px;
+		font-size: 15px;
+		color: #444;
+		font-weight: 600;
+	}
+	
+	.bill-row span:last-child {
+		text-align: right;
+	}
+	
+	.bill-row.grand {
+		border-top: 2px dashed #bce0fd;
+		padding-top: 15px;
+		margin-top: 15px;
+		font-size: 22px;
+		font-weight: 900;
+		color: var(--primary);
+	}
+	
+	.btn-submit {
+		width: 100%;
+		background: var(--primary-gradient);
+		color: white;
+		border: none;
+		padding: 18px;
+		border-radius: 16px;
+		font-size: 18px;
+		font-weight: 800;
+		cursor: pointer;
+		margin-top: 20px;
+		box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
+		transition: transform 0.2s;
+	}
+	
+	.btn-submit:active {
+		transform: scale(0.96);
+	}
+	
+	.search-area {
+		background: white;
+		padding: 16px;
+		border-radius: 16px;
+		margin-bottom: 20px;
+		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+	}
+	
+	.dashboard-box {
+		background: var(--primary-gradient);
+		color: white;
+		padding: 20px;
+		border-radius: 16px;
+		margin-bottom: 20px;
+		display: none;
+		box-shadow: 0 8px 24px rgba(0, 122, 255, 0.25);
+	}
+	
+	.dashboard-box h3 {
+		margin: 0 0 15px 0;
+		font-size: 20px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+		padding-bottom: 10px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	
+	.dash-row {
+		display: flex;
+		justify-content: space-between;
+		font-size: 16px;
+		margin-bottom: 8px;
+		font-weight: 500;
+	}
+	
+	.dash-grand {
+		font-size: 22px;
+		font-weight: 900;
+		margin-top: 15px;
+		border-top: 1px solid rgba(255, 255, 255, 0.3);
+		padding-top: 15px;
+	}
+	
+	.swipe-container {
+		display: flex;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scrollbar-width: none;
+		border-radius: 16px;
+		margin-bottom: 16px;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+	}
+	
+	.swipe-container::-webkit-scrollbar {
+		display: none;
+	}
+	
+	.order-card {
+		width: 100%;
+		flex: 0 0 100%;
+		scroll-snap-align: start;
+		background: var(--card-bg);
+		padding: 20px;
+		border-left: 8px solid #ffcc00;
+		position: relative;
+	}
+	
+	.order-card.overdue {
+		border-left-color: var(--danger);
+		background-color: #fff9f9;
+	}
+	
+	.order-card.delivered {
+		border-left-color: var(--success);
+		opacity: 0.8;
+		background-color: #fafafa;
+	}
+	
+	.swipe-actions {
+		flex: 0 0 160px;
+		scroll-snap-align: end;
+		display: flex;
+	}
+	
+	.action-btn {
+		flex: 1;
+		border: none;
+		color: white;
+		font-weight: bold;
+		font-size: 15px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		cursor: pointer;
+	}
+	
+	.btn-edit {
+		background: #ff9500;
+	}
+	
+	.btn-delete {
+		background: var(--danger);
+		border-radius: 0 16px 16px 0;
+	}
+	
+	.order-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		border-bottom: 1px solid #f2f2f7;
+		padding-bottom: 12px;
+		margin-bottom: 12px;
+	}
+	
+	.customer-name {
+		font-size: 20px;
+		font-weight: 800;
+		margin: 0;
+		color: #111;
+	}
+	
+	.customer-meta {
+		font-size: 14px;
+		color: var(--text-muted);
+		font-weight: 600;
+		margin: 6px 0 0 0;
+	}
+	
+	.order-bill {
+		font-size: 20px;
+		font-weight: 900;
+		color: var(--primary);
+		margin: 0;
+		background: #f0f8ff;
+		padding: 6px 12px;
+		border-radius: 10px;
+	}
+	
+	.delivery-toggle {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-top: 16px;
+		padding-top: 16px;
+		border-top: 1px solid #f2f2f7;
+	}
+	
+	.chk-box {
+		width: 32px;
+		height: 32px;
+		accent-color: var(--success);
+		cursor: pointer;
+		transform: scale(1.1);
+	}
+	
+	.overdue-text {
+		color: var(--danger);
+		font-size: 13px;
+		font-weight: 800;
+		margin-top: 10px;
+		display: inline-block;
+		background: #ffeceb;
+		padding: 4px 8px;
+		border-radius: 6px;
+	}
+	/* MODALS */
+	
+	.modal {
+		display: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.6);
+		backdrop-filter: blur(4px);
+		-webkit-backdrop-filter: blur(4px);
+		z-index: 1000;
+		padding: 20px;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.modal-content {
+		background: white;
+		padding: 24px;
+		border-radius: 24px;
+		width: 100%;
+		max-width: 500px;
+		max-height: 90vh;
+		overflow-y: auto;
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+	}
+	
+	.modal-btn {
+		border: none;
+		padding: 16px;
+		border-radius: 14px;
+		width: 100%;
+		font-weight: 800;
+		margin-top: 12px;
+		cursor: pointer;
+		font-size: 16px;
+		transition: transform 0.2s;
+	}
+	
+	.modal-btn:active {
+		transform: scale(0.97);
+	}
+	
+	.btn-whatsapp {
+		background: var(--success);
+		color: white;
+		box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+	}
+	
+	.btn-print {
+		background: var(--primary-gradient);
+		color: white;
+		box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+	}
+	
+	.btn-close {
+		background: #e5e5ea;
+		color: black;
+		margin-top: 20px;
+	}
+	
+	.btn-backup {
+		background: #ffcc00;
+		color: black;
+		margin-top: 15px;
+	}
+	/* CUSTOM TOAST NOTIFICATIONS */
+	
+	#toastContainer {
+		position: fixed;
+		top: 20px;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 2000;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		width: 90%;
+		max-width: 400px;
+		pointer-events: none;
+	}
+	
+	.toast {
+		background: #333;
+		color: white;
+		padding: 16px 20px;
+		border-radius: 12px;
+		font-weight: 600;
+		font-size: 15px;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+		animation: slideDown 0.3s ease forwards;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+	
+	.toast.error {
+		background: #ff3b30;
+	}
+	
+	.toast.success {
+		background: #25D366;
+	}
+	
+	.toast.fade-out {
+		animation: fadeOut 0.3s ease forwards;
+	}
+	
+	@keyframes slideDown {
+		from {
+			opacity: 0;
+			transform: translateY(-20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	
+	@keyframes fadeOut {
+		from {
+			opacity: 1;
+			transform: translateY(0);
+		}
+		to {
+			opacity: 0;
+			transform: translateY(-20px);
+		}
+	}
+	/* CUSTOM CONFIRM MODAL */
+	
+	.confirm-modal-content {
+		text-align: center;
+		padding: 30px 24px;
+	}
+	
+	.confirm-title {
+		font-size: 20px;
+		font-weight: 800;
+		margin-bottom: 10px;
+		color: #111;
+	}
+	
+	.confirm-msg {
+		font-size: 15px;
+		color: #555;
+		margin-bottom: 25px;
+		line-height: 1.4;
+	}
+	
+	.confirm-actions {
+		display: flex;
+		gap: 10px;
+	}
+	
+	.btn-confirm-yes {
+		flex: 1;
+		background: var(--primary);
+		color: white;
+		border: none;
+		padding: 14px;
+		border-radius: 12px;
+		font-weight: 800;
+		font-size: 16px;
+	}
+	
+	.btn-confirm-no {
+		flex: 1;
+		background: #e5e5ea;
+		color: #333;
+		border: none;
+		padding: 14px;
+		border-radius: 12px;
+		font-weight: 800;
+		font-size: 16px;
+	}
+	
+	.btn-confirm-danger {
+		background: var(--danger);
+	}
+	/* =============================================
     
                PRINT STYLES - KEY FIX FOR URL HIDING
     
                ============================================= */
-    
-            #printArea { display: none; }
-    
-            @media print {
-    
-                /* 
+	
+	#printArea {
+		display: none;
+	}
+	
+	@media print {
+		/* 
     
                  * FIX: Use margin: 15mm (not 0mm).
     
@@ -208,272 +696,194 @@
                  * page content overflow. The real fix is the combination below.
     
                  */
-    
-                @page {
-    
-                    size: A4 portrait;
-    
-                    margin: 15mm 15mm 15mm 15mm;
-    
-                    /* These properties hide header/footer in supported browsers */
-    
-                    marks: none;
-    
-                }
-    
-                html, body {
-    
-                    width: 100% !important;
-    
-                    margin: 0 !important;
-    
-                    padding: 0 !important;
-    
-                    background-color: #ffffff !important;
-    
-                    -webkit-print-color-adjust: exact !important;
-    
-                    print-color-adjust: exact !important;
-    
-                }
-    
-                /* Hide EVERYTHING on the page except our print area */
-    
-                body > *:not(#printArea) {
-    
-                    display: none !important;
-    
-                    visibility: hidden !important;
-    
-                }
-    
-                #printArea {
-    
-                    display: block !important;
-    
-                    visibility: visible !important;
-    
-                    position: static !important;
-    
-                    width: 100% !important;
-    
-                    margin: 0 !important;
-    
-                    padding: 0 !important;
-    
-                }
-    
-            }
-        </style>
-    </head>
+		@page {
+			size: A4 portrait;
+			margin: 15mm 15mm 15mm 15mm;
+			/* These properties hide header/footer in supported browsers */
+			marks: none;
+		}
+		html,
+		body {
+			width: 100% !important;
+			margin: 0 !important;
+			padding: 0 !important;
+			background-color: #ffffff !important;
+			-webkit-print-color-adjust: exact !important;
+			print-color-adjust: exact !important;
+		}
+		/* Hide EVERYTHING on the page except our print area */
+		body > *:not(#printArea) {
+			display: none !important;
+			visibility: hidden !important;
+		}
+		#printArea {
+			display: block !important;
+			visibility: visible !important;
+			position: static !important;
+			width: 100% !important;
+			margin: 0 !important;
+			padding: 0 !important;
+		}
+	}
+	</style>
+</head>
 
-    <body>
-        <div id="printArea"></div>
-        <div id="toastContainer"></div>
-        <div class="header no-print">
-            <h1>Baba Store</h1>
-            <button class="settings-btn" onclick="openSettings()">⚙️</button>
-        </div>
-        <datalist id="customerNamesList"></datalist>
-        <div class="container no-print">
-            <div class="section">
-                <h2 class="section-title" id="formTitle">📝 New Order</h2>
-                <div class="input-group">
-                    <label>Order Date</label>
-                    <input type="date" id="orderDate">
-                </div>
-                <div class="input-group">
-                    <label>Customer Name</label>
-                    <input type="text" id="custName" list="customerNamesList" placeholder="Start typing name..." oninput="autoFillAddress()">
-                </div>
-                <div class="input-group">
-                    <label>Address / Location</label>
-                    <input type="text" id="custAddress" placeholder="Address will auto-fill...">
-                </div>
-            </div>
-            <div class="section">
-                <h2 class="section-title">💼 Labor Rates (Per Bag)</h2>
-                <div class="labor-grid">
-                    <div class="input-group">
-                        <label>Loading (₹)</label>
-                        <input type="number" inputmode="decimal" pattern="[0-9]*" id="loadingRate" placeholder="0" oninput="calculateGrandTotal()">
-                    </div>
-                    <div class="input-group">
-                        <label>Unloading (₹)</label>
-                        <input type="number" inputmode="decimal" pattern="[0-9]*" id="unloadingRate" placeholder="0" oninput="calculateGrandTotal()">
-                    </div>
-                </div>
-                <h2 class="section-title">📦 Products</h2>
-                <div class="product-list" id="productList"></div>
-                <div class="bill-summary">
-                    <div class="bill-row"><span>Products Total:</span> <span id="displayItemTotal">₹0.00</span></div>
-                    <div class="bill-row"><span>Total Bags:</span> <span id="displayTotalBags">0</span></div>
-                    <div class="bill-row"><span>Loading Total:</span> <span id="displayLoadTotal" style="color:#333;">₹0.00</span></div>
-                    <div class="bill-row"><span>Unloading Total:</span> <span id="displayUnloadTotal" style="color:#333;">₹0.00</span></div>
-                    <div class="bill-row grand"><span>Grand Total:</span> <span id="displayGrandTotal">₹0.00</span></div>
-                </div>
-                <button class="btn-submit" id="submitBtn" onclick="submitOrder()">Save Order</button>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; margin-top: 30px;">
-                <h2 style="font-size: 22px; font-weight: 900; margin: 0; margin-left: 5px;">📋 Delivery Board</h2>
-            </div>
-            <div class="search-area">
-                <div class="input-group" style="margin-bottom: 12px;">
-                    <input type="search" id="searchName" placeholder="🔍 Search by Customer Name..." oninput="renderOrders()">
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <input type="date" id="filterDate" onchange="renderOrders()" style="flex:1;">
-                    <button onclick="clearFilter()" style="padding:14px 20px; border-radius:14px; border:none; font-weight:bold; background:#e5e5ea; color: #333;">Clear</button>
-                </div>
-            </div>
-            <div id="dailyDashboard" class="dashboard-box">
-                <h3 id="dashboardTitle">📊 Daily Summary</h3>
-                <div id="dashboardStats" style="margin-bottom:15px;"></div>
-                <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 12px; margin-top: 15px;">
-                    <div class="dash-row"><span>Products Revenue:</span> <span id="dashProdRev">₹0</span></div>
-                    <div class="dash-row"><span>Loading Revenue:</span> <span id="dashLoadRev">₹0</span></div>
-                    <div class="dash-row"><span>Unloading Revenue:</span> <span id="dashUnloadRev">₹0</span></div>
-                    <div class="dash-row dash-grand" style="margin-top:10px; padding-top:10px;"><span>Total Expected:</span> <span id="dashTotalRev">₹0</span></div>
-                </div>
-            </div>
-            <div id="orderLog"></div>
-        </div>
-        <!-- INVOICE MODAL -->
-        <div id="billModal" class="modal no-print">
-            <div class="modal-content">
-                <div id="modalBody" style="background: white; padding: 0;"></div>
-                <button class="modal-btn btn-whatsapp no-print" id="whatsappBtn">💬 Send on WhatsApp</button>
-                <button class="modal-btn btn-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
-                <button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
-            </div>
-        </div>
-        <!-- SETTINGS MODAL -->
-        <div id="settingsModal" class="modal no-print">
-            <div class="modal-content" style="text-align: center;">
-                <h2 style="margin-top:0; color:var(--primary); font-weight: 900;">Business Settings</h2>
-                <p style="color:var(--text-muted); font-size:14px; margin-bottom:12px; font-weight: bold;">Protect your business data by saving it to your phone.</p>
-                <button class="modal-btn btn-backup" onclick="exportData()">💾 Download Backup File</button>
-                <div style="margin-top:24px; padding-top:24px; border-top:2px dashed #eee; text-align: left;">
-                    <label style="font-size:14px; font-weight:800; display:block; margin-bottom:10px; color:#333;">Restore from Backup</label>
-                    <input type="file" id="backupFile" accept=".json" style="margin-bottom:12px; width:100%; padding: 10px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
-                    <button class="modal-btn" style="background:#ff3b30; color:white; margin-top: 0;" onclick="importData()">📂 Restore Data</button>
-                </div>
-                <button class="modal-btn btn-close" onclick="closeModals()">Close Settings</button>
-            </div>
-        </div>
-        <!-- CUSTOM CONFIRM MODAL -->
-        <div id="confirmModal" class="modal no-print" style="z-index: 3000;">
-            <div class="modal-content confirm-modal-content">
-                <div class="confirm-title" id="confirmTitle">Confirm Action</div>
-                <div class="confirm-msg" id="confirmMsg">Are you sure you want to do this?</div>
-                <div class="confirm-actions">
-                    <button class="btn-confirm-no" id="confirmBtnNo">Cancel</button>
-                    <button class="btn-confirm-yes" id="confirmBtnYes">Confirm</button>
-                </div>
-            </div>
-        </div>
-        <script>
-            const products = [
-    
-                "Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar",
-    
-                "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Shujji", "Sujji 47 Kg", "Sujji 48 Kg",
-    
-                "Darra", "Milk More", "Doodh Virdi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"
-    
-            ];
-    
-            let currentItems = {};
-    
-            let db;
-    
-            let editingOrderId = null; 
-    
-            let customerMemory = {}; 
-    
-            function safeId(str) { return str.replace(/[^a-zA-Z0-9]/g, ''); }
-    
-            function triggerHaptic() {
-    
-                if ("vibrate" in navigator) navigator.vibrate(40); 
-    
-            }
-    
-            function showToast(message, type = 'error') {
-    
-                triggerHaptic();
-    
-                const container = document.getElementById('toastContainer');
-    
-                const toast = document.createElement('div');
-    
-                toast.className = `toast ${type}`;
-    
-                const icon = type === 'error' ? '⚠️' : '✅';
-    
-                toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
-    
-                container.appendChild(toast);
-    
-                setTimeout(() => {
-    
-                    toast.classList.add('fade-out');
-    
-                    setTimeout(() => toast.remove(), 300);
-    
-                }, 3000);
-    
-            }
-    
-            function showConfirm(title, message, isDanger, onConfirm, onCancel) {
-    
-                triggerHaptic();
-    
-                document.getElementById('confirmTitle').innerText = title;
-    
-                document.getElementById('confirmMsg').innerText = message;
-    
-                const btnYes = document.getElementById('confirmBtnYes');
-    
-                btnYes.className = isDanger ? "btn-confirm-yes btn-confirm-danger" : "btn-confirm-yes";
-    
-                document.getElementById('confirmModal').style.display = 'flex';
-    
-                document.getElementById('confirmBtnYes').onclick = () => {
-    
-                    document.getElementById('confirmModal').style.display = 'none';
-    
-                    if(onConfirm) onConfirm();
-    
-                };
-    
-                document.getElementById('confirmBtnNo').onclick = () => {
-    
-                    document.getElementById('confirmModal').style.display = 'none';
-    
-                    if(onCancel) onCancel();
-    
-                };
-    
-            }
-    
-            function initApp() {
-    
-                let today = new Date().toISOString().split('T')[0];
-    
-                document.getElementById('orderDate').value = today;
-    
-                document.getElementById('filterDate').value = today;
-    
-                const container = document.getElementById('productList');
-    
-                products.forEach(p => {
-    
-                    currentItems[p] = { qty: 0, rate: "" };
-    
-                    let sId = safeId(p);
-    
-                    container.innerHTML += `
+<body>
+	<div id="printArea"></div>
+	<div id="toastContainer"></div>
+	<div class="header no-print">
+		<h1>Baba Store</h1>
+		<button class="settings-btn" onclick="openSettings()">⚙️</button>
+	</div>
+	<datalist id="customerNamesList"></datalist>
+	<div class="container no-print">
+		<div class="section">
+			<h2 class="section-title" id="formTitle">📝 New Order</h2>
+			<div class="input-group">
+				<label>Order Date</label>
+				<input type="date" id="orderDate"> </div>
+			<div class="input-group">
+				<label>Customer Name</label>
+				<input type="text" id="custName" list="customerNamesList" placeholder="Start typing name..." oninput="autoFillAddress()"> </div>
+			<div class="input-group">
+				<label>Address / Location</label>
+				<input type="text" id="custAddress" placeholder="Address will auto-fill..."> </div>
+		</div>
+		<div class="section">
+			<h2 class="section-title">💼 Labor Rates (Per Bag)</h2>
+			<div class="labor-grid">
+				<div class="input-group">
+					<label>Loading (₹)</label>
+					<input type="number" inputmode="decimal" pattern="[0-9]*" id="loadingRate" placeholder="0" oninput="calculateGrandTotal()"> </div>
+				<div class="input-group">
+					<label>Unloading (₹)</label>
+					<input type="number" inputmode="decimal" pattern="[0-9]*" id="unloadingRate" placeholder="0" oninput="calculateGrandTotal()"> </div>
+			</div>
+			<h2 class="section-title">📦 Products</h2>
+			<div class="product-list" id="productList"></div>
+			<div class="bill-summary">
+				<div class="bill-row"><span>Products Total:</span> <span id="displayItemTotal">₹0.00</span></div>
+				<div class="bill-row"><span>Total Bags:</span> <span id="displayTotalBags">0</span></div>
+				<div class="bill-row"><span>Loading Total:</span> <span id="displayLoadTotal" style="color:#333;">₹0.00</span></div>
+				<div class="bill-row"><span>Unloading Total:</span> <span id="displayUnloadTotal" style="color:#333;">₹0.00</span></div>
+				<div class="bill-row grand"><span>Grand Total:</span> <span id="displayGrandTotal">₹0.00</span></div>
+			</div>
+			<button class="btn-submit" id="submitBtn" onclick="submitOrder()">Save Order</button>
+		</div>
+		<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; margin-top: 30px;">
+			<h2 style="font-size: 22px; font-weight: 900; margin: 0; margin-left: 5px;">📋 Delivery Board</h2> </div>
+		<div class="search-area">
+			<div class="input-group" style="margin-bottom: 12px;">
+				<input type="search" id="searchName" placeholder="🔍 Search by Customer Name..." oninput="renderOrders()"> </div>
+			<div style="display: flex; gap: 10px;">
+				<input type="date" id="filterDate" onchange="renderOrders()" style="flex:1;">
+				<button onclick="clearFilter()" style="padding:14px 20px; border-radius:14px; border:none; font-weight:bold; background:#e5e5ea; color: #333;">Clear</button>
+			</div>
+		</div>
+		<div id="dailyDashboard" class="dashboard-box">
+			<h3 id="dashboardTitle">📊 Daily Summary</h3>
+			<div id="dashboardStats" style="margin-bottom:15px;"></div>
+			<div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 12px; margin-top: 15px;">
+				<div class="dash-row"><span>Products Revenue:</span> <span id="dashProdRev">₹0</span></div>
+				<div class="dash-row"><span>Loading Revenue:</span> <span id="dashLoadRev">₹0</span></div>
+				<div class="dash-row"><span>Unloading Revenue:</span> <span id="dashUnloadRev">₹0</span></div>
+				<div class="dash-row dash-grand" style="margin-top:10px; padding-top:10px;"><span>Total Expected:</span> <span id="dashTotalRev">₹0</span></div>
+			</div>
+		</div>
+		<div id="orderLog"></div>
+	</div>
+	<!-- INVOICE MODAL -->
+	<div id="billModal" class="modal no-print">
+		<div class="modal-content">
+			<div id="modalBody" style="background: white; padding: 0;"></div>
+			<button class="modal-btn btn-whatsapp no-print" id="whatsappBtn">💬 Send on WhatsApp</button>
+			<button class="modal-btn btn-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+			<button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
+		</div>
+	</div>
+	<!-- SETTINGS MODAL -->
+	<div id="settingsModal" class="modal no-print">
+		<div class="modal-content" style="text-align: center;">
+			<h2 style="margin-top:0; color:var(--primary); font-weight: 900;">Business Settings</h2>
+			<p style="color:var(--text-muted); font-size:14px; margin-bottom:12px; font-weight: bold;">Protect your business data by saving it to your phone.</p>
+			<button class="modal-btn btn-backup" onclick="exportData()">💾 Download Backup File</button>
+			<div style="margin-top:24px; padding-top:24px; border-top:2px dashed #eee; text-align: left;">
+				<label style="font-size:14px; font-weight:800; display:block; margin-bottom:10px; color:#333;">Restore from Backup</label>
+				<input type="file" id="backupFile" accept=".json" style="margin-bottom:12px; width:100%; padding: 10px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
+				<button class="modal-btn" style="background:#ff3b30; color:white; margin-top: 0;" onclick="importData()">📂 Restore Data</button>
+			</div>
+			<button class="modal-btn btn-close" onclick="closeModals()">Close Settings</button>
+		</div>
+	</div>
+	<!-- CUSTOM CONFIRM MODAL -->
+	<div id="confirmModal" class="modal no-print" style="z-index: 3000;">
+		<div class="modal-content confirm-modal-content">
+			<div class="confirm-title" id="confirmTitle">Confirm Action</div>
+			<div class="confirm-msg" id="confirmMsg">Are you sure you want to do this?</div>
+			<div class="confirm-actions">
+				<button class="btn-confirm-no" id="confirmBtnNo">Cancel</button>
+				<button class="btn-confirm-yes" id="confirmBtnYes">Confirm</button>
+			</div>
+		</div>
+	</div>
+	<script>
+	const products = ["Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar", "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Shujji", "Sujji 47 Kg", "Sujji 48 Kg", "Darra", "Milk More", "Doodh Virdi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"];
+	let currentItems = {};
+	let db;
+	let editingOrderId = null;
+	let customerMemory = {};
+
+	function safeId(str) {
+		return str.replace(/[^a-zA-Z0-9]/g, '');
+	}
+
+	function triggerHaptic() {
+		if("vibrate" in navigator) navigator.vibrate(40);
+	}
+
+	function showToast(message, type = 'error') {
+		triggerHaptic();
+		const container = document.getElementById('toastContainer');
+		const toast = document.createElement('div');
+		toast.className = `toast ${type}`;
+		const icon = type === 'error' ? '⚠️' : '✅';
+		toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+		container.appendChild(toast);
+		setTimeout(() => {
+			toast.classList.add('fade-out');
+			setTimeout(() => toast.remove(), 300);
+		}, 3000);
+	}
+
+	function showConfirm(title, message, isDanger, onConfirm, onCancel) {
+		triggerHaptic();
+		document.getElementById('confirmTitle').innerText = title;
+		document.getElementById('confirmMsg').innerText = message;
+		const btnYes = document.getElementById('confirmBtnYes');
+		btnYes.className = isDanger ? "btn-confirm-yes btn-confirm-danger" : "btn-confirm-yes";
+		document.getElementById('confirmModal').style.display = 'flex';
+		document.getElementById('confirmBtnYes').onclick = () => {
+			document.getElementById('confirmModal').style.display = 'none';
+			if(onConfirm) onConfirm();
+		};
+		document.getElementById('confirmBtnNo').onclick = () => {
+			document.getElementById('confirmModal').style.display = 'none';
+			if(onCancel) onCancel();
+		};
+	}
+
+	function initApp() {
+		let today = new Date().toISOString().split('T')[0];
+		document.getElementById('orderDate').value = today;
+		document.getElementById('filterDate').value = today;
+		const container = document.getElementById('productList');
+		products.forEach(p => {
+			currentItems[p] = {
+				qty: 0,
+				rate: ""
+			};
+			let sId = safeId(p);
+			container.innerHTML += `
     <div class="product-row">
     <span class="product-name">${p}</span>
     <div class="controls-row">
@@ -488,366 +898,237 @@
     <div class="item-total" id="total-${sId}">₹0</div>
     </div>
     </div>`;
-    
-                });
-    
-                initDatabase();
-    
-            }
-    
-            function updateQty(product, change) {
-    
-                currentItems[product].qty = Math.max(0, currentItems[product].qty + change);
-    
-                let qtyEl = document.getElementById(`qty-${safeId(product)}`);
-    
-                qtyEl.innerText = currentItems[product].qty;
-    
-                qtyEl.classList.add('pop-anim');
-    
-                setTimeout(() => qtyEl.classList.remove('pop-anim'), 150);
-    
-                calculateItem(product);
-    
-            }
-    
-            function calculateItem(product) {
-    
-                let rateInput = document.getElementById(`rate-${safeId(product)}`).value;
-    
-                currentItems[product].rate = rateInput === "" ? 0 : parseFloat(rateInput);
-    
-                document.getElementById(`total-${safeId(product)}`).innerText = `₹${(currentItems[product].qty * currentItems[product].rate).toFixed(0)}`;
-    
-                calculateGrandTotal();
-    
-            }
-    
-            function calculateGrandTotal() {
-    
-                let totalQty = 0; let itemsTotal = 0;
-    
-                products.forEach(p => {
-    
-                    let q = currentItems[p].qty; let r = currentItems[p].rate || 0;
-    
-                    totalQty += q; itemsTotal += (q * r);
-    
-                });
-    
-                let loadRate = parseFloat(document.getElementById('loadingRate').value) || 0;
-    
-                let unloadRate = parseFloat(document.getElementById('unloadingRate').value) || 0;
-    
-                let loadTotal = totalQty * loadRate; let unloadTotal = totalQty * unloadRate;
-    
-                let finalTotal = itemsTotal + loadTotal + unloadTotal;
-    
-                document.getElementById('displayItemTotal').innerText = `₹${itemsTotal.toFixed(2)}`;
-    
-                document.getElementById('displayTotalBags').innerText = totalQty;
-    
-                document.getElementById('displayLoadTotal').innerText = loadTotal > 0 ? `₹${loadTotal.toFixed(2)} (₹${loadRate}x${totalQty})` : `₹0.00`;
-    
-                document.getElementById('displayUnloadTotal').innerText = unloadTotal > 0 ? `₹${unloadTotal.toFixed(2)} (₹${unloadRate}x${totalQty})` : `₹0.00`;
-    
-                document.getElementById('displayGrandTotal').innerText = `₹${finalTotal.toFixed(2)}`;
-    
-                return { itemsTotal, loadTotal, unloadTotal, finalTotal, totalQty, loadRate, unloadRate };
-    
-            }
-    
-            function initDatabase() {
-    
-                let request = indexedDB.open("BabaStoreDB", 4);
-    
-                request.onupgradeneeded = e => {
-    
-                    db = e.target.result;
-    
-                    if (!db.objectStoreNames.contains("orders")) db.createObjectStore("orders", { keyPath: "id", autoIncrement: true });
-    
-                };
-    
-                request.onsuccess = e => { db = e.target.result; renderOrders(); };
-    
-            }
-    
-            function clearFilter() { 
-    
-                triggerHaptic();
-    
-                document.getElementById('filterDate').value = ''; 
-    
-                document.getElementById('searchName').value = ''; 
-    
-                renderOrders(); 
-    
-            }
-    
-            function autoFillAddress() {
-    
-                let name = document.getElementById('custName').value.trim();
-    
-                if (customerMemory[name]) {
-    
-                    document.getElementById('custAddress').value = customerMemory[name];
-    
-                }
-    
-            }
-    
-            function submitOrder() {
-    
-                triggerHaptic();
-    
-                const name = document.getElementById('custName').value.trim();
-    
-                const address = document.getElementById('custAddress').value.trim();
-    
-                const rawDate = document.getElementById('orderDate').value;
-    
-                if (!name) return showToast("Please enter a customer name.", "error");
-    
-                let totals = calculateGrandTotal();
-    
-                if (totals.totalQty === 0) return showToast("Please add at least 1 product quantity.", "error");
-    
-                let orderItems = {};
-    
-                products.forEach(p => { 
-    
-                    if(currentItems[p].qty > 0) orderItems[p] = { qty: currentItems[p].qty, rate: currentItems[p].rate || 0, total: currentItems[p].qty * (currentItems[p].rate || 0) };
-    
-                });
-    
-                let d = new Date(rawDate);
-    
-                let formattedDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
-    
-                let orderData = {
-    
-                    customerName: name, address: address, filterDate: rawDate, displayDate: formattedDate,
-    
-                    timestamp: Date.now(), isDelivered: false, items: orderItems,
-    
-                    loadRate: totals.loadRate, loadTotal: totals.loadTotal,
-    
-                    unloadRate: totals.unloadRate, unloadTotal: totals.unloadTotal,
-    
-                    itemsTotal: totals.itemsTotal, billTotal: totals.finalTotal, totalBags: totals.totalQty
-    
-                };
-    
-                let store = db.transaction(["orders"], "readwrite").objectStore("orders");
-    
-                if (editingOrderId) {
-    orderData.id = editingOrderId;
-    
-                    store.put(orderData).onsuccess = () => {
-    
-                        showToast("Order Updated!", "success");
-    
-                        resetForm();
-    
-                    };
-    
-                } else {
-    
-                    store.add(orderData).onsuccess = () => {
-    
-                        showToast("Order Saved!", "success");
-    
-                        resetForm();
-    
-                    };
-    
-                }
-    
-            }
-    
-            function resetForm() {
-    
-                editingOrderId = null;
-    
-                document.getElementById('formTitle').innerText = "📝 New Order";
-    
-                document.getElementById('submitBtn').innerText = "Save Order";
-    
-                document.getElementById('submitBtn').style.background = "var(--primary-gradient)";
-    
-                document.getElementById('custName').value = ""; document.getElementById('custAddress').value = "";
-    
-                document.getElementById('loadingRate').value = ""; document.getElementById('unloadingRate').value = "";
-    
-                products.forEach(p => { 
-    
-                    currentItems[p].qty = 0; currentItems[p].rate = "";
-    
-                    document.getElementById(`qty-${safeId(p)}`).innerText = 0; 
-    
-                    document.getElementById(`rate-${safeId(p)}`).value = ""; 
-    
-                    document.getElementById(`total-${safeId(p)}`).innerText = "₹0"; 
-    
-                });
-    
-                calculateGrandTotal(); renderOrders(); window.scrollTo(0,0);
-    
-            }
-    
-            function editOrder(id) {
-    
-                triggerHaptic();
-    
-                db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
-    
-                    let order = e.target.result;
-    
-                    editingOrderId = order.id;
-    
-                    document.getElementById('formTitle').innerText = "✏️ Editing Order...";
-    
-                    document.getElementById('submitBtn').innerText = "Update Existing Order";
-    
-                    document.getElementById('submitBtn').style.background = "#ff9500"; 
-    
-                    document.getElementById('orderDate').value = order.filterDate;
-    
-                    document.getElementById('custName').value = order.customerName;
-    
-                    document.getElementById('custAddress').value = order.address || "";
-    
-                    document.getElementById('loadingRate').value = order.loadRate || "";
-    
-                    document.getElementById('unloadingRate').value = order.unloadRate || "";
-    
-                    products.forEach(p => { currentItems[p] = { qty: 0, rate: "" }; });
-    
-                    for (let p in order.items) {
-    
-                        currentItems[p] = { qty: order.items[p].qty, rate: order.items[p].rate };
-    
-                        document.getElementById(`qty-${safeId(p)}`).innerText = currentItems[p].qty;
-    
-                        document.getElementById(`rate-${safeId(p)}`).value = currentItems[p].rate || "";
-    
-                    }
-    
-                    products.forEach(calculateItem); window.scrollTo(0,0);
-    
-                };
-    
-            }
-    
-            function deleteOrder(id) {
-    
-                showConfirm("Delete Order", "Are you sure you want to completely DELETE this order?", true, 
-    
-                    () => { 
-    
-                        db.transaction(["orders"], "readwrite").objectStore("orders").delete(id).onsuccess = () => {
-    
-                            showToast("Order Deleted", "error");
-    
-                            renderOrders();
-    
-                        };
-    
-                    }
-    
-                );
-    
-            }
-    
-            function toggleDelivery(id, isChecked) {
-    
-                if (isChecked) {
-    
-                    showConfirm("Lock Delivery", "Mark this order as Delivered? Once marked, it cannot be undone.", false, 
-    
-                        () => { 
-    
-                            let store = db.transaction(["orders"], "readwrite").objectStore("orders");
-    
-                            store.get(id).onsuccess = e => {
-    
-                                let data = e.target.result; 
-    
-                                data.isDelivered = true;
-    
-                                store.put(data).onsuccess = () => {
-    
-                                    showToast("Locked as Delivered!", "success");
-    
-                                    renderOrders();
-    
-                                };
-    
-                            };
-    
-                        },
-    
-                        () => { renderOrders(); }
-    
-                    );
-    
-                }
-    
-            }
-    
-            function viewBill(id) {
-    
-                triggerHaptic();
-    
-                db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
-    
-                    let o = e.target.result;
-    
-                    let whatsappText = `*BABA STORE INVOICE*\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
-    
-                    let itemsHtml = ""; 
-    
-                    for (let p in o.items) {
-    
-                        whatsappText += `${p}: ${o.items[p].qty} x ₹${o.items[p].rate} = ₹${o.items[p].total}\n`;
-    
-                        itemsHtml += `<tr>
+		});
+		initDatabase();
+	}
+
+	function updateQty(product, change) {
+		currentItems[product].qty = Math.max(0, currentItems[product].qty + change);
+		let qtyEl = document.getElementById(`qty-${safeId(product)}`);
+		qtyEl.innerText = currentItems[product].qty;
+		qtyEl.classList.add('pop-anim');
+		setTimeout(() => qtyEl.classList.remove('pop-anim'), 150);
+		calculateItem(product);
+	}
+
+	function calculateItem(product) {
+		let rateInput = document.getElementById(`rate-${safeId(product)}`).value;
+		currentItems[product].rate = rateInput === "" ? 0 : parseFloat(rateInput);
+		document.getElementById(`total-${safeId(product)}`).innerText = `₹${(currentItems[product].qty * currentItems[product].rate).toFixed(0)}`;
+		calculateGrandTotal();
+	}
+
+	function calculateGrandTotal() {
+		let totalQty = 0;
+		let itemsTotal = 0;
+		products.forEach(p => {
+			let q = currentItems[p].qty;
+			let r = currentItems[p].rate || 0;
+			totalQty += q;
+			itemsTotal += (q * r);
+		});
+		let loadRate = parseFloat(document.getElementById('loadingRate').value) || 0;
+		let unloadRate = parseFloat(document.getElementById('unloadingRate').value) || 0;
+		let loadTotal = totalQty * loadRate;
+		let unloadTotal = totalQty * unloadRate;
+		let finalTotal = itemsTotal + loadTotal + unloadTotal;
+		document.getElementById('displayItemTotal').innerText = `₹${itemsTotal.toFixed(2)}`;
+		document.getElementById('displayTotalBags').innerText = totalQty;
+		document.getElementById('displayLoadTotal').innerText = loadTotal > 0 ? `₹${loadTotal.toFixed(2)} (₹${loadRate}x${totalQty})` : `₹0.00`;
+		document.getElementById('displayUnloadTotal').innerText = unloadTotal > 0 ? `₹${unloadTotal.toFixed(2)} (₹${unloadRate}x${totalQty})` : `₹0.00`;
+		document.getElementById('displayGrandTotal').innerText = `₹${finalTotal.toFixed(2)}`;
+		return {
+			itemsTotal, loadTotal, unloadTotal, finalTotal, totalQty, loadRate, unloadRate
+		};
+	}
+
+	function initDatabase() {
+		let request = indexedDB.open("BabaStoreDB", 4);
+		request.onupgradeneeded = e => {
+			db = e.target.result;
+			if(!db.objectStoreNames.contains("orders")) db.createObjectStore("orders", {
+				keyPath: "id",
+				autoIncrement: true
+			});
+		};
+		request.onsuccess = e => {
+			db = e.target.result;
+			renderOrders();
+		};
+	}
+
+	function clearFilter() {
+		triggerHaptic();
+		document.getElementById('filterDate').value = '';
+		document.getElementById('searchName').value = '';
+		renderOrders();
+	}
+
+	function autoFillAddress() {
+		let name = document.getElementById('custName').value.trim();
+		if(customerMemory[name]) {
+			document.getElementById('custAddress').value = customerMemory[name];
+		}
+	}
+
+	function submitOrder() {
+		triggerHaptic();
+		const name = document.getElementById('custName').value.trim();
+		const address = document.getElementById('custAddress').value.trim();
+		const rawDate = document.getElementById('orderDate').value;
+		if(!name) return showToast("Please enter a customer name.", "error");
+		let totals = calculateGrandTotal();
+		if(totals.totalQty === 0) return showToast("Please add at least 1 product quantity.", "error");
+		let orderItems = {};
+		products.forEach(p => {
+			if(currentItems[p].qty > 0) orderItems[p] = {
+				qty: currentItems[p].qty,
+				rate: currentItems[p].rate || 0,
+				total: currentItems[p].qty * (currentItems[p].rate || 0)
+			};
+		});
+		let d = new Date(rawDate);
+		let formattedDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+		let orderData = {
+			customerName: name,
+			address: address,
+			filterDate: rawDate,
+			displayDate: formattedDate,
+			timestamp: Date.now(),
+			isDelivered: false,
+			items: orderItems,
+			loadRate: totals.loadRate,
+			loadTotal: totals.loadTotal,
+			unloadRate: totals.unloadRate,
+			unloadTotal: totals.unloadTotal,
+			itemsTotal: totals.itemsTotal,
+			billTotal: totals.finalTotal,
+			totalBags: totals.totalQty
+		};
+		let store = db.transaction(["orders"], "readwrite").objectStore("orders");
+		if(editingOrderId) {
+			orderData.id = editingOrderId;
+			store.put(orderData).onsuccess = () => {
+				showToast("Order Updated!", "success");
+				resetForm();
+			};
+		} else {
+			store.add(orderData).onsuccess = () => {
+				showToast("Order Saved!", "success");
+				resetForm();
+			};
+		}
+	}
+
+	function resetForm() {
+		editingOrderId = null;
+		document.getElementById('formTitle').innerText = "📝 New Order";
+		document.getElementById('submitBtn').innerText = "Save Order";
+		document.getElementById('submitBtn').style.background = "var(--primary-gradient)";
+		document.getElementById('custName').value = "";
+		document.getElementById('custAddress').value = "";
+		document.getElementById('loadingRate').value = "";
+		document.getElementById('unloadingRate').value = "";
+		products.forEach(p => {
+			currentItems[p].qty = 0;
+			currentItems[p].rate = "";
+			document.getElementById(`qty-${safeId(p)}`).innerText = 0;
+			document.getElementById(`rate-${safeId(p)}`).value = "";
+			document.getElementById(`total-${safeId(p)}`).innerText = "₹0";
+		});
+		calculateGrandTotal();
+		renderOrders();
+		window.scrollTo(0, 0);
+	}
+
+	function editOrder(id) {
+		triggerHaptic();
+		db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
+			let order = e.target.result;
+			editingOrderId = order.id;
+			document.getElementById('formTitle').innerText = "✏️ Editing Order...";
+			document.getElementById('submitBtn').innerText = "Update Existing Order";
+			document.getElementById('submitBtn').style.background = "#ff9500";
+			document.getElementById('orderDate').value = order.filterDate;
+			document.getElementById('custName').value = order.customerName;
+			document.getElementById('custAddress').value = order.address || "";
+			document.getElementById('loadingRate').value = order.loadRate || "";
+			document.getElementById('unloadingRate').value = order.unloadRate || "";
+			products.forEach(p => {
+				currentItems[p] = {
+					qty: 0,
+					rate: ""
+				};
+			});
+			for(let p in order.items) {
+				currentItems[p] = {
+					qty: order.items[p].qty,
+					rate: order.items[p].rate
+				};
+				document.getElementById(`qty-${safeId(p)}`).innerText = currentItems[p].qty;
+				document.getElementById(`rate-${safeId(p)}`).value = currentItems[p].rate || "";
+			}
+			products.forEach(calculateItem);
+			window.scrollTo(0, 0);
+		};
+	}
+
+	function deleteOrder(id) {
+		showConfirm("Delete Order", "Are you sure you want to completely DELETE this order?", true, () => {
+			db.transaction(["orders"], "readwrite").objectStore("orders").delete(id).onsuccess = () => {
+				showToast("Order Deleted", "error");
+				renderOrders();
+			};
+		});
+	}
+
+	function toggleDelivery(id, isChecked) {
+		if(isChecked) {
+			showConfirm("Lock Delivery", "Mark this order as Delivered? Once marked, it cannot be undone.", false, () => {
+				let store = db.transaction(["orders"], "readwrite").objectStore("orders");
+				store.get(id).onsuccess = e => {
+					let data = e.target.result;
+					data.isDelivered = true;
+					store.put(data).onsuccess = () => {
+						showToast("Locked as Delivered!", "success");
+						renderOrders();
+					};
+				};
+			}, () => {
+				renderOrders();
+			});
+		}
+	}
+
+	function viewBill(id) {
+		triggerHaptic();
+		db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
+			let o = e.target.result;
+			let whatsappText = `*BABA STORE INVOICE*\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
+			let itemsHtml = "";
+			for(let p in o.items) {
+				whatsappText += `${p}: ${o.items[p].qty} x ₹${o.items[p].rate} = ₹${o.items[p].total}\n`;
+				itemsHtml += `<tr>
     <td style="padding:10px 0; color:#222; font-weight:600; font-size:13px; border-bottom:1px solid #f0f0f0;">${p}</td>
     <td style="text-align:center; padding:10px 0; color:#555; font-size:13px; border-bottom:1px solid #f0f0f0;">${o.items[p].qty}</td>
     <td style="text-align:center; padding:10px 0; color:#555; font-size:13px; border-bottom:1px solid #f0f0f0;">₹${o.items[p].rate}</td>
     <td style="text-align:right; padding:10px 0; font-weight:800; color:#000; font-size:13px; border-bottom:1px solid #f0f0f0;">₹${o.items[p].total}</td>
     </tr>`;
-    
-                    }
-    
-                    whatsappText += `-----------------\nProducts Total: ₹${o.itemsTotal?.toFixed(2)}\n`;
-    
-                    if(o.loadTotal > 0) whatsappText += `Loading (${o.totalBags}x): ₹${o.loadTotal?.toFixed(2)}\n`;
-    
-                    if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
-    
-                    whatsappText += `*GRAND TOTAL: ₹${o.billTotal?.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
-    
-                    document.getElementById('whatsappBtn').onclick = () => {
-    
-                        triggerHaptic();
-    
-                        window.location.href = `whatsapp://send?text=${encodeURIComponent(whatsappText)}`;
-    
-                    };
-    
-                    let loadSub = o.loadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.loadRate} × ${o.totalBags} bags)</span>` : "";
-    
-                    let unloadSub = o.unloadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.unloadRate} × ${o.totalBags} bags)</span>` : "";
-    
-                    // ============================================================
-    
-                    // CLEAN COMPACT BILL - matches screenshot, no empty space
-    
-                    // ============================================================
-    
-                    let html = `
+			}
+			whatsappText += `-----------------\nProducts Total: ₹${o.itemsTotal?.toFixed(2)}\n`;
+			if(o.loadTotal > 0) whatsappText += `Loading (${o.totalBags}x): ₹${o.loadTotal?.toFixed(2)}\n`;
+			if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
+			whatsappText += `*GRAND TOTAL: ₹${o.billTotal?.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
+			document.getElementById('whatsappBtn').onclick = () => {
+				triggerHaptic();
+				window.location.href = `whatsapp://send?text=${encodeURIComponent(whatsappText)}`;
+			};
+			let loadSub = o.loadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.loadRate} × ${o.totalBags} bags)</span>` : "";
+			let unloadSub = o.unloadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.unloadRate} × ${o.totalBags} bags)</span>` : "";
+			// ============================================================
+			// CLEAN COMPACT BILL - matches screenshot, no empty space
+			// ============================================================
+			let html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; padding: 20px;">
     <!-- Store Header -->
     <div style="text-align: center; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1.5px solid #e0e0e0;">
@@ -913,191 +1194,124 @@
     </div>
     
                     `;
-    
-                    document.getElementById('modalBody').innerHTML = html;
-    
-                    document.getElementById('printArea').innerHTML = html;
-    
-                    document.getElementById('billModal').style.display = 'flex';
-    
-                };
-    
-            }
-    
-            function openSettings() { triggerHaptic(); document.getElementById('settingsModal').style.display = 'flex'; }
-    
-            function closeModals() { triggerHaptic(); document.getElementById('billModal').style.display = 'none'; document.getElementById('settingsModal').style.display = 'none'; }
-    
-            function exportData() {
-    
-                triggerHaptic();
-    
-                db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
-    
-                    let data = JSON.stringify(e.target.result);
-    
-                    let blob = new Blob([data], { type: "application/json" });
-    
-                    let a = document.createElement("a");
-    
-                    a.href = URL.createObjectURL(blob);
-    
-                    a.download = `BabaStore_Backup_${new Date().toISOString().split('T')[0]}.json`;
-    
-                    a.click();
-    
-                };
-    
-            }
-    
-            function importData() {
-    
-                triggerHaptic();
-    
-                let file = document.getElementById('backupFile').files[0];
-    
-                if (!file) return showToast("Please select a backup file first.", "error");
-    
-                let reader = new FileReader();
-    
-                reader.onload = (e) => {
-    
-                    try {
-    
-                        let data = JSON.parse(e.target.result);
-    
-                        let store = db.transaction(["orders"], "readwrite").objectStore("orders");
-    
-                        store.clear().onsuccess = () => {
-    
-                            data.forEach(order => store.add(order));
-    
-                            showToast("Data Restored Successfully!", "success");
-    
-                            closeModals(); renderOrders();
-    
-                        };
-    
-                    } catch (err) { showToast("Invalid Backup File!", "error"); }
-    
-                };
-    
-                reader.readAsText(file);
-    
-            }
-    
-            function renderOrders() {
-    
-                db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
-    
-                    const log = document.getElementById('orderLog'); log.innerHTML = "";
-    
-                    let allOrders = e.target.result;
-    
-                    customerMemory = {}; 
-    
-                    allOrders.forEach(o => { 
-    
-                        if(o.customerName && o.address) customerMemory[o.customerName] = o.address;
-    
-                    });
-    
-                    document.getElementById('customerNamesList').innerHTML = Object.keys(customerMemory).map(n => `<option value="${n}">`).join("");
-    
-                    let selectedFilter = document.getElementById('filterDate').value;
-    
-                    let searchQuery = document.getElementById('searchName').value.toLowerCase();
-    
-                    if (selectedFilter) allOrders = allOrders.filter(o => o.filterDate === selectedFilter);
-    
-                    if (searchQuery) allOrders = allOrders.filter(o => o.customerName.toLowerCase().includes(searchQuery));
-    
-                    if (selectedFilter && !searchQuery && allOrders.length > 0) {
-    
-                        document.getElementById('dailyDashboard').style.display = 'block';
-    
-                        document.getElementById('dashboardTitle').innerText = `📊 Summary for ${selectedFilter}`;
-    
-                        let dashProdRev = 0; let dashLoadRev = 0; let dashUnloadRev = 0; let dashTotalRev = 0;
-    
-                        let bagCounts = {};
-    
-                        allOrders.forEach(o => {
-    
-                            dashProdRev += (o.itemsTotal || 0);
-    
-                            dashLoadRev += (o.loadTotal || 0);
-    
-                            dashUnloadRev += (o.unloadTotal || 0);
-    
-                            dashTotalRev += (o.billTotal || 0);
-    
-                            for (let p in o.items) {
-    
-                                bagCounts[p] = (bagCounts[p] || 0) + o.items[p].qty;
-    
-                            }
-    
-                        });
-    
-                        let statsHtml = Object.entries(bagCounts).map(([p, qty]) => {
-    
-                            return `<div class="dash-row"><span>${p}</span> <span><b style="font-size:18px;">${qty}</b> bags</span></div>`;
-    
-                        }).join("");
-    
-                        document.getElementById('dashboardStats').innerHTML = statsHtml;
-    
-                        document.getElementById('dashProdRev').innerText = `₹${dashProdRev.toFixed(2)}`;
-    
-                        document.getElementById('dashLoadRev').innerText = `₹${dashLoadRev.toFixed(2)}`;
-    
-                        document.getElementById('dashUnloadRev').innerText = `₹${dashUnloadRev.toFixed(2)}`;
-    
-                        document.getElementById('dashTotalRev').innerText = `₹${dashTotalRev.toFixed(2)}`;
-    
-                    } else {
-    
-                        document.getElementById('dailyDashboard').style.display = 'none';
-    
-                    }
-    
-                    let sorted = allOrders.sort((a,b) => b.timestamp - a.timestamp);
-    
-                    let now = Date.now(); let timeLimit = 43200000; 
-    
-                    if (sorted.length === 0) {
-    
-                        return log.innerHTML = `
+			document.getElementById('modalBody').innerHTML = html;
+			document.getElementById('printArea').innerHTML = html;
+			document.getElementById('billModal').style.display = 'flex';
+		};
+	}
+
+	function openSettings() {
+		triggerHaptic();
+		document.getElementById('settingsModal').style.display = 'flex';
+	}
+
+	function closeModals() {
+		triggerHaptic();
+		document.getElementById('billModal').style.display = 'none';
+		document.getElementById('settingsModal').style.display = 'none';
+	}
+
+	function exportData() {
+		triggerHaptic();
+		db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
+			let data = JSON.stringify(e.target.result);
+			let blob = new Blob([data], {
+				type: "application/json"
+			});
+			let a = document.createElement("a");
+			a.href = URL.createObjectURL(blob);
+			a.download = `BabaStore_Backup_${new Date().toISOString().split('T')[0]}.json`;
+			a.click();
+		};
+	}
+
+	function importData() {
+		triggerHaptic();
+		let file = document.getElementById('backupFile').files[0];
+		if(!file) return showToast("Please select a backup file first.", "error");
+		let reader = new FileReader();
+		reader.onload = (e) => {
+			try {
+				let data = JSON.parse(e.target.result);
+				let store = db.transaction(["orders"], "readwrite").objectStore("orders");
+				store.clear().onsuccess = () => {
+					data.forEach(order => store.add(order));
+					showToast("Data Restored Successfully!", "success");
+					closeModals();
+					renderOrders();
+				};
+			} catch(err) {
+				showToast("Invalid Backup File!", "error");
+			}
+		};
+		reader.readAsText(file);
+	}
+
+	function renderOrders() {
+		db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
+			const log = document.getElementById('orderLog');
+			log.innerHTML = "";
+			let allOrders = e.target.result;
+			customerMemory = {};
+			allOrders.forEach(o => {
+				if(o.customerName && o.address) customerMemory[o.customerName] = o.address;
+			});
+			document.getElementById('customerNamesList').innerHTML = Object.keys(customerMemory).map(n => `<option value="${n}">`).join("");
+			let selectedFilter = document.getElementById('filterDate').value;
+			let searchQuery = document.getElementById('searchName').value.toLowerCase();
+			if(selectedFilter) allOrders = allOrders.filter(o => o.filterDate === selectedFilter);
+			if(searchQuery) allOrders = allOrders.filter(o => o.customerName.toLowerCase().includes(searchQuery));
+			if(selectedFilter && !searchQuery && allOrders.length > 0) {
+				document.getElementById('dailyDashboard').style.display = 'block';
+				document.getElementById('dashboardTitle').innerText = `📊 Summary for ${selectedFilter}`;
+				let dashProdRev = 0;
+				let dashLoadRev = 0;
+				let dashUnloadRev = 0;
+				let dashTotalRev = 0;
+				let bagCounts = {};
+				allOrders.forEach(o => {
+					dashProdRev += (o.itemsTotal || 0);
+					dashLoadRev += (o.loadTotal || 0);
+					dashUnloadRev += (o.unloadTotal || 0);
+					dashTotalRev += (o.billTotal || 0);
+					for(let p in o.items) {
+						bagCounts[p] = (bagCounts[p] || 0) + o.items[p].qty;
+					}
+				});
+				let statsHtml = Object.entries(bagCounts).map(([p, qty]) => {
+					return `<div class="dash-row"><span>${p}</span> <span><b style="font-size:18px;">${qty}</b> bags</span></div>`;
+				}).join("");
+				document.getElementById('dashboardStats').innerHTML = statsHtml;
+				document.getElementById('dashProdRev').innerText = `₹${dashProdRev.toFixed(2)}`;
+				document.getElementById('dashLoadRev').innerText = `₹${dashLoadRev.toFixed(2)}`;
+				document.getElementById('dashUnloadRev').innerText = `₹${dashUnloadRev.toFixed(2)}`;
+				document.getElementById('dashTotalRev').innerText = `₹${dashTotalRev.toFixed(2)}`;
+			} else {
+				document.getElementById('dailyDashboard').style.display = 'none';
+			}
+			let sorted = allOrders.sort((a, b) => b.timestamp - a.timestamp);
+			let now = Date.now();
+			let timeLimit = 43200000;
+			if(sorted.length === 0) {
+				return log.innerHTML = `
     <div class="empty-state">
     <h3 style="font-size: 40px; margin-bottom: 10px;">📋</h3>
     <h3>No Orders Found</h3>
     <p style="font-size: 14px;">Try changing the date or search term.</p>
     </div>`;
-    
-                    }
-    
-                    sorted.forEach(order => {
-    
-                        let isOverdue = !order.isDelivered && (now - order.timestamp) > timeLimit;
-    
-                        let cardClass = "order-card " + (order.isDelivered ? "delivered" : (isOverdue ? "overdue" : ""));
-    
-                        let overdueHtml = isOverdue ? `<span class="overdue-text">⚠️ Over 12 hours pending!</span>` : '';
-    
-                        let deliveryToggleHtml = order.isDelivered 
-    
-                            ? `<div class="delivery-toggle" onclick="event.stopPropagation()">
+			}
+			sorted.forEach(order => {
+				let isOverdue = !order.isDelivered && (now - order.timestamp) > timeLimit;
+				let cardClass = "order-card " + (order.isDelivered ? "delivered" : (isOverdue ? "overdue" : ""));
+				let overdueHtml = isOverdue ? `<span class="overdue-text">⚠️ Over 12 hours pending!</span>` : '';
+				let deliveryToggleHtml = order.isDelivered ? `<div class="delivery-toggle" onclick="event.stopPropagation()">
     <span style="font-weight:800; font-size:15px; color:var(--success)">✓ Delivered (Locked)</span>
     <input type="checkbox" class="chk-box" checked disabled style="opacity: 0.5;">
-    </div>`
-    
-                            : `<div class="delivery-toggle" onclick="event.stopPropagation()">
+    </div>` : `<div class="delivery-toggle" onclick="event.stopPropagation()">
     <span style="font-weight:800; font-size:15px; color:var(--danger)">Un Delivered</span>
     <input type="checkbox" class="chk-box" onchange="toggleDelivery(${order.id}, this.checked)">
     </div>`;
-    
-                        log.innerHTML += `
+				log.innerHTML += `
     <div class="swipe-container">
     <div class="${cardClass}" onclick="viewBill(${order.id})">
     <div class="order-header">
@@ -1118,15 +1332,11 @@
     <button class="action-btn btn-delete" onclick="deleteOrder(${order.id})"><span style="font-size:20px;">🗑️</span> Delete</button>
     </div>
     </div>`;
-    
-                    });
-    
-                };
-    
-            }
-    
-            window.onload = initApp;
-        </script>
-    </body>
+			});
+		};
+	}
+	window.onload = initApp;
+	</script>
+</body>
 
-    </html>
+</html>
