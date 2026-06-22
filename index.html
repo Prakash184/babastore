@@ -35,7 +35,6 @@
             padding-bottom: 40px;
         }
 
-        /* Sticky Header */
         .header {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
@@ -52,7 +51,6 @@
 
         .container { padding: 16px; max-width: 600px; margin: 0 auto; }
 
-        /* Beautiful Cards */
         .section {
             background: var(--card-bg);
             border-radius: 16px;
@@ -66,7 +64,6 @@
             margin-top: 0; margin-bottom: 16px; border-bottom: 2px solid var(--background); padding-bottom: 8px;
         }
 
-        /* Inputs */
         .input-group { margin-bottom: 16px; }
         label { display: block; font-size: 13px; margin-bottom: 6px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
         input[type="text"], input[type="date"] {
@@ -77,7 +74,6 @@
             border-color: var(--primary); outline: none; background-color: #fff;
         }
 
-        /* Product Steppers */
         .product-row {
             display: flex; justify-content: space-between; align-items: center; 
             padding: 14px 0; border-bottom: 1px solid #f2f2f7;
@@ -98,7 +94,6 @@
         .btn-step:active { transform: scale(0.95); background: #e5e5ea; }
         .qty-val { font-size: 18px; font-weight: 700; min-width: 24px; text-align: center; }
 
-        /* Submit Button */
         .btn-submit {
             width: 100%; background-color: var(--primary); color: white; border: none; 
             padding: 16px; border-radius: 14px; font-size: 18px; font-weight: bold; 
@@ -107,7 +102,6 @@
         }
         .btn-submit:active { transform: scale(0.98); background-color: var(--primary-hover); }
 
-        /* Order Cards */
         .order-card {
             background: var(--card-bg); border-radius: 14px; padding: 16px; margin-bottom: 12px; 
             display: flex; justify-content: space-between; align-items: center; 
@@ -115,13 +109,11 @@
             transition: all 0.3s ease;
         }
         
-        /* The Red Warning for Late Orders */
         .order-card.overdue {
             border-left-color: var(--danger);
             background-color: var(--danger-bg);
         }
         
-        /* The Green Success for Delivered */
         .order-card.delivered { 
             border-left-color: var(--success); opacity: 0.6; background-color: #f9f9f9;
         }
@@ -133,13 +125,11 @@
         .overdue-text { color: var(--danger); font-size: 12px; font-weight: bold; display: none; margin-top: 4px;}
         .order-card.overdue .overdue-text { display: block; }
 
-        /* Beautiful Checkbox */
         .chk-box { 
             width: 32px; height: 32px; accent-color: var(--success); cursor: pointer; 
             transform: scale(1.2);
         }
 
-        /* Setup Notification Button */
         .btn-notify {
             background: #ffeceb; color: var(--danger); border: none; padding: 10px; 
             border-radius: 8px; width: 100%; font-weight: bold; margin-bottom: 16px;
@@ -154,12 +144,11 @@
     </div>
 
     <div class="container">
-        <!-- Notification Setup (Only shows if permissions are needed) -->
+        <!-- Notification Setup -->
         <button id="notifyBtn" class="btn-notify" onclick="requestNotificationPermission()">
             ⚠️ Tap here to turn on Order Reminders
         </button>
 
-        <!-- Order Placement Section -->
         <div class="section">
             <h2 class="section-title">Customer Details</h2>
             <div class="input-group">
@@ -168,22 +157,20 @@
             </div>
             <div class="input-group">
                 <label>Customer Name</label>
-                <input type="text" id="custName" placeholder="Enter Customer Name......">
+                <input type="text" id="custName" placeholder="e.g. Rahul Kumar">
             </div>
             <div class="input-group">
                 <label>Address / Location</label>
-                <input type="text" id="custAddress" placeholder="Enter Address......">
+                <input type="text" id="custAddress" placeholder="e.g. Main Market Shop">
             </div>
         </div>
 
-        <!-- Inventory / Stepper Section -->
         <div class="section">
             <h2 class="section-title">Select Items</h2>
             <div id="productList"></div>
             <button class="btn-submit" onclick="submitOrder()">Save Order</button>
         </div>
 
-        <!-- Active Deliveries Log -->
         <h2 style="font-size: 20px; font-weight: 700; margin-left: 5px;">Delivery Board</h2>
         <div id="orderLog"></div>
     </div>
@@ -228,7 +215,6 @@
             request.onsuccess = e => { db = e.target.result; renderOrders(); };
         }
 
-        // --- NOTIFICATION LOGIC ---
         function checkNotificationStatus() {
             if ("Notification" in window && Notification.permission !== "granted") {
                 document.getElementById("notifyBtn").style.display = "block";
@@ -240,20 +226,19 @@
                 Notification.requestPermission().then(permission => {
                     if (permission === "granted") {
                         document.getElementById("notifyBtn").style.display = "none";
-                        alert("Reminders activated! You will be alerted for orders older than 3 hours.");
+                        // TEST MODE MESSAGE
+                        alert("Reminders activated! You will be alerted for orders older than 30 seconds.");
                     }
                 });
             }
         }
 
-        // Scans for late orders every time the app is opened
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === 'visible' && db) {
-                renderOrders(); // Re-rendering automatically checks for overdue orders
+                renderOrders(); 
             }
         });
 
-        // --- ORDER SUBMISSION ---
         function submitOrder() {
             const name = document.getElementById('custName').value.trim();
             const address = document.getElementById('custAddress').value.trim();
@@ -285,14 +270,13 @@
             };
 
             store.add(newOrder).onsuccess = () => {
-                // Reset form
                 document.getElementById('custName').value = "";
                 document.getElementById('custAddress').value = "";
                 products.forEach(p => { currentQuantities[p] = 0; document.getElementById(`qty-${btoa(p)}`).innerText = 0; });
                 renderOrders();
                 
-                // Set the immediate browser timer just in case the app stays open
-                setTimeout(() => { renderOrders(); }, 10800000); 
+                // TEST MODE TIMER: 30,000 milliseconds (30 seconds)
+                setTimeout(() => { renderOrders(); }, 30000); 
             };
         }
 
@@ -309,7 +293,6 @@
             };
         }
 
-        // --- RENDER & CHECK LATE ORDERS ---
         function renderOrders() {
             let transaction = db.transaction(["orders"], "readonly");
             let store = transaction.objectStore("orders");
@@ -321,24 +304,23 @@
                 
                 let sortedOrders = request.result.sort((a,b) => b.timestamp - a.timestamp);
                 let now = Date.now();
-                let threeHours = 10800000; // 3 hours in milliseconds
+                
+                // TEST MODE LIMIT: 30,000 milliseconds (30 seconds)
+                let timeLimit = 30000; 
 
                 sortedOrders.forEach(order => {
                     let itemsSummary = Object.entries(order.items).map(([p, q]) => `${q}x ${p}`).join(", ");
                     
-                    // Check if order is over 3 hours old AND not delivered
                     let isOverdue = false;
-                    if (!order.isDelivered && (now - order.timestamp) > threeHours) {
+                    if (!order.isDelivered && (now - order.timestamp) > timeLimit) {
                         isOverdue = true;
-                        // Fire a push notification if they just opened the app
                         if (Notification.permission === "granted" && document.visibilityState === 'visible') {
                             new Notification("⚠️ Late Delivery!", {
-                                body: `${order.customerName}'s order is over 3 hours late!`,
+                                body: `${order.customerName}'s order is over 30 seconds late!`,
                             });
                         }
                     }
 
-                    // Build Card HTML
                     let cardClass = "order-card";
                     if (order.isDelivered) cardClass += " delivered";
                     else if (isOverdue) cardClass += " overdue";
@@ -349,7 +331,8 @@
                                 <p class="customer-name">${order.customerName}</p>
                                 <p class="customer-address">${order.address || 'No Address'}</p>
                                 <p class="order-items">${itemsSummary}</p>
-                                <p class="overdue-text">⚠️ Over 3 hours pending!</p>
+                                <!-- TEST MODE TEXT -->
+                                <p class="overdue-text">⚠️ Over 30 seconds pending!</p>
                             </div>
                             <div>
                                 <input type="checkbox" class="chk-box" onchange="toggleDelivery(${order.id}, this.checked)" ${order.isDelivered ? 'checked' : ''}>
