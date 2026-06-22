@@ -88,6 +88,7 @@
         .chk-box { width: 32px; height: 32px; accent-color: var(--success); cursor: pointer; transform: scale(1.1);}
         .overdue-text { color: var(--danger); font-size: 13px; font-weight: 800; margin-top: 10px; display: inline-block; background: #ffeceb; padding: 4px 8px; border-radius: 6px;}
 
+        /* MODALS */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 1000; padding: 20px; align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 24px; border-radius: 24px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2);}
         
@@ -106,19 +107,32 @@
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
         .empty-state h3 { font-size: 20px; color: #333; margin-bottom: 5px;}
 
-        /* Hide specific elements when printing */
+        /* --- NEW: CUSTOM TOAST NOTIFICATIONS --- */
+        #toastContainer { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none;}
+        .toast { background: #333; color: white; padding: 16px 20px; border-radius: 12px; font-weight: 600; font-size: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideDown 0.3s ease forwards; display: flex; align-items: center; gap: 10px;}
+        .toast.error { background: #ff3b30; }
+        .toast.success { background: #25D366; }
+        .toast.fade-out { animation: fadeOut 0.3s ease forwards; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+
+        /* --- NEW: CUSTOM CONFIRM MODAL --- */
+        .confirm-modal-content { text-align: center; padding: 30px 24px; }
+        .confirm-title { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: #111; }
+        .confirm-msg { font-size: 15px; color: #555; margin-bottom: 25px; line-height: 1.4;}
+        .confirm-actions { display: flex; gap: 10px; }
+        .btn-confirm-yes { flex: 1; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 16px; }
+        .btn-confirm-no { flex: 1; background: #e5e5ea; color: #333; border: none; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 16px; }
+        .btn-confirm-danger { background: var(--danger); }
+
         @media print {
-            @page { margin: 10mm; size: auto; }
-            body { background: white !important; margin: 0; padding: 0; color: black; }
-            .header, .container, .no-print { display: none !important; }
-            #billModal { display: block !important; position: static !important; background: white !important; height: auto !important; width: 100% !important; padding: 0 !important; box-sizing: border-box;}
-            .modal-content { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; overflow: visible !important; padding: 0 !important;}
-            .print-only { display: block !important; }
+            .no-print { display: none !important; }
         }
-        .print-only { display: none; }
     </style>
 </head>
 <body>
+
+    <div id="toastContainer"></div>
 
     <div class="header no-print">
         <h1>Baba Store</h1>
@@ -201,7 +215,6 @@
         <div id="orderLog"></div>
     </div>
 
-    <!-- INVOICE MODAL -->
     <div id="billModal" class="modal">
         <div class="modal-content">
             <div id="modalBody" style="background: white; padding: 10px;"></div>
@@ -212,7 +225,6 @@
         </div>
     </div>
 
-    <!-- SETTINGS MODAL -->
     <div id="settingsModal" class="modal no-print">
         <div class="modal-content" style="text-align: center;">
             <h2 style="margin-top:0; color:var(--primary); font-weight: 900;">Business Settings</h2>
@@ -227,6 +239,17 @@
             </div>
             
             <button class="modal-btn btn-close" onclick="closeModals()">Close Settings</button>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal no-print" style="z-index: 3000;">
+        <div class="modal-content confirm-modal-content">
+            <div class="confirm-title" id="confirmTitle">Confirm Action</div>
+            <div class="confirm-msg" id="confirmMsg">Are you sure you want to do this?</div>
+            <div class="confirm-actions">
+                <button class="btn-confirm-no" id="confirmBtnNo">Cancel</button>
+                <button class="btn-confirm-yes" id="confirmBtnYes">Confirm</button>
+            </div>
         </div>
     </div>
 
@@ -246,6 +269,52 @@
 
         function triggerHaptic() {
             if ("vibrate" in navigator) navigator.vibrate(40); 
+        }
+
+        // --- NEW: CUSTOM TOAST NOTIFICATIONS ---
+        function showToast(message, type = 'error') {
+            triggerHaptic();
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            // Add icon based on type
+            const icon = type === 'error' ? '⚠️' : '✅';
+            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- NEW: CUSTOM CONFIRM DIALOG ---
+        function showConfirm(title, message, isDanger, onConfirm, onCancel) {
+            triggerHaptic();
+            document.getElementById('confirmTitle').innerText = title;
+            document.getElementById('confirmMsg').innerText = message;
+            
+            const btnYes = document.getElementById('confirmBtnYes');
+            if(isDanger) {
+                btnYes.className = "btn-confirm-yes btn-confirm-danger";
+            } else {
+                btnYes.className = "btn-confirm-yes";
+            }
+
+            document.getElementById('confirmModal').style.display = 'flex';
+
+            document.getElementById('confirmBtnYes').onclick = () => {
+                document.getElementById('confirmModal').style.display = 'none';
+                if(onConfirm) onConfirm();
+            };
+
+            document.getElementById('confirmBtnNo').onclick = () => {
+                document.getElementById('confirmModal').style.display = 'none';
+                if(onCancel) onCancel();
+            };
         }
 
         function initApp() {
@@ -345,9 +414,10 @@
             const address = document.getElementById('custAddress').value.trim();
             const rawDate = document.getElementById('orderDate').value;
             
-            if (!name) return alert("Please enter a customer name.");
+            if (!name) return showToast("Please enter a customer name.", "error");
+            
             let totals = calculateGrandTotal();
-            if (totals.totalQty === 0) return alert("Please add at least 1 product quantity.");
+            if (totals.totalQty === 0) return showToast("Please add at least 1 product quantity.", "error");
 
             let orderItems = {};
             products.forEach(p => { 
@@ -369,9 +439,15 @@
             
             if (editingOrderId) {
                 orderData.id = editingOrderId;
-                store.put(orderData).onsuccess = resetForm;
+                store.put(orderData).onsuccess = () => {
+                    showToast("Order Updated!", "success");
+                    resetForm();
+                };
             } else {
-                store.add(orderData).onsuccess = resetForm;
+                store.add(orderData).onsuccess = () => {
+                    showToast("Order Saved!", "success");
+                    resetForm();
+                };
             }
         }
 
@@ -419,30 +495,34 @@
         }
 
         function deleteOrder(id) {
-            triggerHaptic();
-            if(confirm("Are you sure you want to completely DELETE this order?")) {
-                db.transaction(["orders"], "readwrite").objectStore("orders").delete(id).onsuccess = renderOrders;
-            }
-        }
-
-        // --- UPDATED: DELIVERY LOCK LOGIC ---
-        function toggleDelivery(id, isChecked) {
-            triggerHaptic();
-            if (isChecked) {
-                let conf = confirm("Are you sure you want to mark this order as Delivered? Once marked, it cannot be undone.");
-                if (!conf) {
-                    renderOrders(); // Revert the checkbox visual change
-                    return;
-                }
-                let store = db.transaction(["orders"], "readwrite").objectStore("orders");
-                store.get(id).onsuccess = e => {
-                    let data = e.target.result; 
-                    data.isDelivered = true;
-                    store.put(data).onsuccess = () => {
-                        alert("✅ Order has been successfully locked as Delivered!");
+            showConfirm("Delete Order", "Are you sure you want to completely DELETE this order?", true, 
+                () => { // ON YES
+                    db.transaction(["orders"], "readwrite").objectStore("orders").delete(id).onsuccess = () => {
+                        showToast("Order Deleted", "error");
                         renderOrders();
                     };
-                };
+                }
+            );
+        }
+
+        function toggleDelivery(id, isChecked) {
+            if (isChecked) {
+                showConfirm("Lock Delivery", "Mark this order as Delivered? Once marked, it cannot be undone.", false, 
+                    () => { // ON YES
+                        let store = db.transaction(["orders"], "readwrite").objectStore("orders");
+                        store.get(id).onsuccess = e => {
+                            let data = e.target.result; 
+                            data.isDelivered = true;
+                            store.put(data).onsuccess = () => {
+                                showToast("Locked as Delivered!", "success");
+                                renderOrders();
+                            };
+                        };
+                    },
+                    () => { // ON NO/CANCEL
+                        renderOrders(); // Reverts the checkbox back to empty visually
+                    }
+                );
             }
         }
 
@@ -500,7 +580,6 @@
         function closeModals() { triggerHaptic(); document.getElementById('billModal').style.display = 'none'; document.getElementById('settingsModal').style.display = 'none'; }
 
         function exportData() {
-            triggerHaptic();
             db.transaction(["orders"], "readonly").objectStore("orders").getAll().onsuccess = (e) => {
                 let data = JSON.stringify(e.target.result);
                 let blob = new Blob([data], { type: "application/json" });
@@ -512,9 +591,8 @@
         }
 
         function importData() {
-            triggerHaptic();
             let file = document.getElementById('backupFile').files[0];
-            if (!file) return alert("Please select a backup file first.");
+            if (!file) return showToast("Please select a backup file first.", "error");
             
             let reader = new FileReader();
             reader.onload = (e) => {
@@ -523,10 +601,10 @@
                     let store = db.transaction(["orders"], "readwrite").objectStore("orders");
                     store.clear().onsuccess = () => {
                         data.forEach(order => store.add(order));
-                        alert("Data Restored Successfully!");
+                        showToast("Data Restored Successfully!", "success");
                         closeModals(); renderOrders();
                     };
-                } catch (err) { alert("Invalid Backup File!"); }
+                } catch (err) { showToast("Invalid Backup File!", "error"); }
             };
             reader.readAsText(file);
         }
@@ -599,7 +677,6 @@
                     let cardClass = "order-card " + (order.isDelivered ? "delivered" : (isOverdue ? "overdue" : ""));
                     let overdueHtml = isOverdue ? `<span class="overdue-text">⚠️ Over 12 hours pending!</span>` : '';
 
-                    // --- UPDATED: RENDER LOCKED STATE FOR DELIVERED ITEMS ---
                     let deliveryToggleHtml = order.isDelivered 
                         ? `<div class="delivery-toggle" onclick="event.stopPropagation()">
                             <span style="font-weight:800; font-size:15px; color:var(--success)">
