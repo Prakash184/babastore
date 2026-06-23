@@ -748,6 +748,11 @@
 			<div class="input-group">
 				<label>Address / Location</label>
 				<input type="text" id="custAddress" placeholder="Address will auto-fill..."> </div>
+            
+            <div class="input-group">
+				<label>Back Dues (₹) [Optional]</label>
+				<input type="number" inputmode="decimal" pattern="[0-9]*" id="backDues" placeholder="0"> 
+            </div>
 		</div>
 		<div class="section">
 			<h2 class="section-title">💼 Labor Rates (Per Bag)</h2>
@@ -792,7 +797,6 @@
 		</div>
 		<div id="orderLog"></div>
 	</div>
-	<!-- INVOICE MODAL -->
 	<div id="billModal" class="modal no-print">
 		<div class="modal-content">
 			<div id="modalBody" style="background: white; padding: 0;"></div>
@@ -801,7 +805,6 @@
 			<button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
 		</div>
 	</div>
-	<!-- SETTINGS MODAL -->
 	<div id="settingsModal" class="modal no-print">
 		<div class="modal-content" style="text-align: center;">
 			<h2 style="margin-top:0; color:var(--primary); font-weight: 900;">Business Settings</h2>
@@ -815,7 +818,6 @@
 			<button class="modal-btn btn-close" onclick="closeModals()">Close Settings</button>
 		</div>
 	</div>
-	<!-- CUSTOM CONFIRM MODAL -->
 	<div id="confirmModal" class="modal no-print" style="z-index: 3000;">
 		<div class="modal-content confirm-modal-content">
 			<div class="confirm-title" id="confirmTitle">Confirm Action</div>
@@ -976,6 +978,8 @@
 		const name = document.getElementById('custName').value.trim();
 		const address = document.getElementById('custAddress').value.trim();
 		const rawDate = document.getElementById('orderDate').value;
+        const backDuesVal = parseFloat(document.getElementById('backDues').value) || 0;
+
 		if(!name) return showToast("Please enter a customer name.", "error");
 		let totals = calculateGrandTotal();
 		if(totals.totalQty === 0) return showToast("Please add at least 1 product quantity.", "error");
@@ -1003,7 +1007,8 @@
 			unloadTotal: totals.unloadTotal,
 			itemsTotal: totals.itemsTotal,
 			billTotal: totals.finalTotal,
-			totalBags: totals.totalQty
+			totalBags: totals.totalQty,
+            backDues: backDuesVal
 		};
 		let store = db.transaction(["orders"], "readwrite").objectStore("orders");
 		if(editingOrderId) {
@@ -1029,6 +1034,7 @@
 		document.getElementById('custAddress').value = "";
 		document.getElementById('loadingRate').value = "";
 		document.getElementById('unloadingRate').value = "";
+        document.getElementById('backDues').value = "";
 		products.forEach(p => {
 			currentItems[p].qty = 0;
 			currentItems[p].rate = "";
@@ -1054,6 +1060,7 @@
 			document.getElementById('custAddress').value = order.address || "";
 			document.getElementById('loadingRate').value = order.loadRate || "";
 			document.getElementById('unloadingRate').value = order.unloadRate || "";
+            document.getElementById('backDues').value = order.backDues || "";
 			products.forEach(p => {
 				currentItems[p] = {
 					qty: 0,
@@ -1104,6 +1111,10 @@
 		triggerHaptic();
 		db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
 			let o = e.target.result;
+            
+            let backDues = o.backDues || 0;
+            let finalPayable = o.billTotal + backDues;
+
 			let whatsappText = `*BABA STORE INVOICE*\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
 			let itemsHtml = "";
 			for(let p in o.items) {
@@ -1118,25 +1129,69 @@
 			whatsappText += `-----------------\nProducts Total: ₹${o.itemsTotal?.toFixed(2)}\n`;
 			if(o.loadTotal > 0) whatsappText += `Loading (${o.totalBags}x): ₹${o.loadTotal?.toFixed(2)}\n`;
 			if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
-			whatsappText += `*GRAND TOTAL: ₹${o.billTotal?.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
+            
+            if (backDues > 0) {
+                whatsappText += `Current Bill: ₹${o.billTotal?.toFixed(2)}\n`;
+                whatsappText += `Back Dues: ₹${backDues.toFixed(2)}\n`;
+                whatsappText += `*NET PAYABLE: ₹${finalPayable.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
+            } else {
+                whatsappText += `*GRAND TOTAL: ₹${o.billTotal?.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
+            }
+
 			document.getElementById('whatsappBtn').onclick = () => {
 				triggerHaptic();
 				window.location.href = `whatsapp://send?text=${encodeURIComponent(whatsappText)}`;
 			};
+            
 			let loadSub = o.loadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.loadRate} × ${o.totalBags} bags)</span>` : "";
 			let unloadSub = o.unloadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.unloadRate} × ${o.totalBags} bags)</span>` : "";
+			
+            let totalsHtml = `
+            <div style="display:flex; justify-content:space-between; margin-bottom:7px; font-size:13px; font-weight:600; color:#444;">
+            <span>Products Total</span>
+            <span>₹${o.itemsTotal?.toFixed(2) || '0.00'}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:7px; font-size:13px; font-weight:600; color:#444;">
+            <span>Loading${loadSub}</span>
+            <span>₹${o.loadTotal?.toFixed(2) || '0.00'}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:13px; font-weight:600; color:#444;">
+            <span>Unloading${unloadSub}</span>
+            <span>₹${o.unloadTotal?.toFixed(2) || '0.00'}</span>
+            </div>`;
+
+            if (backDues > 0) {
+                totalsHtml += `
+                <div style="border-top: 1px dashed #ccc; padding-top: 12px; margin-bottom: 7px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:14px; font-weight:700; color:#333;">Current Bill</span>
+                <span style="font-size:14px; font-weight:700; color:#333;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+                <span style="font-size:14px; font-weight:700; color:#ff3b30;">Previous Dues</span>
+                <span style="font-size:14px; font-weight:700; color:#ff3b30;">+ ₹${backDues.toFixed(2)}</span>
+                </div>
+                <div style="border-top: 2px dashed #ccc; padding-top: 12px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:18px; font-weight:900; color:#007aff;">Net Payable</span>
+                <span style="font-size:20px; font-weight:900; color:#007aff;">₹${finalPayable.toFixed(2)}</span>
+                </div>`;
+            } else {
+                totalsHtml += `
+                <div style="border-top: 2px dashed #ccc; padding-top: 12px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:18px; font-weight:900; color:#007aff;">Grand Total</span>
+                <span style="font-size:20px; font-weight:900; color:#007aff;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
+                </div>`;
+            }
+
 			// ============================================================
 			// CLEAN COMPACT BILL - matches screenshot, no empty space
 			// ============================================================
 			let html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; padding: 20px;">
-    <!-- Store Header -->
-    <div style="text-align: center; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1.5px solid #e0e0e0;">
+        <div style="text-align: center; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1.5px solid #e0e0e0;">
     <h1 style="margin: 0 0 2px 0; font-size: 22px; color: #000; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">BABA STORE</h1>
     <p style="margin: 0; font-size: 11px; color: #999; font-weight: 600; letter-spacing: 0.5px;">INVOICE</p>
     </div>
-    <!-- Customer Info -->
-    <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #ebebeb;">
+        <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #ebebeb;">
     <table style="width:100%; font-size:13px; border-collapse:collapse;">
     <tr>
     <td style="padding: 3px 0; color:#777; font-weight:700; width:70px;">Customer</td>
@@ -1152,8 +1207,7 @@
     </tr>
     </table>
     </div>
-    <!-- Products Table -->
-    <table style="width:100%; border-collapse:collapse; margin-bottom: 16px;">
+        <table style="width:100%; border-collapse:collapse; margin-bottom: 16px;">
     <thead>
     <tr style="border-bottom: 2px solid #e0e0e0;">
     <th style="text-align:left; color:#999; text-transform:uppercase; font-size:10px; padding-bottom:8px; font-weight:800; letter-spacing:0.5px;">Item</th>
@@ -1167,28 +1221,10 @@
                                     ${itemsHtml}
     </tbody>
     </table>
-    <!-- Totals Section -->
-    <div style="border-top: 1px solid #e0e0e0; padding-top: 12px;">
-    <div style="display:flex; justify-content:space-between; margin-bottom:7px; font-size:13px; font-weight:600; color:#444;">
-    <span>Products Total</span>
-    <span>₹${o.itemsTotal?.toFixed(2) || '0.00'}</span>
+        <div style="border-top: 1px solid #e0e0e0; padding-top: 12px;">
+        ${totalsHtml}
     </div>
-    <div style="display:flex; justify-content:space-between; margin-bottom:7px; font-size:13px; font-weight:600; color:#444;">
-    <span>Loading${loadSub}</span>
-    <span>₹${o.loadTotal?.toFixed(2) || '0.00'}</span>
-    </div>
-    <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:13px; font-weight:600; color:#444;">
-    <span>Unloading${unloadSub}</span>
-    <span>₹${o.unloadTotal?.toFixed(2) || '0.00'}</span>
-    </div>
-    <!-- Grand Total -->
-    <div style="border-top: 2px dashed #ccc; padding-top: 12px; display:flex; justify-content:space-between; align-items:center;">
-    <span style="font-size:18px; font-weight:900; color:#007aff;">Grand Total</span>
-    <span style="font-size:20px; font-weight:900; color:#007aff;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
-    </div>
-    </div>
-    <!-- Footer -->
-    <div style="margin-top: 20px; padding-top: 12px; border-top: 1px dashed #ddd; text-align:center;">
+        <div style="margin-top: 20px; padding-top: 12px; border-top: 1px dashed #ddd; text-align:center;">
     <p style="margin:0; font-size:10px; color:#ccc; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;">Thank you for shopping at Baba Store</p>
     </div>
     </div>
