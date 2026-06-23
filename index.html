@@ -750,7 +750,7 @@
 				<input type="text" id="custAddress" placeholder="Address will auto-fill..."> </div>
             
             <div class="input-group">
-				<label>Back Dues (₹) [Optional]</label>
+				<label>Back Dues (₹) </label>
 				<input type="number" inputmode="decimal" pattern="[0-9]*" id="backDues" placeholder="0"> 
             </div>
 		</div>
@@ -829,7 +829,7 @@
 		</div>
 	</div>
 	<script>
-	const products = ["Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar", "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Sujji", "Sujji 47 Kg", "Sujji 48 Kg", "Darra", "Milk More", "Doodh Virdi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"];
+	const products = ["Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar", "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Sujji", "Sujji 47 Kg", "Sujji 48 Kg", "Darra", "Milk More", "Doodh Virdhi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"];
 	let currentItems = {};
 	let db;
 	let editingOrderId = null;
@@ -1167,7 +1167,7 @@
                 <span style="font-size:14px; font-weight:700; color:#333;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-                <span style="font-size:14px; font-weight:700; color:#ff3b30;">Previous Dues</span>
+                <span style="font-size:14px; font-weight:700; color:#ff3b30;">Back Dues</span>
                 <span style="font-size:14px; font-weight:700; color:#ff3b30;">+ ₹${backDues.toFixed(2)}</span>
                 </div>
                 <div style="border-top: 2px dashed #ccc; padding-top: 12px; display:flex; justify-content:space-between; align-items:center;">
