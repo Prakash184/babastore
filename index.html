@@ -11,11 +11,14 @@
 	<style>
 	:root {
 		--primary: #007aff;
+		--primary-hover: #005bb5;
 		--primary-gradient: linear-gradient(135deg, #007aff, #005bb5);
-		--success: #25D366;
+		--success: #34c759;
+        --success-gradient: linear-gradient(135deg, #34c759, #28a745);
 		--danger: #ff3b30;
 		--danger-bg: #ffeceb;
-		--background: #f2f2f7;
+		--warning: #ff9500;
+		--background: #f0f4f8; /* Soft modern blue-gray */
 		--card-bg: #ffffff;
 		--text-main: #1c1c1e;
 		--text-muted: #8e8e93;
@@ -29,7 +32,9 @@
 	
 	body {
 		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-		background-color: var(--background);
+		background: var(--background);
+        background-image: radial-gradient(circle at 50% 0%, #ffffff 0%, var(--background) 80%);
+        background-attachment: fixed;
 		margin: 0;
 		padding: 0;
 		color: var(--text-main);
@@ -38,8 +43,8 @@
 	
 	.header {
 		background: rgba(255, 255, 255, 0.85);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
+		backdrop-filter: blur(15px);
+		-webkit-backdrop-filter: blur(15px);
 		position: sticky;
 		top: 0;
 		z-index: 100;
@@ -47,36 +52,38 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+		border-bottom: 1px solid rgba(0, 122, 255, 0.1);
+		box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04);
 	}
 	
 	.header h1 {
 		margin: 0;
-		font-size: 26px;
-		font-weight: 800;
-		color: var(--primary);
+		font-size: 28px;
+		font-weight: 900;
+		background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
 		letter-spacing: -0.5px;
 	}
 	
 	.settings-btn {
-		background: #f2f2f7;
+		background: #eef5ff;
 		border: none;
 		font-size: 20px;
 		cursor: pointer;
 		color: var(--primary);
-		height: 40px;
-		width: 40px;
-		border-radius: 20px;
+		height: 42px;
+		width: 42px;
+		border-radius: 21px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+		box-shadow: 0 4px 10px rgba(0, 122, 255, 0.15);
 		transition: transform 0.2s;
 	}
 	
 	.settings-btn:active {
-		transform: scale(0.9);
+		transform: scale(0.85) rotate(45deg);
 	}
 	
 	.container {
@@ -87,20 +94,24 @@
 	
 	.section {
 		background: var(--card-bg);
-		border-radius: 20px;
-		padding: 24px 20px;
+		border-radius: 24px;
+		padding: 28px 20px;
 		margin-bottom: 24px;
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+		box-shadow: 0 12px 35px rgba(0, 0, 0, 0.06);
+        border-top: 5px solid var(--primary);
 	}
 	
 	.section-title {
 		font-weight: 800;
-		font-size: 19px;
+		font-size: 20px;
 		margin-top: 0;
 		margin-bottom: 20px;
-		border-bottom: 2px solid var(--background);
-		padding-bottom: 10px;
-		color: #000;
+		border-bottom: 2px solid #f0f4f8;
+		padding-bottom: 12px;
+		color: #111;
+        display: flex;
+        align-items: center;
+        gap: 8px;
 	}
 	
 	.input-group {
@@ -110,12 +121,12 @@
 	
 	label {
 		display: block;
-		font-size: 13px;
+		font-size: 12px;
 		margin-bottom: 8px;
-		font-weight: 700;
-		color: var(--text-muted);
+		font-weight: 800;
+		color: var(--primary);
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
+		letter-spacing: 0.8px;
 	}
 	
 	input[type="text"],
@@ -128,18 +139,19 @@
 		border: 1.5px solid var(--border-color);
 		border-radius: 14px;
 		font-size: 16px;
-		font-weight: 500;
-		background-color: #fafafa;
+		font-weight: 600;
+		background-color: #f8fafc;
 		display: block;
 		font-family: inherit;
 		transition: all 0.3s;
+        color: #222;
 	}
 	
 	input:focus {
 		border-color: var(--primary);
 		outline: none;
 		background-color: #fff;
-		box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+		box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
 	}
 	
 	.labor-grid {
@@ -147,20 +159,25 @@
 		grid-template-columns: 1fr 1fr;
 		gap: 15px;
 		margin-bottom: 20px;
-		background: #fffaf0;
-		padding: 16px;
+		background: linear-gradient(135deg, #fffcf2, #fff5d6);
+		padding: 18px;
 		border-radius: 16px;
-		border: 1px solid #ffebb3;
+		border: 1px solid #ffe499;
 	}
 	
 	.labor-grid .input-group {
 		margin-bottom: 0;
 	}
+    
+    .labor-grid label {
+        color: #d48800;
+    }
 	
 	.labor-grid input {
 		border-color: #ffcc00;
 		background: white;
-		font-weight: bold;
+		font-weight: 800;
+        color: #d48800;
 	}
 	
 	.product-list {
@@ -168,6 +185,10 @@
 		overflow-y: auto;
 		padding-right: 5px;
 		margin-bottom: 10px;
+        scrollbar-width: none;
+	}
+    .product-list::-webkit-scrollbar {
+		display: none;
 	}
 	
 	.product-row {
@@ -180,7 +201,7 @@
 	
 	.product-name {
 		font-size: 16px;
-		font-weight: 700;
+		font-weight: 800;
 		color: #222;
 	}
 	
@@ -194,22 +215,23 @@
 	.rate-box {
 		display: flex;
 		align-items: center;
-		background: #f4f4f5;
+		background: #f0f4f8;
 		border-radius: 12px;
-		border: 1px solid var(--border-color);
+		border: 1px solid transparent;
 		padding: 0 12px;
 		width: 120px;
-		transition: border 0.2s;
+		transition: all 0.2s;
 	}
 	
 	.rate-box:focus-within {
 		border-color: var(--primary);
 		background: #fff;
+        box-shadow: 0 0 0 3px rgba(0,122,255,0.1);
 	}
 	
 	.rate-box span {
 		color: var(--text-muted);
-		font-weight: 700;
+		font-weight: 800;
 		font-size: 18px;
 	}
 	
@@ -219,7 +241,7 @@
 		padding: 14px 8px;
 		width: 100%;
 		font-size: 16px;
-		font-weight: 700;
+		font-weight: 800;
 		color: var(--primary);
 	}
 	
@@ -243,17 +265,18 @@
 		font-size: 24px;
 		font-weight: 500;
 		cursor: pointer;
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-		transition: transform 0.1s;
+		box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+		transition: transform 0.15s;
 	}
 	
 	.btn-step:active {
-		transform: scale(0.9);
+		transform: scale(0.85);
+        background: #eef5ff;
 	}
 	
 	.qty-val {
 		font-size: 18px;
-		font-weight: 800;
+		font-weight: 900;
 		min-width: 28px;
 		text-align: center;
 		transition: all 0.15s ease;
@@ -265,37 +288,34 @@
 	}
 	
 	.item-total {
-		font-size: 16px;
-		font-weight: 800;
+		font-size: 17px;
+		font-weight: 900;
 		color: var(--text-muted);
 		width: 85px;
 		text-align: right;
 	}
 	
 	.bill-summary {
-		background: #f0f8ff;
-		padding: 20px;
-		border-radius: 16px;
+		background: linear-gradient(135deg, #f0f8ff, #e6f2ff);
+		padding: 22px;
+		border-radius: 18px;
 		margin-top: 20px;
-		border: 1px solid #d6eaff;
+		border: 1px solid #cce4ff;
+        box-shadow: 0 4px 15px rgba(0, 122, 255, 0.08);
 	}
 	
 	.bill-row {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 10px;
+		margin-bottom: 12px;
 		font-size: 15px;
-		color: #444;
-		font-weight: 600;
-	}
-	
-	.bill-row span:last-child {
-		text-align: right;
+		color: #333;
+		font-weight: 700;
 	}
 	
 	.bill-row.grand {
-		border-top: 2px dashed #bce0fd;
+		border-top: 2px dashed #99caff;
 		padding-top: 15px;
 		margin-top: 15px;
 		font-size: 22px;
@@ -310,41 +330,43 @@
 		border: none;
 		padding: 18px;
 		border-radius: 16px;
-		font-size: 18px;
-		font-weight: 800;
+		font-size: 19px;
+		font-weight: 900;
 		cursor: pointer;
-		margin-top: 20px;
-		box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
-		transition: transform 0.2s;
+		margin-top: 24px;
+		box-shadow: 0 8px 25px rgba(0, 122, 255, 0.35);
+		transition: all 0.2s;
+        letter-spacing: 0.5px;
 	}
 	
 	.btn-submit:active {
-		transform: scale(0.96);
+		transform: scale(0.95);
+        box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2);
 	}
 	
 	.search-area {
 		background: white;
-		padding: 16px;
-		border-radius: 16px;
-		margin-bottom: 20px;
-		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+		padding: 20px;
+		border-radius: 20px;
+		margin-bottom: 24px;
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
 	}
 	
 	.dashboard-box {
 		background: var(--primary-gradient);
 		color: white;
-		padding: 20px;
-		border-radius: 16px;
-		margin-bottom: 20px;
+		padding: 24px;
+		border-radius: 20px;
+		margin-bottom: 24px;
 		display: none;
-		box-shadow: 0 8px 24px rgba(0, 122, 255, 0.25);
+		box-shadow: 0 10px 30px rgba(0, 122, 255, 0.25);
 	}
 	
 	.dashboard-box h3 {
-		margin: 0 0 15px 0;
+		margin: 0 0 18px 0;
 		font-size: 20px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-		padding-bottom: 10px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+		padding-bottom: 12px;
 		display: flex;
 		align-items: center;
 		gap: 8px;
@@ -354,16 +376,16 @@
 		display: flex;
 		justify-content: space-between;
 		font-size: 16px;
-		margin-bottom: 8px;
-		font-weight: 500;
+		margin-bottom: 10px;
+		font-weight: 600;
 	}
 	
 	.dash-grand {
-		font-size: 22px;
+		font-size: 24px;
 		font-weight: 900;
-		margin-top: 15px;
+		margin-top: 18px;
 		border-top: 1px solid rgba(255, 255, 255, 0.3);
-		padding-top: 15px;
+		padding-top: 18px;
 	}
 	
 	.swipe-container {
@@ -371,9 +393,9 @@
 		overflow-x: auto;
 		scroll-snap-type: x mandatory;
 		scrollbar-width: none;
-		border-radius: 16px;
-		margin-bottom: 16px;
-		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+		border-radius: 20px;
+		margin-bottom: 18px;
+		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 	}
 	
 	.swipe-container::-webkit-scrollbar {
@@ -385,7 +407,7 @@
 		flex: 0 0 100%;
 		scroll-snap-align: start;
 		background: var(--card-bg);
-		padding: 20px;
+		padding: 24px;
 		border-left: 8px solid #ffcc00;
 		position: relative;
 	}
@@ -397,8 +419,8 @@
 	
 	.order-card.delivered {
 		border-left-color: var(--success);
-		opacity: 0.8;
-		background-color: #fafafa;
+		opacity: 0.9;
+		background-color: #f7fdf9;
 	}
 	
 	.swipe-actions {
@@ -421,29 +443,24 @@
 		cursor: pointer;
 	}
 	
-	.btn-edit {
-		background: #ff9500;
-	}
-	
-	.btn-delete {
-		background: var(--danger);
-		border-radius: 0 16px 16px 0;
-	}
+	.btn-edit { background: var(--warning); }
+	.btn-delete { background: var(--danger); border-radius: 0 20px 20px 0; }
 	
 	.order-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
 		border-bottom: 1px solid #f2f2f7;
-		padding-bottom: 12px;
-		margin-bottom: 12px;
+		padding-bottom: 16px;
+		margin-bottom: 16px;
 	}
 	
 	.customer-name {
-		font-size: 20px;
-		font-weight: 800;
+		font-size: 22px;
+		font-weight: 900;
 		margin: 0;
 		color: #111;
+        letter-spacing: -0.5px;
 	}
 	
 	.customer-meta {
@@ -454,21 +471,21 @@
 	}
 	
 	.order-bill {
-		font-size: 20px;
+		font-size: 22px;
 		font-weight: 900;
 		color: var(--primary);
 		margin: 0;
-		background: #f0f8ff;
-		padding: 6px 12px;
-		border-radius: 10px;
+		background: #eef5ff;
+		padding: 8px 14px;
+		border-radius: 12px;
 	}
 	
 	.delivery-toggle {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-top: 16px;
-		padding-top: 16px;
+		margin-top: 20px;
+		padding-top: 20px;
 		border-top: 1px solid #f2f2f7;
 	}
 	
@@ -477,21 +494,37 @@
 		height: 32px;
 		accent-color: var(--success);
 		cursor: pointer;
-		transform: scale(1.1);
+		transform: scale(1.15);
 	}
 	
 	.overdue-text {
 		color: var(--danger);
 		font-size: 13px;
 		font-weight: 800;
-		margin-top: 10px;
+		margin-top: 12px;
 		display: inline-block;
 		background: #ffeceb;
-		padding: 4px 8px;
-		border-radius: 6px;
+		padding: 6px 10px;
+		border-radius: 8px;
 	}
+    
+    .btn-add-new {
+		background: #eef5ff; 
+		color: var(--primary); 
+		border: 1px solid #cce0ff; 
+		padding: 8px 16px; 
+		border-radius: 14px; 
+		font-weight: 800; 
+		font-size: 14px; 
+		cursor: pointer; 
+		box-shadow: 0 4px 10px rgba(0,122,255,0.1);
+		transition: transform 0.2s;
+	}
+	.btn-add-new:active {
+		transform: scale(0.92);
+	}
+
 	/* MODALS */
-	
 	.modal {
 		display: none;
 		position: fixed;
@@ -500,12 +533,18 @@
 		width: 100%;
 		height: 100%;
 		background: rgba(0, 0, 0, 0.6);
-		backdrop-filter: blur(4px);
-		-webkit-backdrop-filter: blur(4px);
+		backdrop-filter: blur(5px);
+		-webkit-backdrop-filter: blur(5px);
 		z-index: 1000;
 		padding: 20px;
 		align-items: center;
 		justify-content: center;
+        animation: fadeIn 0.2s ease;
+	}
+    
+    @keyframes fadeIn {
+		from { opacity: 0; }
+		to { opacity: 1; }
 	}
 	
 	.modal-content {
@@ -516,7 +555,7 @@
 		max-width: 500px;
 		max-height: 90vh;
 		overflow-y: auto;
-		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
 	}
 	
 	.modal-btn {
@@ -527,7 +566,7 @@
 		font-weight: 800;
 		margin-top: 12px;
 		cursor: pointer;
-		font-size: 16px;
+		font-size: 17px;
 		transition: transform 0.2s;
 	}
 	
@@ -536,30 +575,30 @@
 	}
 	
 	.btn-whatsapp {
-		background: var(--success);
+		background: var(--success-gradient);
 		color: white;
-		box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+		box-shadow: 0 8px 20px rgba(52, 199, 89, 0.3);
 	}
 	
 	.btn-print {
 		background: var(--primary-gradient);
 		color: white;
-		box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+		box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
 	}
 	
 	.btn-close {
-		background: #e5e5ea;
+		background: #f2f2f7;
 		color: black;
-		margin-top: 20px;
+		margin-top: 24px;
 	}
 	
 	.btn-backup {
-		background: #ffcc00;
+		background: linear-gradient(135deg, #ffcc00, #ffb300);
 		color: black;
 		margin-top: 15px;
 	}
-	/* CUSTOM TOAST NOTIFICATIONS */
-	
+
+	/* TOASTS */
 	#toastContainer {
 		position: fixed;
 		top: 20px;
@@ -575,76 +614,51 @@
 	}
 	
 	.toast {
-		background: #333;
+		background: rgba(30, 30, 30, 0.95);
+        backdrop-filter: blur(10px);
 		color: white;
-		padding: 16px 20px;
-		border-radius: 12px;
-		font-weight: 600;
+		padding: 18px 24px;
+		border-radius: 14px;
+		font-weight: 700;
 		font-size: 15px;
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
 		animation: slideDown 0.3s ease forwards;
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		gap: 12px;
 	}
 	
-	.toast.error {
-		background: #ff3b30;
-	}
+	.toast.error { background: rgba(255, 59, 48, 0.95); }
+	.toast.success { background: rgba(52, 199, 89, 0.95); }
 	
-	.toast.success {
-		background: #25D366;
-	}
-	
-	.toast.fade-out {
-		animation: fadeOut 0.3s ease forwards;
-	}
-	
-	@keyframes slideDown {
-		from {
-			opacity: 0;
-			transform: translateY(-20px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-	
-	@keyframes fadeOut {
-		from {
-			opacity: 1;
-			transform: translateY(0);
-		}
-		to {
-			opacity: 0;
-			transform: translateY(-20px);
-		}
-	}
-	/* CUSTOM CONFIRM MODAL */
-	
+	.toast.fade-out { animation: fadeOut 0.3s ease forwards; }
+	@keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+	@keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+
+	/* CONFIRM MODAL */
 	.confirm-modal-content {
 		text-align: center;
 		padding: 30px 24px;
 	}
 	
 	.confirm-title {
-		font-size: 20px;
-		font-weight: 800;
-		margin-bottom: 10px;
+		font-size: 22px;
+		font-weight: 900;
+		margin-bottom: 12px;
 		color: #111;
 	}
 	
 	.confirm-msg {
-		font-size: 15px;
+		font-size: 16px;
 		color: #555;
-		margin-bottom: 25px;
-		line-height: 1.4;
+		margin-bottom: 28px;
+		line-height: 1.5;
+        font-weight: 500;
 	}
 	
 	.confirm-actions {
 		display: flex;
-		gap: 10px;
+		gap: 12px;
 	}
 	
 	.btn-confirm-yes {
@@ -652,19 +666,19 @@
 		background: var(--primary);
 		color: white;
 		border: none;
-		padding: 14px;
-		border-radius: 12px;
+		padding: 16px;
+		border-radius: 14px;
 		font-weight: 800;
 		font-size: 16px;
 	}
 	
 	.btn-confirm-no {
 		flex: 1;
-		background: #e5e5ea;
+		background: #f2f2f7;
 		color: #333;
 		border: none;
-		padding: 14px;
-		border-radius: 12px;
+		padding: 16px;
+		border-radius: 14px;
 		font-weight: 800;
 		font-size: 16px;
 	}
@@ -672,38 +686,17 @@
 	.btn-confirm-danger {
 		background: var(--danger);
 	}
-	/* =============================================
-    
-               PRINT STYLES - KEY FIX FOR URL HIDING
-    
-               ============================================= */
-	
-	#printArea {
-		display: none;
-	}
+
+	/* PRINT CSS */
+	#printArea { display: none; }
 	
 	@media print {
-		/* 
-    
-                 * FIX: Use margin: 15mm (not 0mm).
-    
-                 * With 0mm, Chrome/Safari still show URL because they add it
-    
-                 * inside the margin area. With a proper margin, the browser
-    
-                 * renders the URL in that space BUT we hide it via the
-    
-                 * page content overflow. The real fix is the combination below.
-    
-                 */
 		@page {
 			size: A4 portrait;
 			margin: 15mm 15mm 15mm 15mm;
-			/* These properties hide header/footer in supported browsers */
 			marks: none;
 		}
-		html,
-		body {
+		html, body {
 			width: 100% !important;
 			margin: 0 !important;
 			padding: 0 !important;
@@ -711,7 +704,6 @@
 			-webkit-print-color-adjust: exact !important;
 			print-color-adjust: exact !important;
 		}
-		/* Hide EVERYTHING on the page except our print area */
 		body > *:not(#printArea) {
 			display: none !important;
 			visibility: hidden !important;
@@ -765,9 +757,9 @@
 					<input type="number" inputmode="decimal" pattern="[0-9]*" id="unloadingRate" placeholder="0" oninput="calculateGrandTotal()"> </div>
 			</div>
             
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--background); margin-bottom: 20px; padding-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--background); margin-bottom: 20px; padding-bottom: 12px;">
                 <h2 class="section-title" style="border: none; margin: 0; padding: 0;">📦 Products</h2>
-                <button type="button" class="no-print" onclick="openNewProductModal()" style="background: #e5e5ea; color: var(--primary); border: none; padding: 6px 14px; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">+ Add New</button>
+                <button type="button" class="btn-add-new no-print" onclick="openNewProductModal()">+ Add New</button>
             </div>
             
 			<div class="product-list" id="productList"></div>
@@ -775,30 +767,30 @@
 			<div class="bill-summary">
 				<div class="bill-row"><span>Products Total:</span> <span id="displayItemTotal">₹0.00</span></div>
 				<div class="bill-row"><span>Total Bags:</span> <span id="displayTotalBags">0</span></div>
-				<div class="bill-row"><span>Loading Total:</span> <span id="displayLoadTotal" style="color:#333;">₹0.00</span></div>
-				<div class="bill-row"><span>Unloading Total:</span> <span id="displayUnloadTotal" style="color:#333;">₹0.00</span></div>
+				<div class="bill-row"><span>Loading Total:</span> <span id="displayLoadTotal" style="color:#007aff;">₹0.00</span></div>
+				<div class="bill-row"><span>Unloading Total:</span> <span id="displayUnloadTotal" style="color:#007aff;">₹0.00</span></div>
 				<div class="bill-row grand"><span>Grand Total:</span> <span id="displayGrandTotal">₹0.00</span></div>
 			</div>
 			<button class="btn-submit" id="submitBtn" onclick="submitOrder()">Save Order</button>
 		</div>
-		<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; margin-top: 30px;">
-			<h2 style="font-size: 22px; font-weight: 900; margin: 0; margin-left: 5px;">📋 Delivery Board</h2> </div>
+		<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; margin-top: 35px;">
+			<h2 style="font-size: 24px; font-weight: 900; margin: 0; margin-left: 5px; color:#111;">📋 Delivery Board</h2> </div>
 		<div class="search-area">
-			<div class="input-group" style="margin-bottom: 12px;">
+			<div class="input-group" style="margin-bottom: 16px;">
 				<input type="search" id="searchName" placeholder="🔍 Search by Customer Name..." oninput="renderOrders()"> </div>
-			<div style="display: flex; gap: 10px;">
+			<div style="display: flex; gap: 12px;">
 				<input type="date" id="filterDate" onchange="renderOrders()" style="flex:1;">
-				<button onclick="clearFilter()" style="padding:14px 20px; border-radius:14px; border:none; font-weight:bold; background:#e5e5ea; color: #333;">Clear</button>
+				<button onclick="clearFilter()" style="padding:16px 20px; border-radius:14px; border:none; font-weight:800; font-size:16px; background:#e5e5ea; color: #333; cursor:pointer;">Clear</button>
 			</div>
 		</div>
 		<div id="dailyDashboard" class="dashboard-box">
 			<h3 id="dashboardTitle">📊 Daily Summary</h3>
 			<div id="dashboardStats" style="margin-bottom:15px;"></div>
-			<div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 12px; margin-top: 15px;">
+			<div style="background: rgba(255,255,255,0.15); padding: 18px; border-radius: 16px; margin-top: 15px;">
 				<div class="dash-row"><span>Products Revenue:</span> <span id="dashProdRev">₹0</span></div>
 				<div class="dash-row"><span>Loading Revenue:</span> <span id="dashLoadRev">₹0</span></div>
 				<div class="dash-row"><span>Unloading Revenue:</span> <span id="dashUnloadRev">₹0</span></div>
-				<div class="dash-row dash-grand" style="margin-top:10px; padding-top:10px;"><span>Total Expected:</span> <span id="dashTotalRev">₹0</span></div>
+				<div class="dash-row dash-grand" style="margin-top:12px; padding-top:12px;"><span>Total Expected:</span> <span id="dashTotalRev">₹0</span></div>
 			</div>
 		</div>
 		<div id="orderLog"></div>
@@ -807,9 +799,9 @@
     <div id="newProductModal" class="modal no-print" style="z-index: 3000;">
         <div class="modal-content confirm-modal-content">
             <div class="confirm-title">Add Custom Product</div>
-            <div class="confirm-msg" style="margin-bottom: 15px;">Add a new dealership item. It will be permanently added to your app list.</div>
+            <div class="confirm-msg" style="margin-bottom: 20px;">Add a new dealership item. It will be permanently added to your app list.</div>
             <div class="input-group" style="text-align: left; margin-bottom: 25px;">
-                <input type="text" id="newProductName" placeholder="e.g. New Brand 50kg" style="width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border-color); font-size: 16px; font-weight: 600;"> 
+                <input type="text" id="newProductName" placeholder="e.g. New Product 50kg" style="width: 100%;"> 
             </div>
             <div class="confirm-actions">
                 <button class="btn-confirm-no" onclick="closeModals()">Cancel</button>
@@ -821,9 +813,9 @@
     <div id="editProductModal" class="modal no-print" style="z-index: 3000;">
         <div class="modal-content confirm-modal-content">
             <div class="confirm-title">Edit Custom Product</div>
-            <div class="confirm-msg" style="margin-bottom: 15px;">Fix typos in your custom product name.</div>
+            <div class="confirm-msg" style="margin-bottom: 20px;">Fix typos in your custom product name.</div>
             <div class="input-group" style="text-align: left; margin-bottom: 25px;">
-                <input type="text" id="editProductName" placeholder="Product Name" style="width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border-color); font-size: 16px; font-weight: 600;"> 
+                <input type="text" id="editProductName" placeholder="Product Name" style="width: 100%;"> 
             </div>
             <div class="confirm-actions">
                 <button class="btn-confirm-no" onclick="closeModals()">Cancel</button>
@@ -833,29 +825,31 @@
     </div>
 
 	<div id="billModal" class="modal no-print">
-		<div class="modal-content">
-			<div id="modalBody" style="background: white; padding: 0;"></div>
-			<button class="modal-btn btn-whatsapp no-print" id="whatsappBtn">💬 Send on WhatsApp</button>
-			<button class="modal-btn btn-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
-			<button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
+		<div class="modal-content" style="padding: 0; overflow: hidden; max-width: 550px;">
+			<div id="modalBody" style="background: white;"></div>
+            <div style="padding: 24px; background: #f9f9f9; border-top: 1px solid #eee;">
+			    <button class="modal-btn btn-whatsapp no-print" id="whatsappBtn" style="margin-top:0;">💬 Send on WhatsApp</button>
+			    <button class="modal-btn btn-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+			    <button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
+            </div>
 		</div>
 	</div>
 	
 	<div id="settingsModal" class="modal no-print">
 		<div class="modal-content" style="text-align: center;">
 			<h2 style="margin-top:0; color:var(--primary); font-weight: 900;">Business Settings</h2>
-			<p style="color:var(--text-muted); font-size:14px; margin-bottom:12px; font-weight: bold;">Protect your business data by saving it to your phone.</p>
-			<button class="modal-btn btn-backup" onclick="exportData()">💾 Download Backup File</button>
-			<div style="margin-top:24px; padding-top:24px; border-top:2px dashed #eee; text-align: left;">
-				<label style="font-size:14px; font-weight:800; display:block; margin-bottom:10px; color:#333;">Restore from Backup</label>
-				<input type="file" id="backupFile" accept=".json" style="margin-bottom:12px; width:100%; padding: 10px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
-				<button class="modal-btn" style="background:#ff3b30; color:white; margin-top: 0;" onclick="importData()">📂 Restore Data</button>
+			<p style="color:var(--text-muted); font-size:15px; margin-bottom:20px; font-weight: 600;">Protect your business data by saving it to your phone.</p>
+			<button class="modal-btn btn-backup" onclick="exportData()" style="padding: 20px; font-size: 18px;">💾 Download Backup File</button>
+			<div style="margin-top:35px; padding-top:28px; border-top:2px dashed #e5e5ea; text-align: left;">
+				<label style="font-size:14px; font-weight:800; display:block; margin-bottom:12px; color:#111;">Restore from Backup</label>
+				<input type="file" id="backupFile" accept=".json" style="margin-bottom:16px; width:100%; background: #f4f6f9; border: 1.5px solid var(--border-color);">
+				<button class="modal-btn" style="background:var(--danger); color:white; margin-top: 0; box-shadow: 0 8px 20px rgba(255, 59, 48, 0.25);" onclick="importData()">📂 Restore Data</button>
 			</div>
 			<button class="modal-btn btn-close" onclick="closeModals()">Close Settings</button>
 		</div>
 	</div>
 	
-	<div id="confirmModal" class="modal no-print" style="z-index: 3000;">
+	<div id="confirmModal" class="modal no-print" style="z-index: 4000;">
 		<div class="modal-content confirm-modal-content">
 			<div class="confirm-title" id="confirmTitle">Confirm Action</div>
 			<div class="confirm-msg" id="confirmMsg">Are you sure you want to do this?</div>
@@ -918,7 +912,6 @@
 		document.getElementById('orderDate').value = today;
 		document.getElementById('filterDate').value = today;
         
-        // Load custom products and add them to the top of the products array
         let customProdsList = JSON.parse(localStorage.getItem('babaStoreCustomProducts') || '[]');
         customProdsList.reverse().forEach(cp => {
             if(!products.includes(cp)) products.unshift(cp);
@@ -934,7 +927,6 @@
 		initDatabase();
 	}
 
-    // RENDER PRODUCTS (Matches original layout perfectly)
     function renderProducts() {
         const container = document.getElementById('productList');
         container.innerHTML = '';
@@ -948,8 +940,8 @@
             let total = qty * (rate || 0);
 
             let rowHtml = `
-            <div class="product-row" ${isCustom ? 'style="border-bottom:none;"' : ''}>
-                <span class="product-name">${p} ${isCustom ? '<span style="font-size:11px; color:#ff9500; font-weight:normal; margin-left:8px;">(Slide left to edit)</span>' : ''}</span>
+            <div class="product-row" ${isCustom ? 'style="border-bottom:none; background: #fff;"' : ''}>
+                <span class="product-name">${p} ${isCustom ? '<span style="font-size:11px; color:var(--warning); font-weight:800; margin-left:8px;">(Slide left to edit)</span>' : ''}</span>
                 <div class="controls-row">
                     <div class="rate-box">
                         <span>₹</span><input type="number" inputmode="decimal" pattern="[0-9]*" id="rate-${sId}" placeholder="Rate" value="${rate}" oninput="calculateItem('${p}')">
@@ -965,13 +957,13 @@
 
             if (isCustom) {
                 container.innerHTML += `
-                <div class="swipe-container" style="box-shadow: none; margin-bottom: 0; border-radius: 0; border-bottom: 1px solid var(--border-color); background: transparent;">
-                    <div style="width: 100%; flex: 0 0 100%; scroll-snap-align: start;">
+                <div class="swipe-container" style="background: transparent; border: 1.5px solid var(--primary); border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,122,255,0.08);">
+                    <div style="width: 100%; flex: 0 0 100%; scroll-snap-align: start; padding: 0 12px;">
                         ${rowHtml}
                     </div>
-                    <div class="swipe-actions" style="flex: 0 0 120px; padding: 10px 0 10px 10px; background: transparent; display: flex; gap: 5px;">
-                        <button class="action-btn" style="background:#ff9500; border-radius:12px; color:white; font-size:18px;" onclick="openEditProductModal('${p}')">✏️</button>
-                        <button class="action-btn" style="background:var(--danger); border-radius:12px; color:white; font-size:18px;" onclick="deleteCustomProduct('${p}')">🗑️</button>
+                    <div class="swipe-actions" style="flex: 0 0 130px; padding: 12px; background: transparent; display: flex; gap: 8px;">
+                        <button class="action-btn" style="background:var(--warning); border-radius:14px; color:white; font-size:18px; box-shadow: 0 2px 8px rgba(255,149,0,0.3);" onclick="openEditProductModal('${p}')">✏️</button>
+                        <button class="action-btn" style="background:var(--danger); border-radius:14px; color:white; font-size:18px; box-shadow: 0 2px 8px rgba(255,59,48,0.3);" onclick="deleteCustomProduct('${p}')">🗑️</button>
                     </div>
                 </div>`;
             } else {
@@ -980,7 +972,6 @@
         });
     }
 
-    // MODAL FUNCTIONS FOR ADDING
     function openNewProductModal() {
         triggerHaptic();
         document.getElementById('newProductName').value = '';
@@ -1008,7 +999,6 @@
         showToast("New Product Added!", "success");
     }
 
-    // MODAL FUNCTIONS FOR EDITING
     function openEditProductModal(oldName) {
         triggerHaptic();
         productBeingEdited = oldName;
@@ -1201,7 +1191,7 @@
 			currentItems[p].qty = 0;
 			currentItems[p].rate = "";
 		});
-        renderProducts(); // Re-render fresh inputs
+        renderProducts();
 		calculateGrandTotal();
 		renderOrders();
 		window.scrollTo(0, 0);
@@ -1214,7 +1204,7 @@
 			editingOrderId = order.id;
 			document.getElementById('formTitle').innerText = "✏️ Editing Order...";
 			document.getElementById('submitBtn').innerText = "Update Existing Order";
-			document.getElementById('submitBtn').style.background = "#ff9500";
+			document.getElementById('submitBtn').style.background = "var(--warning)";
 			document.getElementById('orderDate').value = order.filterDate;
 			document.getElementById('custName').value = order.customerName;
 			document.getElementById('custAddress').value = order.address || "";
@@ -1283,14 +1273,18 @@
 			let itemsHtml = "";
 			for(let p in o.items) {
 				whatsappText += `${p}: ${o.items[p].qty} x ₹${o.items[p].rate} = ₹${o.items[p].total}\n`;
-				itemsHtml += `<tr>
-    <td style="padding:10px 0; color:#222; font-weight:600; font-size:13px; border-bottom:1px solid #f0f0f0;">${p}</td>
-    <td style="text-align:center; padding:10px 0; color:#555; font-size:13px; border-bottom:1px solid #f0f0f0;">${o.items[p].qty}</td>
-    <td style="text-align:center; padding:10px 0; color:#555; font-size:13px; border-bottom:1px solid #f0f0f0;">₹${o.items[p].rate}</td>
-    <td style="text-align:right; padding:10px 0; font-weight:800; color:#000; font-size:13px; border-bottom:1px solid #f0f0f0;">₹${o.items[p].total}</td>
-    </tr>`;
+				
+                // Beautiful Table Rows for PDF
+                itemsHtml += `
+                <tr>
+                    <td style="padding:12px 10px; color:#222; font-weight:700; font-size:13px; border-bottom:1px solid #eef2f9;">${p}</td>
+                    <td style="text-align:center; padding:12px 10px; color:#555; font-weight:600; font-size:13px; border-bottom:1px solid #eef2f9;">${o.items[p].qty}</td>
+                    <td style="text-align:center; padding:12px 10px; color:#555; font-weight:600; font-size:13px; border-bottom:1px solid #eef2f9;">₹${o.items[p].rate}</td>
+                    <td style="text-align:right; padding:12px 10px; font-weight:900; color:#111; font-size:14px; border-bottom:1px solid #eef2f9;">₹${o.items[p].total}</td>
+                </tr>`;
 			}
-			whatsappText += `-----------------\nProducts Total: ₹${o.itemsTotal?.toFixed(2)}\n`;
+			
+            whatsappText += `-----------------\nProducts Total: ₹${o.itemsTotal?.toFixed(2)}\n`;
 			if(o.loadTotal > 0) whatsappText += `Loading (${o.totalBags}x): ₹${o.loadTotal?.toFixed(2)}\n`;
 			if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
             
@@ -1307,90 +1301,99 @@
 				window.location.href = `whatsapp://send?text=${encodeURIComponent(whatsappText)}`;
 			};
             
-			let loadSub = o.loadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.loadRate} × ${o.totalBags} bags)</span>` : "";
-			let unloadSub = o.unloadRate > 0 ? ` <span style="font-size:11px; color:#999;">(₹${o.unloadRate} × ${o.totalBags} bags)</span>` : "";
+			let loadSub = o.loadRate > 0 ? ` <span style="font-size:11px; color:#777; font-weight:500;">(₹${o.loadRate} × ${o.totalBags} bags)</span>` : "";
+			let unloadSub = o.unloadRate > 0 ? ` <span style="font-size:11px; color:#777; font-weight:500;">(₹${o.unloadRate} × ${o.totalBags} bags)</span>` : "";
 			
+            // BEAUTIFUL PDF TOTALS SECTION
             let totalsHtml = `
-            <div style="display:flex; justify-content:space-between; margin-bottom:7px; font-size:13px; font-weight:600; color:#444;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px; font-weight:700; color:#555;">
             <span>Products Total</span>
             <span>₹${o.itemsTotal?.toFixed(2) || '0.00'}</span>
             </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:7px; font-size:13px; font-weight:600; color:#444;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px; font-weight:700; color:#555;">
             <span>Loading${loadSub}</span>
             <span>₹${o.loadTotal?.toFixed(2) || '0.00'}</span>
             </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:13px; font-weight:600; color:#444;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:14px; font-weight:700; color:#555;">
             <span>Unloading${unloadSub}</span>
             <span>₹${o.unloadTotal?.toFixed(2) || '0.00'}</span>
             </div>`;
 
             if (backDues > 0) {
                 totalsHtml += `
-                <div style="border-top: 1px dashed #ccc; padding-top: 12px; margin-bottom: 7px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:14px; font-weight:700; color:#333;">Current Bill</span>
-                <span style="font-size:14px; font-weight:700; color:#333;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
+                <div style="border-top: 2px dashed #d1e3ff; padding-top: 16px; margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:15px; font-weight:800; color:#222;">Current Bill</span>
+                <span style="font-size:15px; font-weight:800; color:#222;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-                <span style="font-size:14px; font-weight:700; color:#ff3b30;">Back Dues</span>
-                <span style="font-size:14px; font-weight:700; color:#ff3b30;">+ ₹${backDues.toFixed(2)}</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                <span style="font-size:15px; font-weight:800; color:#ff3b30;">Back Dues</span>
+                <span style="font-size:15px; font-weight:800; color:#ff3b30;">+ ₹${backDues.toFixed(2)}</span>
                 </div>
-                <div style="border-top: 2px dashed #ccc; padding-top: 12px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:18px; font-weight:900; color:#007aff;">Net Payable</span>
-                <span style="font-size:20px; font-weight:900; color:#007aff;">₹${finalPayable.toFixed(2)}</span>
+                <div style="background: linear-gradient(135deg, #eef5ff, #d6e8ff); padding: 18px 20px; border-radius: 14px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #cce0ff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                <span style="font-size:18px; font-weight:900; color:#005bb5; text-transform:uppercase;">Net Payable</span>
+                <span style="font-size:24px; font-weight:900; color:#005bb5;">₹${finalPayable.toFixed(2)}</span>
                 </div>`;
             } else {
                 totalsHtml += `
-                <div style="border-top: 2px dashed #ccc; padding-top: 12px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:18px; font-weight:900; color:#007aff;">Grand Total</span>
-                <span style="font-size:20px; font-weight:900; color:#007aff;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
+                <div style="background: linear-gradient(135deg, #eef5ff, #d6e8ff); padding: 18px 20px; border-radius: 14px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #cce0ff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                <span style="font-size:18px; font-weight:900; color:#005bb5; text-transform:uppercase;">Grand Total</span>
+                <span style="font-size:24px; font-weight:900; color:#005bb5;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
                 </div>`;
             }
 
+			// ============================================================
+			// BEAUTIFUL COLORFUL PDF TEMPLATE
+			// ============================================================
 			let html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; padding: 20px;">
-        <div style="text-align: center; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1.5px solid #e0e0e0;">
-    <h1 style="margin: 0 0 2px 0; font-size: 22px; color: #000; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">BABA STORE</h1>
-    <p style="margin: 0; font-size: 11px; color: #999; font-weight: 600; letter-spacing: 0.5px;">INVOICE</p>
-    </div>
-        <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #ebebeb;">
-    <table style="width:100%; font-size:13px; border-collapse:collapse;">
-    <tr>
-    <td style="padding: 3px 0; color:#777; font-weight:700; width:70px;">Customer</td>
-    <td style="padding: 3px 0; font-weight:800; color:#111;">: ${o.customerName}</td>
-    </tr>
-    <tr>
-    <td style="padding: 3px 0; color:#777; font-weight:700;">Address</td>
-    <td style="padding: 3px 0; color:#444; font-weight:600;">: ${o.address || 'N/A'}</td>
-    </tr>
-    <tr>
-    <td style="padding: 3px 0; color:#777; font-weight:700;">Date</td>
-    <td style="padding: 3px 0; color:#444; font-weight:600;">: ${o.displayDate}</td>
-    </tr>
-    </table>
-    </div>
-        <table style="width:100%; border-collapse:collapse; margin-bottom: 16px;">
-    <thead>
-    <tr style="border-bottom: 2px solid #e0e0e0;">
-    <th style="text-align:left; color:#999; text-transform:uppercase; font-size:10px; padding-bottom:8px; font-weight:800; letter-spacing:0.5px;">Item</th>
-    <th style="text-align:center; color:#999; text-transform:uppercase; font-size:10px; padding-bottom:8px; font-weight:800; letter-spacing:0.5px; width:40px;">Qty</th>
-    <th style="text-align:center; color:#999; text-transform:uppercase; font-size:10px; padding-bottom:8px; font-weight:800; letter-spacing:0.5px; width:70px;">Rate</th>
-    <th style="text-align:right; color:#999; text-transform:uppercase; font-size:10px; padding-bottom:8px; font-weight:800; letter-spacing:0.5px; width:70px;">Total</th>
-    </tr>
-    </thead>
-    <tbody>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; width: 100%; box-sizing: border-box;">
     
-                                    ${itemsHtml}
-    </tbody>
-    </table>
-        <div style="border-top: 1px solid #e0e0e0; padding-top: 12px;">
-        ${totalsHtml}
-    </div>
-        <div style="margin-top: 20px; padding-top: 12px; border-top: 1px dashed #ddd; text-align:center;">
-    <p style="margin:0; font-size:10px; color:#ccc; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;">Thank you for shopping at Baba Store</p>
-    </div>
+        <div style="background: linear-gradient(135deg, #007aff, #005bb5); padding: 25px 20px; text-align: center; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+    <h1 style="margin: 0 0 5px 0; font-size: 28px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">BABA STORE</h1>
+    <p style="margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #cce0ff;">OFFICIAL INVOICE</p>
     </div>
     
-                    `;
+    <div style="padding: 24px;">
+        <div style="background: #f8fbff; border-left: 4px solid #007aff; padding: 16px 20px; margin-bottom: 24px; border-radius: 0 12px 12px 0; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+            <table style="width:100%; font-size:14px; border-collapse:collapse;">
+            <tr>
+            <td style="padding: 4px 0; color:#666; font-weight:700; width:80px; text-transform:uppercase; font-size:11px; letter-spacing:0.5px;">Billed To</td>
+            <td style="padding: 4px 0; font-weight:900; color:#111; font-size: 16px;">: ${o.customerName}</td>
+            </tr>
+            <tr>
+            <td style="padding: 4px 0; color:#666; font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:0.5px;">Address</td>
+            <td style="padding: 4px 0; color:#333; font-weight:600;">: ${o.address || 'N/A'}</td>
+            </tr>
+            <tr>
+            <td style="padding: 4px 0; color:#666; font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:0.5px;">Date</td>
+            <td style="padding: 4px 0; color:#333; font-weight:600;">: ${o.displayDate}</td>
+            </tr>
+            </table>
+        </div>
+        
+        <table style="width:100%; border-collapse: separate; border-spacing: 0; margin-bottom: 24px; border: 1px solid #eef2f9; border-radius: 12px; overflow:hidden;">
+        <thead style="background: #f0f8ff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+        <tr>
+        <th style="text-align:left; color:#005bb5; text-transform:uppercase; font-size:11px; padding:14px 10px; font-weight:900; letter-spacing:0.5px;">Item</th>
+        <th style="text-align:center; color:#005bb5; text-transform:uppercase; font-size:11px; padding:14px 10px; font-weight:900; letter-spacing:0.5px; width:45px;">Qty</th>
+        <th style="text-align:center; color:#005bb5; text-transform:uppercase; font-size:11px; padding:14px 10px; font-weight:900; letter-spacing:0.5px; width:75px;">Rate</th>
+        <th style="text-align:right; color:#005bb5; text-transform:uppercase; font-size:11px; padding:14px 10px; font-weight:900; letter-spacing:0.5px; width:80px;">Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        ${itemsHtml}
+        </tbody>
+        </table>
+        
+        <div style="padding-top: 10px;">
+            ${totalsHtml}
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 16px; border-top: 1px dashed #d1e3ff; text-align:center;">
+        <p style="margin:0; font-size:11px; color:#99abc0; font-weight:800; letter-spacing:1px; text-transform:uppercase;">Thank you for shopping at Baba Store</p>
+        </div>
+    </div>
+    </div>`;
+
 			document.getElementById('modalBody').innerHTML = html;
 			document.getElementById('printArea').innerHTML = html;
 			document.getElementById('billModal').style.display = 'flex';
@@ -1497,10 +1500,10 @@
 			let timeLimit = 43200000;
 			if(sorted.length === 0) {
 				return log.innerHTML = `
-    <div class="empty-state">
-    <h3 style="font-size: 40px; margin-bottom: 10px;">📋</h3>
-    <h3>No Orders Found</h3>
-    <p style="font-size: 14px;">Try changing the date or search term.</p>
+    <div class="empty-state" style="text-align:center; padding: 40px 20px;">
+    <h3 style="font-size: 50px; margin-bottom: 15px; opacity:0.8;">📋</h3>
+    <h3 style="color:#111; font-weight:800; font-size:22px;">No Orders Found</h3>
+    <p style="font-size: 15px; color:var(--text-muted); font-weight:600;">Try changing the date or search term.</p>
     </div>`;
 			}
 			sorted.forEach(order => {
@@ -1524,7 +1527,7 @@
     </div>
     <p class="order-bill">₹${order.billTotal ? order.billTotal.toFixed(2) : '0.00'}</p>
     </div>
-    <div style="font-size:13px; color:#666; font-weight:500;">Tap card to open Bill / Send WhatsApp...</div>
+    <div style="font-size:13px; color:var(--primary); font-weight:700; margin-bottom:12px;">Tap card to open Bill / Send WhatsApp...</div>
     
                                     ${overdueHtml}
     
