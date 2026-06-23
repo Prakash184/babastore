@@ -18,7 +18,7 @@
 		--danger: #ff3b30;
 		--danger-bg: #ffeceb;
 		--warning: #ff9500;
-		--background: #f0f4f8; /* Soft modern blue-gray */
+		--background: #f0f4f8;
 		--card-bg: #ffffff;
 		--text-main: #1c1c1e;
 		--text-muted: #8e8e93;
@@ -95,7 +95,7 @@
 	.section {
 		background: var(--card-bg);
 		border-radius: 24px;
-		padding: 28px 20px;
+		padding: 28px 16px;
 		margin-bottom: 24px;
 		box-shadow: 0 12px 35px rgba(0, 0, 0, 0.06);
         border-top: 5px solid var(--primary);
@@ -157,10 +157,10 @@
 	.labor-grid {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 15px;
+		gap: 12px;
 		margin-bottom: 20px;
 		background: linear-gradient(135deg, #fffcf2, #fff5d6);
-		padding: 18px;
+		padding: 16px;
 		border-radius: 16px;
 		border: 1px solid #ffe499;
 	}
@@ -181,7 +181,7 @@
 	}
 	
 	.product-list {
-		max-height: 450px;
+		max-height: 480px;
 		overflow-y: auto;
 		padding-right: 5px;
 		margin-bottom: 10px;
@@ -209,7 +209,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 8px;
+		gap: 4px; /* Tighter gap for mobile */
 	}
 	
 	.rate-box {
@@ -218,8 +218,8 @@
 		background: #f0f4f8;
 		border-radius: 12px;
 		border: 1px solid transparent;
-		padding: 0 12px;
-		width: 120px;
+		padding: 0 8px;
+		width: 110px; /* Adjusted to prevent squeezing */
 		transition: all 0.2s;
 	}
 	
@@ -232,15 +232,15 @@
 	.rate-box span {
 		color: var(--text-muted);
 		font-weight: 800;
-		font-size: 18px;
+		font-size: 16px;
 	}
 	
 	.rate-box input {
 		border: none;
 		background: transparent;
-		padding: 14px 8px;
+		padding: 12px 4px;
 		width: 100%;
-		font-size: 16px;
+		font-size: 15px;
 		font-weight: 800;
 		color: var(--primary);
 	}
@@ -248,7 +248,7 @@
 	.stepper {
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: 8px; /* Tighter gap */
 		background: var(--background);
 		border-radius: 24px;
 		padding: 4px;
@@ -256,13 +256,13 @@
 	}
 	
 	.btn-step {
-		width: 38px;
-		height: 38px;
-		border-radius: 19px;
+		width: 34px;
+		height: 34px;
+		border-radius: 17px;
 		border: none;
 		background: var(--card-bg);
 		color: var(--primary);
-		font-size: 24px;
+		font-size: 20px;
 		font-weight: 500;
 		cursor: pointer;
 		box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
@@ -275,9 +275,9 @@
 	}
 	
 	.qty-val {
-		font-size: 18px;
+		font-size: 16px;
 		font-weight: 900;
-		min-width: 28px;
+		min-width: 24px;
 		text-align: center;
 		transition: all 0.15s ease;
 	}
@@ -288,16 +288,16 @@
 	}
 	
 	.item-total {
-		font-size: 17px;
+		font-size: 16px;
 		font-weight: 900;
 		color: var(--text-muted);
-		width: 85px;
+		width: 75px;
 		text-align: right;
 	}
 	
 	.bill-summary {
 		background: linear-gradient(135deg, #f0f8ff, #e6f2ff);
-		padding: 22px;
+		padding: 20px;
 		border-radius: 18px;
 		margin-top: 20px;
 		border: 1px solid #cce4ff;
@@ -549,12 +549,9 @@
 	
 	.modal-content {
 		background: white;
-		padding: 24px;
 		border-radius: 24px;
 		width: 100%;
 		max-width: 500px;
-		max-height: 90vh;
-		overflow-y: auto;
 		box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
 	}
 	
@@ -588,8 +585,8 @@
 	
 	.btn-close {
 		background: #f2f2f7;
-		color: black;
-		margin-top: 24px;
+		color: #111;
+		margin-top: 16px;
 	}
 	
 	.btn-backup {
@@ -646,6 +643,7 @@
 		font-weight: 900;
 		margin-bottom: 12px;
 		color: #111;
+		letter-spacing: -0.5px;
 	}
 	
 	.confirm-msg {
@@ -670,6 +668,7 @@
 		border-radius: 14px;
 		font-weight: 800;
 		font-size: 16px;
+		box-shadow: 0 4px 15px rgba(0, 122, 255, 0.2);
 	}
 	
 	.btn-confirm-no {
@@ -685,6 +684,7 @@
 	
 	.btn-confirm-danger {
 		background: var(--danger);
+		box-shadow: 0 4px 15px rgba(255, 59, 48, 0.2);
 	}
 
 	/* PRINT CSS */
@@ -742,7 +742,7 @@
 				<input type="text" id="custAddress" placeholder="Address will auto-fill..."> </div>
             
             <div class="input-group">
-				<label>Back Dues (₹) </label>
+				<label>Back Dues (₹) [Optional]</label>
 				<input type="number" inputmode="decimal" pattern="[0-9]*" id="backDues" placeholder="0"> 
             </div>
 		</div>
@@ -797,11 +797,11 @@
 	</div>
 	
     <div id="newProductModal" class="modal no-print" style="z-index: 3000;">
-        <div class="modal-content confirm-modal-content">
+        <div class="modal-content confirm-modal-content" style="padding: 24px;">
             <div class="confirm-title">Add Custom Product</div>
             <div class="confirm-msg" style="margin-bottom: 20px;">Add a new dealership item. It will be permanently added to your app list.</div>
             <div class="input-group" style="text-align: left; margin-bottom: 25px;">
-                <input type="text" id="newProductName" placeholder="e.g. New Product 50kg" style="width: 100%;"> 
+                <input type="text" id="newProductName" placeholder="e.g. New Brand 50kg" style="width: 100%;"> 
             </div>
             <div class="confirm-actions">
                 <button class="btn-confirm-no" onclick="closeModals()">Cancel</button>
@@ -811,7 +811,7 @@
     </div>
     
     <div id="editProductModal" class="modal no-print" style="z-index: 3000;">
-        <div class="modal-content confirm-modal-content">
+        <div class="modal-content confirm-modal-content" style="padding: 24px;">
             <div class="confirm-title">Edit Custom Product</div>
             <div class="confirm-msg" style="margin-bottom: 20px;">Fix typos in your custom product name.</div>
             <div class="input-group" style="text-align: left; margin-bottom: 25px;">
@@ -825,9 +825,10 @@
     </div>
 
 	<div id="billModal" class="modal no-print">
-		<div class="modal-content" style="padding: 0; overflow: hidden; max-width: 550px;">
-			<div id="modalBody" style="background: white;"></div>
-            <div style="padding: 24px; background: #f9f9f9; border-top: 1px solid #eee;">
+        <div class="modal-content" style="padding: 0; max-width: 550px; display: flex; flex-direction: column; max-height: 85vh; overflow: hidden;">
+			<div id="modalBody" style="background: white; overflow-y: auto; flex: 1;"></div>
+            
+            <div style="padding: 20px 24px; background: #f9f9f9; border-top: 1px solid #eee; flex-shrink: 0;">
 			    <button class="modal-btn btn-whatsapp no-print" id="whatsappBtn" style="margin-top:0;">💬 Send on WhatsApp</button>
 			    <button class="modal-btn btn-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
 			    <button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
@@ -836,11 +837,11 @@
 	</div>
 	
 	<div id="settingsModal" class="modal no-print">
-		<div class="modal-content" style="text-align: center;">
+		<div class="modal-content" style="text-align: center; padding: 24px;">
 			<h2 style="margin-top:0; color:var(--primary); font-weight: 900;">Business Settings</h2>
-			<p style="color:var(--text-muted); font-size:15px; margin-bottom:20px; font-weight: 600;">Protect your business data by saving it to your phone.</p>
-			<button class="modal-btn btn-backup" onclick="exportData()" style="padding: 20px; font-size: 18px;">💾 Download Backup File</button>
-			<div style="margin-top:35px; padding-top:28px; border-top:2px dashed #e5e5ea; text-align: left;">
+			<p style="color:var(--text-muted); font-size:14px; margin-bottom:20px; font-weight: 600;">Protect your business data by saving it to your phone.</p>
+			<button class="modal-btn btn-backup" onclick="exportData()" style="padding: 16px; font-size: 16px;">💾 Download Backup File</button>
+			<div style="margin-top:35px; padding-top:24px; border-top:2px dashed #e5e5ea; text-align: left;">
 				<label style="font-size:14px; font-weight:800; display:block; margin-bottom:12px; color:#111;">Restore from Backup</label>
 				<input type="file" id="backupFile" accept=".json" style="margin-bottom:16px; width:100%; background: #f4f6f9; border: 1.5px solid var(--border-color);">
 				<button class="modal-btn" style="background:var(--danger); color:white; margin-top: 0; box-shadow: 0 8px 20px rgba(255, 59, 48, 0.25);" onclick="importData()">📂 Restore Data</button>
@@ -850,7 +851,7 @@
 	</div>
 	
 	<div id="confirmModal" class="modal no-print" style="z-index: 4000;">
-		<div class="modal-content confirm-modal-content">
+		<div class="modal-content confirm-modal-content" style="padding: 24px;">
 			<div class="confirm-title" id="confirmTitle">Confirm Action</div>
 			<div class="confirm-msg" id="confirmMsg">Are you sure you want to do this?</div>
 			<div class="confirm-actions">
@@ -861,7 +862,7 @@
 	</div>
 	
 	<script>
-	const products = ["Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar", "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Sujji", "Sujji 47 Kg", "Sujji 48 Kg", "Darra", "Milk More", "Doodh Virdhi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"];
+	const products = ["Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar", "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Sujji", "Sujji 47 Kg", "Sujji 48 Kg", "Darra", "Milk More", "Doodh Virdi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"];
 	let currentItems = {};
 	let db;
 	let editingOrderId = null;
@@ -958,12 +959,12 @@
             if (isCustom) {
                 container.innerHTML += `
                 <div class="swipe-container" style="background: transparent; border: 1.5px solid var(--primary); border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,122,255,0.08);">
-                    <div style="width: 100%; flex: 0 0 100%; scroll-snap-align: start; padding: 0 12px;">
+                    <div style="width: 100%; flex: 0 0 100%; scroll-snap-align: start; padding: 0 5px;">
                         ${rowHtml}
                     </div>
-                    <div class="swipe-actions" style="flex: 0 0 130px; padding: 12px; background: transparent; display: flex; gap: 8px;">
-                        <button class="action-btn" style="background:var(--warning); border-radius:14px; color:white; font-size:18px; box-shadow: 0 2px 8px rgba(255,149,0,0.3);" onclick="openEditProductModal('${p}')">✏️</button>
-                        <button class="action-btn" style="background:var(--danger); border-radius:14px; color:white; font-size:18px; box-shadow: 0 2px 8px rgba(255,59,48,0.3);" onclick="deleteCustomProduct('${p}')">🗑️</button>
+                    <div class="swipe-actions" style="flex: 0 0 130px; padding: 12px 12px 12px 0; background: transparent; display: flex; gap: 6px;">
+                        <button class="action-btn btn-edit" style="border-radius:14px;" onclick="openEditProductModal('${p}')"><span style="font-size:18px;">✏️</span></button>
+                        <button class="action-btn btn-delete" style="border-radius:14px;" onclick="deleteCustomProduct('${p}')"><span style="font-size:18px;">🗑️</span></button>
                     </div>
                 </div>`;
             } else {
@@ -1191,7 +1192,7 @@
 			currentItems[p].qty = 0;
 			currentItems[p].rate = "";
 		});
-        renderProducts();
+        renderProducts(); 
 		calculateGrandTotal();
 		renderOrders();
 		window.scrollTo(0, 0);
@@ -1274,7 +1275,6 @@
 			for(let p in o.items) {
 				whatsappText += `${p}: ${o.items[p].qty} x ₹${o.items[p].rate} = ₹${o.items[p].total}\n`;
 				
-                // Beautiful Table Rows for PDF
                 itemsHtml += `
                 <tr>
                     <td style="padding:12px 10px; color:#222; font-weight:700; font-size:13px; border-bottom:1px solid #eef2f9;">${p}</td>
@@ -1304,7 +1304,6 @@
 			let loadSub = o.loadRate > 0 ? ` <span style="font-size:11px; color:#777; font-weight:500;">(₹${o.loadRate} × ${o.totalBags} bags)</span>` : "";
 			let unloadSub = o.unloadRate > 0 ? ` <span style="font-size:11px; color:#777; font-weight:500;">(₹${o.unloadRate} × ${o.totalBags} bags)</span>` : "";
 			
-            // BEAUTIFUL PDF TOTALS SECTION
             let totalsHtml = `
             <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px; font-weight:700; color:#555;">
             <span>Products Total</span>
@@ -1326,7 +1325,7 @@
                 <span style="font-size:15px; font-weight:800; color:#222;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                <span style="font-size:15px; font-weight:800; color:#ff3b30;">Back Dues</span>
+                <span style="font-size:15px; font-weight:800; color:#ff3b30;">Previous Dues</span>
                 <span style="font-size:15px; font-weight:800; color:#ff3b30;">+ ₹${backDues.toFixed(2)}</span>
                 </div>
                 <div style="background: linear-gradient(135deg, #eef5ff, #d6e8ff); padding: 18px 20px; border-radius: 14px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #cce0ff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
@@ -1341,9 +1340,6 @@
                 </div>`;
             }
 
-			// ============================================================
-			// BEAUTIFUL COLORFUL PDF TEMPLATE
-			// ============================================================
 			let html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; width: 100%; box-sizing: border-box;">
     
