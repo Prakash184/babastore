@@ -8,18 +8,26 @@
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<meta name="apple-mobile-web-app-title" content="Baba Store">
+	
+    <!-- Professional PDF Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 	<style>
 	:root {
 		--primary: #007aff;
+		--primary-hover: #005bb5;
 		--primary-gradient: linear-gradient(135deg, #007aff, #005bb5);
-		--success: #25D366;
+		--success: #34c759;
 		--danger: #ff3b30;
 		--danger-bg: #ffeceb;
-		--background: #f2f2f7;
+		--warning: #ff9500;
+		--background: #f4f6f9; /* Softer premium background */
 		--card-bg: #ffffff;
 		--text-main: #1c1c1e;
 		--text-muted: #8e8e93;
 		--border-color: #e5e5ea;
+		--shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.04);
+		--shadow-hover: 0 15px 35px rgba(0, 122, 255, 0.15);
 	}
 	
 	* {
@@ -28,18 +36,20 @@
 	}
 	
 	body {
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
 		background-color: var(--background);
 		margin: 0;
 		padding: 0;
 		color: var(--text-main);
-		padding-bottom: 60px;
+		padding-bottom: 80px;
+		-webkit-font-smoothing: antialiased;
 	}
 	
+	/* Premium Glass Header */
 	.header {
-		background: rgba(255, 255, 255, 0.85);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
+		background: rgba(255, 255, 255, 0.75);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
 		position: sticky;
 		top: 0;
 		z-index: 100;
@@ -47,15 +57,17 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+		box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
 	}
 	
 	.header h1 {
 		margin: 0;
 		font-size: 26px;
 		font-weight: 800;
-		color: var(--primary);
+		background: var(--primary-gradient);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
 		letter-spacing: -0.5px;
 	}
 	
@@ -65,18 +77,18 @@
 		font-size: 20px;
 		cursor: pointer;
 		color: var(--primary);
-		height: 40px;
-		width: 40px;
-		border-radius: 20px;
+		height: 42px;
+		width: 42px;
+		border-radius: 21px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-		transition: transform 0.2s;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+		transition: all 0.2s ease;
 	}
 	
 	.settings-btn:active {
-		transform: scale(0.9);
+		transform: scale(0.9) rotate(45deg);
 	}
 	
 	.container {
@@ -85,26 +97,31 @@
 		margin: 0 auto;
 	}
 	
+	/* Upgraded Cards */
 	.section {
 		background: var(--card-bg);
-		border-radius: 20px;
-		padding: 24px 20px;
+		border-radius: 24px;
+		padding: 28px 24px;
 		margin-bottom: 24px;
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+		box-shadow: var(--shadow-soft);
+		border: 1px solid rgba(0,0,0,0.02);
 	}
 	
 	.section-title {
 		font-weight: 800;
-		font-size: 19px;
+		font-size: 20px;
 		margin-top: 0;
-		margin-bottom: 20px;
+		margin-bottom: 22px;
 		border-bottom: 2px solid var(--background);
-		padding-bottom: 10px;
-		color: #000;
+		padding-bottom: 12px;
+		color: #111;
+		display: flex;
+		align-items: center;
+		gap: 8px;
 	}
 	
 	.input-group {
-		margin-bottom: 18px;
+		margin-bottom: 20px;
 		width: 100%;
 	}
 	
@@ -115,9 +132,10 @@
 		font-weight: 700;
 		color: var(--text-muted);
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
+		letter-spacing: 0.8px;
 	}
 	
+	/* Beautiful Inputs */
 	input[type="text"],
 	input[type="date"],
 	input[type="number"],
@@ -126,30 +144,32 @@
 		width: 100%;
 		padding: 16px;
 		border: 1.5px solid var(--border-color);
-		border-radius: 14px;
+		border-radius: 16px;
 		font-size: 16px;
-		font-weight: 500;
+		font-weight: 600;
 		background-color: #fafafa;
 		display: block;
 		font-family: inherit;
-		transition: all 0.3s;
+		transition: all 0.25s ease;
+		color: #333;
 	}
 	
 	input:focus {
 		border-color: var(--primary);
 		outline: none;
 		background-color: #fff;
-		box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+		box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
 	}
 	
+	/* Labor Grid Styling */
 	.labor-grid {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 15px;
 		margin-bottom: 20px;
-		background: #fffaf0;
-		padding: 16px;
-		border-radius: 16px;
+		background: linear-gradient(135deg, #fffcf2, #fffaf0);
+		padding: 18px;
+		border-radius: 20px;
 		border: 1px solid #ffebb3;
 	}
 	
@@ -160,56 +180,69 @@
 	.labor-grid input {
 		border-color: #ffcc00;
 		background: white;
-		font-weight: bold;
+		font-weight: 800;
+		color: #cc8400;
+	}
+
+	.labor-grid input:focus {
+		box-shadow: 0 0 0 4px rgba(255, 204, 0, 0.2);
 	}
 	
 	.product-list {
-		max-height: 450px;
+		max-height: 480px;
 		overflow-y: auto;
 		padding-right: 5px;
 		margin-bottom: 10px;
+		/* Custom invisible scrollbar for smoothness */
+		scrollbar-width: none;
+	}
+	.product-list::-webkit-scrollbar {
+		display: none;
 	}
 	
 	.product-row {
-		padding: 18px 0;
+		padding: 20px 0;
 		border-bottom: 1px solid var(--border-color);
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: 12px;
 	}
 	
 	.product-name {
-		font-size: 16px;
-		font-weight: 700;
-		color: #222;
+		font-size: 17px;
+		font-weight: 800;
+		color: #111;
+		letter-spacing: -0.3px;
 	}
 	
 	.controls-row {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 8px;
+		gap: 10px;
 	}
 	
+	/* Rate Box */
 	.rate-box {
 		display: flex;
 		align-items: center;
 		background: #f4f4f5;
-		border-radius: 12px;
-		border: 1px solid var(--border-color);
-		padding: 0 12px;
-		width: 120px;
-		transition: border 0.2s;
+		border-radius: 14px;
+		border: 1.5px solid transparent;
+		padding: 0 14px;
+		width: 125px;
+		transition: all 0.2s;
 	}
 	
 	.rate-box:focus-within {
 		border-color: var(--primary);
 		background: #fff;
+		box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 	}
 	
 	.rate-box span {
 		color: var(--text-muted);
-		font-weight: 700;
+		font-weight: 800;
 		font-size: 18px;
 	}
 	
@@ -219,75 +252,80 @@
 		padding: 14px 8px;
 		width: 100%;
 		font-size: 16px;
-		font-weight: 700;
+		font-weight: 800;
 		color: var(--primary);
 	}
 	
+	/* Stepper Controls */
 	.stepper {
 		display: flex;
 		align-items: center;
 		gap: 12px;
-		background: var(--background);
+		background: #f4f6f9;
 		border-radius: 24px;
-		padding: 4px;
+		padding: 5px;
 		border: 1px solid var(--border-color);
 	}
 	
 	.btn-step {
-		width: 38px;
-		height: 38px;
-		border-radius: 19px;
+		width: 40px;
+		height: 40px;
+		border-radius: 20px;
 		border: none;
 		background: var(--card-bg);
 		color: var(--primary);
 		font-size: 24px;
 		font-weight: 500;
 		cursor: pointer;
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-		transition: transform 0.1s;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+		transition: transform 0.15s ease;
 	}
 	
 	.btn-step:active {
-		transform: scale(0.9);
+		transform: scale(0.85);
+		background: #eef5ff;
 	}
 	
 	.qty-val {
-		font-size: 18px;
-		font-weight: 800;
-		min-width: 28px;
+		font-size: 19px;
+		font-weight: 900;
+		min-width: 30px;
 		text-align: center;
+		color: #111;
 		transition: all 0.15s ease;
 	}
 	
 	.pop-anim {
-		transform: scale(1.5);
+		transform: scale(1.4);
 		color: var(--primary);
 	}
 	
 	.item-total {
-		font-size: 16px;
-		font-weight: 800;
+		font-size: 17px;
+		font-weight: 900;
 		color: var(--text-muted);
-		width: 85px;
+		width: 90px;
 		text-align: right;
 	}
 	
+	/* Bill Summary Styling */
 	.bill-summary {
-		background: #f0f8ff;
-		padding: 20px;
-		border-radius: 16px;
-		margin-top: 20px;
+		background: linear-gradient(135deg, #f0f8ff, #e6f2ff);
+		padding: 24px;
+		border-radius: 20px;
+		margin-top: 24px;
 		border: 1px solid #d6eaff;
+		box-shadow: 0 4px 15px rgba(0, 122, 255, 0.05);
 	}
 	
 	.bill-row {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 10px;
+		margin-bottom: 12px;
 		font-size: 15px;
 		color: #444;
-		font-weight: 600;
+		font-weight: 700;
 	}
 	
 	.bill-row span:last-child {
@@ -296,55 +334,58 @@
 	
 	.bill-row.grand {
 		border-top: 2px dashed #bce0fd;
-		padding-top: 15px;
-		margin-top: 15px;
-		font-size: 22px;
+		padding-top: 18px;
+		margin-top: 18px;
+		font-size: 24px;
 		font-weight: 900;
 		color: var(--primary);
 	}
 	
+	/* Premium Submit Button */
 	.btn-submit {
 		width: 100%;
 		background: var(--primary-gradient);
 		color: white;
 		border: none;
-		padding: 18px;
-		border-radius: 16px;
-		font-size: 18px;
-		font-weight: 800;
+		padding: 20px;
+		border-radius: 20px;
+		font-size: 19px;
+		font-weight: 900;
 		cursor: pointer;
-		margin-top: 20px;
-		box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3);
-		transition: transform 0.2s;
+		margin-top: 24px;
+		box-shadow: 0 10px 25px rgba(0, 122, 255, 0.35);
+		transition: all 0.2s ease;
+		letter-spacing: 0.5px;
 	}
 	
 	.btn-submit:active {
 		transform: scale(0.96);
+		box-shadow: 0 5px 15px rgba(0, 122, 255, 0.3);
 	}
 	
 	.search-area {
 		background: white;
-		padding: 16px;
-		border-radius: 16px;
-		margin-bottom: 20px;
-		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+		padding: 20px;
+		border-radius: 24px;
+		margin-bottom: 24px;
+		box-shadow: var(--shadow-soft);
 	}
 	
 	.dashboard-box {
 		background: var(--primary-gradient);
 		color: white;
-		padding: 20px;
-		border-radius: 16px;
-		margin-bottom: 20px;
+		padding: 24px;
+		border-radius: 24px;
+		margin-bottom: 24px;
 		display: none;
-		box-shadow: 0 8px 24px rgba(0, 122, 255, 0.25);
+		box-shadow: var(--shadow-hover);
 	}
 	
 	.dashboard-box h3 {
-		margin: 0 0 15px 0;
-		font-size: 20px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-		padding-bottom: 10px;
+		margin: 0 0 18px 0;
+		font-size: 22px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+		padding-bottom: 12px;
 		display: flex;
 		align-items: center;
 		gap: 8px;
@@ -354,26 +395,28 @@
 		display: flex;
 		justify-content: space-between;
 		font-size: 16px;
-		margin-bottom: 8px;
-		font-weight: 500;
+		margin-bottom: 10px;
+		font-weight: 600;
 	}
 	
 	.dash-grand {
-		font-size: 22px;
+		font-size: 24px;
 		font-weight: 900;
-		margin-top: 15px;
+		margin-top: 18px;
 		border-top: 1px solid rgba(255, 255, 255, 0.3);
-		padding-top: 15px;
+		padding-top: 18px;
 	}
 	
+	/* Swipe Containers */
 	.swipe-container {
 		display: flex;
 		overflow-x: auto;
 		scroll-snap-type: x mandatory;
 		scrollbar-width: none;
-		border-radius: 16px;
+		border-radius: 20px;
 		margin-bottom: 16px;
-		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+		box-shadow: var(--shadow-soft);
+		background: var(--card-bg);
 	}
 	
 	.swipe-container::-webkit-scrollbar {
@@ -384,27 +427,31 @@
 		width: 100%;
 		flex: 0 0 100%;
 		scroll-snap-align: start;
-		background: var(--card-bg);
-		padding: 20px;
+		padding: 24px;
 		border-left: 8px solid #ffcc00;
 		position: relative;
+		background: transparent;
 	}
 	
 	.order-card.overdue {
 		border-left-color: var(--danger);
-		background-color: #fff9f9;
+		background-color: #fffaf9;
 	}
 	
 	.order-card.delivered {
 		border-left-color: var(--success);
-		opacity: 0.8;
-		background-color: #fafafa;
+		opacity: 0.85;
+		background-color: #fafdff;
 	}
 	
+	/* Updated Action Buttons Container to fit Edit & Delete */
 	.swipe-actions {
 		flex: 0 0 160px;
 		scroll-snap-align: end;
 		display: flex;
+		gap: 6px;
+		padding: 12px 12px 12px 0;
+		background: var(--card-bg);
 	}
 	
 	.action-btn {
@@ -412,22 +459,27 @@
 		border: none;
 		color: white;
 		font-weight: bold;
-		font-size: 15px;
+		font-size: 14px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 8px;
+		gap: 6px;
 		cursor: pointer;
+		border-radius: 16px;
+		transition: transform 0.15s ease;
+	}
+
+	.action-btn:active {
+		transform: scale(0.9);
 	}
 	
 	.btn-edit {
-		background: #ff9500;
+		background: var(--warning);
 	}
 	
 	.btn-delete {
 		background: var(--danger);
-		border-radius: 0 16px 16px 0;
 	}
 	
 	.order-header {
@@ -435,15 +487,16 @@
 		justify-content: space-between;
 		align-items: flex-start;
 		border-bottom: 1px solid #f2f2f7;
-		padding-bottom: 12px;
-		margin-bottom: 12px;
+		padding-bottom: 16px;
+		margin-bottom: 16px;
 	}
 	
 	.customer-name {
-		font-size: 20px;
-		font-weight: 800;
+		font-size: 22px;
+		font-weight: 900;
 		margin: 0;
 		color: #111;
+		letter-spacing: -0.5px;
 	}
 	
 	.customer-meta {
@@ -454,21 +507,21 @@
 	}
 	
 	.order-bill {
-		font-size: 20px;
+		font-size: 22px;
 		font-weight: 900;
 		color: var(--primary);
 		margin: 0;
 		background: #f0f8ff;
-		padding: 6px 12px;
-		border-radius: 10px;
+		padding: 8px 14px;
+		border-radius: 12px;
 	}
 	
 	.delivery-toggle {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-top: 16px;
-		padding-top: 16px;
+		margin-top: 20px;
+		padding-top: 20px;
 		border-top: 1px solid #f2f2f7;
 	}
 	
@@ -477,21 +530,39 @@
 		height: 32px;
 		accent-color: var(--success);
 		cursor: pointer;
-		transform: scale(1.1);
+		transform: scale(1.15);
 	}
 	
 	.overdue-text {
 		color: var(--danger);
 		font-size: 13px;
 		font-weight: 800;
-		margin-top: 10px;
+		margin-top: 12px;
 		display: inline-block;
 		background: #ffeceb;
-		padding: 4px 8px;
-		border-radius: 6px;
+		padding: 6px 10px;
+		border-radius: 8px;
 	}
+
+	/* ADD NEW PRODUCT BUTTON */
+	.btn-add-new {
+		background: #eef5ff; 
+		color: var(--primary); 
+		border: 1px solid #cce0ff; 
+		padding: 8px 16px; 
+		border-radius: 16px; 
+		font-weight: 800; 
+		font-size: 14px; 
+		cursor: pointer; 
+		box-shadow: 0 4px 10px rgba(0,122,255,0.1);
+		transition: all 0.2s;
+	}
+	.btn-add-new:active {
+		transform: scale(0.92);
+		background: #d6e8ff;
+	}
+
 	/* MODALS */
-	
 	.modal {
 		display: none;
 		position: fixed;
@@ -499,35 +570,41 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: rgba(0, 0, 0, 0.6);
-		backdrop-filter: blur(4px);
-		-webkit-backdrop-filter: blur(4px);
+		background: rgba(0, 0, 0, 0.5);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
 		z-index: 1000;
 		padding: 20px;
 		align-items: center;
 		justify-content: center;
+		animation: fadeIn 0.2s ease;
 	}
 	
+	@keyframes fadeIn {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+
 	.modal-content {
 		background: white;
-		padding: 24px;
-		border-radius: 24px;
+		padding: 30px 24px;
+		border-radius: 28px;
 		width: 100%;
 		max-width: 500px;
 		max-height: 90vh;
 		overflow-y: auto;
-		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
 	}
 	
 	.modal-btn {
 		border: none;
-		padding: 16px;
-		border-radius: 14px;
+		padding: 18px;
+		border-radius: 16px;
 		width: 100%;
 		font-weight: 800;
-		margin-top: 12px;
+		margin-top: 14px;
 		cursor: pointer;
-		font-size: 16px;
+		font-size: 17px;
 		transition: transform 0.2s;
 	}
 	
@@ -538,19 +615,19 @@
 	.btn-whatsapp {
 		background: var(--success);
 		color: white;
-		box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+		box-shadow: 0 8px 20px rgba(52, 199, 89, 0.25);
 	}
 	
 	.btn-print {
 		background: var(--primary-gradient);
 		color: white;
-		box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+		box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25);
 	}
 	
 	.btn-close {
-		background: #e5e5ea;
-		color: black;
-		margin-top: 20px;
+		background: #f2f2f7;
+		color: #111;
+		margin-top: 24px;
 	}
 	
 	.btn-backup {
@@ -558,8 +635,8 @@
 		color: black;
 		margin-top: 15px;
 	}
+
 	/* CUSTOM TOAST NOTIFICATIONS */
-	
 	#toastContainer {
 		position: fixed;
 		top: 20px;
@@ -575,25 +652,26 @@
 	}
 	
 	.toast {
-		background: #333;
+		background: rgba(30, 30, 30, 0.95);
+		backdrop-filter: blur(10px);
 		color: white;
-		padding: 16px 20px;
-		border-radius: 12px;
-		font-weight: 600;
+		padding: 18px 24px;
+		border-radius: 16px;
+		font-weight: 700;
 		font-size: 15px;
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-		animation: slideDown 0.3s ease forwards;
+		box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+		animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		gap: 12px;
 	}
 	
 	.toast.error {
-		background: #ff3b30;
+		background: rgba(255, 59, 48, 0.95);
 	}
 	
 	.toast.success {
-		background: #25D366;
+		background: rgba(52, 199, 89, 0.95);
 	}
 	
 	.toast.fade-out {
@@ -601,50 +679,40 @@
 	}
 	
 	@keyframes slideDown {
-		from {
-			opacity: 0;
-			transform: translateY(-20px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
+		from { opacity: 0; transform: translateY(-30px) scale(0.9); }
+		to { opacity: 1; transform: translateY(0) scale(1); }
 	}
 	
 	@keyframes fadeOut {
-		from {
-			opacity: 1;
-			transform: translateY(0);
-		}
-		to {
-			opacity: 0;
-			transform: translateY(-20px);
-		}
+		from { opacity: 1; transform: translateY(0); }
+		to { opacity: 0; transform: translateY(-20px); }
 	}
+
 	/* CUSTOM CONFIRM MODAL */
-	
 	.confirm-modal-content {
 		text-align: center;
 		padding: 30px 24px;
 	}
 	
 	.confirm-title {
-		font-size: 20px;
-		font-weight: 800;
-		margin-bottom: 10px;
+		font-size: 22px;
+		font-weight: 900;
+		margin-bottom: 12px;
 		color: #111;
+		letter-spacing: -0.5px;
 	}
 	
 	.confirm-msg {
-		font-size: 15px;
+		font-size: 16px;
 		color: #555;
-		margin-bottom: 25px;
-		line-height: 1.4;
+		margin-bottom: 28px;
+		line-height: 1.5;
+		font-weight: 500;
 	}
 	
 	.confirm-actions {
 		display: flex;
-		gap: 10px;
+		gap: 12px;
 	}
 	
 	.btn-confirm-yes {
@@ -652,58 +720,40 @@
 		background: var(--primary);
 		color: white;
 		border: none;
-		padding: 14px;
-		border-radius: 12px;
+		padding: 16px;
+		border-radius: 16px;
 		font-weight: 800;
 		font-size: 16px;
+		box-shadow: 0 4px 15px rgba(0, 122, 255, 0.2);
 	}
 	
 	.btn-confirm-no {
 		flex: 1;
-		background: #e5e5ea;
+		background: #f2f2f7;
 		color: #333;
 		border: none;
-		padding: 14px;
-		border-radius: 12px;
+		padding: 16px;
+		border-radius: 16px;
 		font-weight: 800;
 		font-size: 16px;
 	}
 	
 	.btn-confirm-danger {
 		background: var(--danger);
+		box-shadow: 0 4px 15px rgba(255, 59, 48, 0.2);
 	}
-	/* =============================================
-    
-               PRINT STYLES - KEY FIX FOR URL HIDING
-    
-               ============================================= */
-	
+
 	#printArea {
 		display: none;
 	}
 	
 	@media print {
-		/* 
-    
-                 * FIX: Use margin: 15mm (not 0mm).
-    
-                 * With 0mm, Chrome/Safari still show URL because they add it
-    
-                 * inside the margin area. With a proper margin, the browser
-    
-                 * renders the URL in that space BUT we hide it via the
-    
-                 * page content overflow. The real fix is the combination below.
-    
-                 */
 		@page {
 			size: A4 portrait;
 			margin: 15mm 15mm 15mm 15mm;
-			/* These properties hide header/footer in supported browsers */
 			marks: none;
 		}
-		html,
-		body {
+		html, body {
 			width: 100% !important;
 			margin: 0 !important;
 			padding: 0 !important;
@@ -711,7 +761,6 @@
 			-webkit-print-color-adjust: exact !important;
 			print-color-adjust: exact !important;
 		}
-		/* Hide EVERYTHING on the page except our print area */
 		body > *:not(#printArea) {
 			display: none !important;
 			visibility: hidden !important;
@@ -750,7 +799,7 @@
 				<input type="text" id="custAddress" placeholder="Address will auto-fill..."> </div>
             
             <div class="input-group">
-				<label>Back Dues (₹) </label>
+				<label>Back Dues (₹) [Optional]</label>
 				<input type="number" inputmode="decimal" pattern="[0-9]*" id="backDues" placeholder="0"> 
             </div>
 		</div>
@@ -764,8 +813,15 @@
 					<label>Unloading (₹)</label>
 					<input type="number" inputmode="decimal" pattern="[0-9]*" id="unloadingRate" placeholder="0" oninput="calculateGrandTotal()"> </div>
 			</div>
-			<h2 class="section-title">📦 Products</h2>
+            
+            <!-- NEW PRODUCT HEADER WITH ADD BUTTON -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--background); margin-bottom: 20px; padding-bottom: 12px;">
+                <h2 class="section-title" style="border: none; margin: 0; padding: 0;">📦 Products</h2>
+                <button type="button" class="btn-add-new no-print" onclick="openNewProductModal()">+ Add New</button>
+            </div>
+            
 			<div class="product-list" id="productList"></div>
+            
 			<div class="bill-summary">
 				<div class="bill-row"><span>Products Total:</span> <span id="displayItemTotal">₹0.00</span></div>
 				<div class="bill-row"><span>Total Bags:</span> <span id="displayTotalBags">0</span></div>
@@ -775,50 +831,86 @@
 			</div>
 			<button class="btn-submit" id="submitBtn" onclick="submitOrder()">Save Order</button>
 		</div>
-		<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; margin-top: 30px;">
-			<h2 style="font-size: 22px; font-weight: 900; margin: 0; margin-left: 5px;">📋 Delivery Board</h2> </div>
+		<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; margin-top: 35px;">
+			<h2 style="font-size: 24px; font-weight: 900; margin: 0; margin-left: 5px; color: #111;">📋 Delivery Board</h2> </div>
 		<div class="search-area">
-			<div class="input-group" style="margin-bottom: 12px;">
+			<div class="input-group" style="margin-bottom: 16px;">
 				<input type="search" id="searchName" placeholder="🔍 Search by Customer Name..." oninput="renderOrders()"> </div>
-			<div style="display: flex; gap: 10px;">
+			<div style="display: flex; gap: 12px;">
 				<input type="date" id="filterDate" onchange="renderOrders()" style="flex:1;">
-				<button onclick="clearFilter()" style="padding:14px 20px; border-radius:14px; border:none; font-weight:bold; background:#e5e5ea; color: #333;">Clear</button>
+				<button onclick="clearFilter()" style="padding:16px 22px; border-radius:16px; border:none; font-weight:800; font-size:16px; background:#e5e5ea; color: #333; cursor:pointer;">Clear</button>
 			</div>
 		</div>
 		<div id="dailyDashboard" class="dashboard-box">
 			<h3 id="dashboardTitle">📊 Daily Summary</h3>
 			<div id="dashboardStats" style="margin-bottom:15px;"></div>
-			<div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 12px; margin-top: 15px;">
+			<div style="background: rgba(255,255,255,0.15); padding: 18px; border-radius: 16px; margin-top: 15px;">
 				<div class="dash-row"><span>Products Revenue:</span> <span id="dashProdRev">₹0</span></div>
 				<div class="dash-row"><span>Loading Revenue:</span> <span id="dashLoadRev">₹0</span></div>
 				<div class="dash-row"><span>Unloading Revenue:</span> <span id="dashUnloadRev">₹0</span></div>
-				<div class="dash-row dash-grand" style="margin-top:10px; padding-top:10px;"><span>Total Expected:</span> <span id="dashTotalRev">₹0</span></div>
+				<div class="dash-row dash-grand" style="margin-top:12px; padding-top:12px;"><span>Total Expected:</span> <span id="dashTotalRev">₹0</span></div>
 			</div>
 		</div>
 		<div id="orderLog"></div>
 	</div>
+	
+    <!-- NEW PRODUCT MODAL -->
+    <div id="newProductModal" class="modal no-print">
+        <div class="modal-content confirm-modal-content">
+            <div class="confirm-title">Add Custom Product</div>
+            <div class="confirm-msg" style="margin-bottom: 20px;">Add a new dealership item. It will be permanently added to your app list.</div>
+            <div class="input-group" style="text-align: left; margin-bottom: 25px;">
+                <input type="text" id="newProductName" placeholder="e.g. New Brand 50kg" style="width: 100%;"> 
+            </div>
+            <div class="confirm-actions">
+                <button class="btn-confirm-no" onclick="closeModals()">Cancel</button>
+                <button class="btn-confirm-yes" onclick="saveNewProduct()">Add Product</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT PRODUCT MODAL -->
+    <div id="editProductModal" class="modal no-print">
+        <div class="modal-content confirm-modal-content">
+            <div class="confirm-title">Edit Product Name</div>
+            <div class="confirm-msg" style="margin-bottom: 20px;">Fix any typos in your custom product name.</div>
+            <div class="input-group" style="text-align: left; margin-bottom: 25px;">
+                <input type="text" id="editProductName" style="width: 100%;"> 
+            </div>
+            <div class="confirm-actions">
+                <button class="btn-confirm-no" onclick="closeModals()">Cancel</button>
+                <button class="btn-confirm-yes" onclick="saveEditedProduct()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+	<!-- INVOICE MODAL -->
 	<div id="billModal" class="modal no-print">
 		<div class="modal-content">
 			<div id="modalBody" style="background: white; padding: 0;"></div>
 			<button class="modal-btn btn-whatsapp no-print" id="whatsappBtn">💬 Send on WhatsApp</button>
-			<button class="modal-btn btn-print no-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+			<button class="modal-btn btn-print no-print" onclick="downloadBill()">🖨️ Print / Save PDF</button>
 			<button class="modal-btn btn-close no-print" onclick="closeModals()">Close</button>
 		</div>
 	</div>
+	
+	<!-- SETTINGS MODAL -->
 	<div id="settingsModal" class="modal no-print">
 		<div class="modal-content" style="text-align: center;">
 			<h2 style="margin-top:0; color:var(--primary); font-weight: 900;">Business Settings</h2>
-			<p style="color:var(--text-muted); font-size:14px; margin-bottom:12px; font-weight: bold;">Protect your business data by saving it to your phone.</p>
-			<button class="modal-btn btn-backup" onclick="exportData()">💾 Download Backup File</button>
-			<div style="margin-top:24px; padding-top:24px; border-top:2px dashed #eee; text-align: left;">
-				<label style="font-size:14px; font-weight:800; display:block; margin-bottom:10px; color:#333;">Restore from Backup</label>
-				<input type="file" id="backupFile" accept=".json" style="margin-bottom:12px; width:100%; padding: 10px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
-				<button class="modal-btn" style="background:#ff3b30; color:white; margin-top: 0;" onclick="importData()">📂 Restore Data</button>
+			<p style="color:var(--text-muted); font-size:15px; margin-bottom:16px; font-weight: 600;">Protect your business data by saving it to your phone.</p>
+			<button class="modal-btn btn-backup" onclick="exportData()" style="padding: 20px; font-size: 18px;">💾 Download Backup File</button>
+			<div style="margin-top:30px; padding-top:24px; border-top:2px dashed #eee; text-align: left;">
+				<label style="font-size:14px; font-weight:800; display:block; margin-bottom:12px; color:#333;">Restore from Backup</label>
+				<input type="file" id="backupFile" accept=".json" style="margin-bottom:16px; width:100%; padding: 12px; background: #f9f9f9; border-radius: 12px; border: 1.5px solid #ddd;">
+				<button class="modal-btn" style="background:var(--danger); color:white; margin-top: 0; box-shadow: 0 4px 15px rgba(255, 59, 48, 0.2);" onclick="importData()">📂 Restore Data</button>
 			</div>
 			<button class="modal-btn btn-close" onclick="closeModals()">Close Settings</button>
 		</div>
 	</div>
-	<div id="confirmModal" class="modal no-print" style="z-index: 3000;">
+	
+	<!-- CUSTOM CONFIRM MODAL -->
+	<div id="confirmModal" class="modal no-print" style="z-index: 4000;">
 		<div class="modal-content confirm-modal-content">
 			<div class="confirm-title" id="confirmTitle">Confirm Action</div>
 			<div class="confirm-msg" id="confirmMsg">Are you sure you want to do this?</div>
@@ -828,12 +920,16 @@
 			</div>
 		</div>
 	</div>
+	
 	<script>
-	const products = ["Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar", "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Sujji", "Sujji 47 Kg", "Sujji 48 Kg", "Darra", "Milk More", "Doodh Virdhi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"];
+	const products = ["Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar", "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Sujji", "Sujji 47 Kg", "Sujji 48 Kg", "Darra", "Milk More", "Doodh Virdi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"];
 	let currentItems = {};
 	let db;
 	let editingOrderId = null;
 	let customerMemory = {};
+    let currentBillFilename = "BabaStore_Bill.pdf";
+    let currentInvoiceHTML = "";
+    let productBeingEdited = "";
 
 	function safeId(str) {
 		return str.replace(/[^a-zA-Z0-9]/g, '');
@@ -878,45 +974,171 @@
 		let today = new Date().toISOString().split('T')[0];
 		document.getElementById('orderDate').value = today;
 		document.getElementById('filterDate').value = today;
-		const container = document.getElementById('productList');
+        
+        // Load custom products and add them to the top of the products array
+        let customProdsList = JSON.parse(localStorage.getItem('babaStoreCustomProducts') || '[]');
+        customProdsList.reverse().forEach(cp => {
+            if(!products.includes(cp)) products.unshift(cp);
+        });
+
 		products.forEach(p => {
-			currentItems[p] = {
-				qty: 0,
-				rate: ""
-			};
-			let sId = safeId(p);
-			container.innerHTML += `
-    <div class="product-row">
-    <span class="product-name">${p}</span>
-    <div class="controls-row">
-    <div class="rate-box">
-    <span>₹</span><input type="number" inputmode="decimal" pattern="[0-9]*" id="rate-${sId}" placeholder="Rate" oninput="calculateItem('${p}')">
-    </div>
-    <div class="stepper">
-    <button class="btn-step" onclick="updateQty('${p}', -1)">-</button>
-    <span class="qty-val" id="qty-${sId}">0</span>
-    <button class="btn-step" onclick="updateQty('${p}', 1)">+</button>
-    </div>
-    <div class="item-total" id="total-${sId}">₹0</div>
-    </div>
-    </div>`;
+            if (!currentItems[p]) {
+			    currentItems[p] = { qty: 0, rate: "" };
+            }
 		});
+        
+        renderProducts();
 		initDatabase();
 	}
+
+    // FUNCTION TO RENDER ALL PRODUCTS WITH SWIPE-TO-EDIT & DELETE
+    function renderProducts() {
+        const container = document.getElementById('productList');
+        container.innerHTML = '';
+        let customProdsList = JSON.parse(localStorage.getItem('babaStoreCustomProducts') || '[]');
+
+        products.forEach(p => {
+            let sId = safeId(p);
+            let isCustom = customProdsList.includes(p);
+            
+            // Build the standard inner row HTML
+            let rowHtml = `
+            <div style="flex: 0 0 100%; scroll-snap-align: start; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: var(--card-bg); border-radius: 20px;">
+                <span class="product-name">${p} ${isCustom ? '<span style="font-size:11px; color:var(--warning); font-weight:700; margin-left:8px;">(Slide left to edit)</span>' : ''}</span>
+                <div class="controls-row">
+                    <div class="rate-box">
+                        <span>₹</span><input type="number" inputmode="decimal" pattern="[0-9]*" id="rate-${sId}" placeholder="Rate" value="${currentItems[p].rate !== undefined ? currentItems[p].rate : ''}" oninput="calculateItem('${p}')">
+                    </div>
+                    <div class="stepper">
+                        <button class="btn-step" onclick="updateQty('${p}', -1)">-</button>
+                        <span class="qty-val" id="qty-${sId}">${currentItems[p].qty}</span>
+                        <button class="btn-step" onclick="updateQty('${p}', 1)">+</button>
+                    </div>
+                    <div class="item-total" id="total-${sId}">₹${(currentItems[p].qty * currentItems[p].rate) || 0}</div>
+                </div>
+            </div>`;
+
+            // Wrap custom products in a swipe container to reveal edit/delete buttons
+            if (isCustom) {
+                container.innerHTML += `
+                <div class="swipe-container" style="margin-bottom:12px; border: 1px solid var(--border-color);">
+                    ${rowHtml}
+                    <div class="swipe-actions">
+                        <button class="action-btn btn-edit" onclick="openEditProductModal('${p}')"><span style="font-size:18px;">✏️</span></button>
+                        <button class="action-btn btn-delete" onclick="deleteCustomProduct('${p}')"><span style="font-size:18px;">🗑️</span></button>
+                    </div>
+                </div>`;
+            } else {
+                // Standard products get normal layout
+                container.innerHTML += `<div style="border-bottom: 1px solid var(--border-color); padding: 0 5px;">${rowHtml}</div>`;
+            }
+        });
+    }
+
+    // FUNCTION TO OPEN ADD MODAL
+    function openNewProductModal() {
+        triggerHaptic();
+        document.getElementById('newProductName').value = '';
+        document.getElementById('newProductModal').style.display = 'flex';
+        setTimeout(() => document.getElementById('newProductName').focus(), 100);
+    }
+
+    // FUNCTION TO SAVE NEW CUSTOM PRODUCT
+    function saveNewProduct() {
+        triggerHaptic();
+        let name = document.getElementById('newProductName').value.trim();
+        if (!name) return showToast("Enter a product name", "error");
+        
+        let exists = products.some(p => p.toLowerCase() === name.toLowerCase());
+        if (exists) return showToast("Product already exists!", "error");
+
+        let customProdsList = JSON.parse(localStorage.getItem('babaStoreCustomProducts') || '[]');
+        customProdsList.push(name);
+        localStorage.setItem('babaStoreCustomProducts', JSON.stringify(customProdsList));
+
+        products.unshift(name);
+        currentItems[name] = { qty: 0, rate: "" };
+        
+        renderProducts();
+        closeModals();
+        showToast("New Product Added!", "success");
+    }
+
+    // FUNCTION TO OPEN EDIT MODAL
+    function openEditProductModal(oldName) {
+        triggerHaptic();
+        productBeingEdited = oldName;
+        document.getElementById('editProductName').value = oldName;
+        document.getElementById('editProductModal').style.display = 'flex';
+        setTimeout(() => document.getElementById('editProductName').focus(), 100);
+    }
+
+    // FUNCTION TO SAVE EDITED PRODUCT
+    function saveEditedProduct() {
+        triggerHaptic();
+        let newName = document.getElementById('editProductName').value.trim();
+        if (!newName) return showToast("Name cannot be empty", "error");
+        if (newName === productBeingEdited) return closeModals(); // No changes made
+        
+        let exists = products.some(p => p.toLowerCase() === newName.toLowerCase());
+        if (exists) return showToast("Product already exists!", "error");
+
+        // Update Local Storage Array
+        let customProdsList = JSON.parse(localStorage.getItem('babaStoreCustomProducts') || '[]');
+        let cIndex = customProdsList.indexOf(productBeingEdited);
+        if (cIndex > -1) {
+            customProdsList[cIndex] = newName;
+            localStorage.setItem('babaStoreCustomProducts', JSON.stringify(customProdsList));
+        }
+
+        // Update active variables so user doesn't lose current inputs
+        let pIndex = products.indexOf(productBeingEdited);
+        if (pIndex > -1) products[pIndex] = newName;
+
+        currentItems[newName] = currentItems[productBeingEdited];
+        delete currentItems[productBeingEdited];
+        
+        renderProducts();
+        calculateGrandTotal();
+        closeModals();
+        showToast("Product Updated!", "success");
+    }
+
+    // FUNCTION TO DELETE CUSTOM PRODUCT
+    function deleteCustomProduct(name) {
+        triggerHaptic();
+        showConfirm("Delete Product", `Are you sure you want to permanently remove "${name}" from your list?`, true, () => {
+            const index = products.indexOf(name);
+            if (index > -1) products.splice(index, 1);
+            
+            delete currentItems[name];
+            
+            let customProdsList = JSON.parse(localStorage.getItem('babaStoreCustomProducts') || '[]');
+            customProdsList = customProdsList.filter(p => p !== name);
+            localStorage.setItem('babaStoreCustomProducts', JSON.stringify(customProdsList));
+            
+            renderProducts();
+            calculateGrandTotal();
+            showToast("Product Deleted", "success");
+        });
+    }
 
 	function updateQty(product, change) {
 		currentItems[product].qty = Math.max(0, currentItems[product].qty + change);
 		let qtyEl = document.getElementById(`qty-${safeId(product)}`);
-		qtyEl.innerText = currentItems[product].qty;
-		qtyEl.classList.add('pop-anim');
-		setTimeout(() => qtyEl.classList.remove('pop-anim'), 150);
+        if (qtyEl) {
+		    qtyEl.innerText = currentItems[product].qty;
+		    qtyEl.classList.add('pop-anim');
+		    setTimeout(() => qtyEl.classList.remove('pop-anim'), 150);
+        }
 		calculateItem(product);
 	}
 
 	function calculateItem(product) {
 		let rateInput = document.getElementById(`rate-${safeId(product)}`).value;
 		currentItems[product].rate = rateInput === "" ? 0 : parseFloat(rateInput);
-		document.getElementById(`total-${safeId(product)}`).innerText = `₹${(currentItems[product].qty * currentItems[product].rate).toFixed(0)}`;
+        let totalEl = document.getElementById(`total-${safeId(product)}`);
+		if (totalEl) totalEl.innerText = `₹${(currentItems[product].qty * currentItems[product].rate).toFixed(0)}`;
 		calculateGrandTotal();
 	}
 
@@ -1038,10 +1260,8 @@
 		products.forEach(p => {
 			currentItems[p].qty = 0;
 			currentItems[p].rate = "";
-			document.getElementById(`qty-${safeId(p)}`).innerText = 0;
-			document.getElementById(`rate-${safeId(p)}`).value = "";
-			document.getElementById(`total-${safeId(p)}`).innerText = "₹0";
 		});
+        renderProducts(); // Re-render fresh inputs
 		calculateGrandTotal();
 		renderOrders();
 		window.scrollTo(0, 0);
@@ -1054,29 +1274,36 @@
 			editingOrderId = order.id;
 			document.getElementById('formTitle').innerText = "✏️ Editing Order...";
 			document.getElementById('submitBtn').innerText = "Update Existing Order";
-			document.getElementById('submitBtn').style.background = "#ff9500";
+			document.getElementById('submitBtn').style.background = "var(--warning)";
 			document.getElementById('orderDate').value = order.filterDate;
 			document.getElementById('custName').value = order.customerName;
 			document.getElementById('custAddress').value = order.address || "";
 			document.getElementById('loadingRate').value = order.loadRate || "";
 			document.getElementById('unloadingRate').value = order.unloadRate || "";
             document.getElementById('backDues').value = order.backDues || "";
-			products.forEach(p => {
-				currentItems[p] = {
-					qty: 0,
-					rate: ""
-				};
+			
+            // Reset state
+            products.forEach(p => {
+				currentItems[p] = { qty: 0, rate: "" };
 			});
-			for(let p in order.items) {
-				currentItems[p] = {
-					qty: order.items[p].qty,
-					rate: order.items[p].rate
-				};
-				document.getElementById(`qty-${safeId(p)}`).innerText = currentItems[p].qty;
-				document.getElementById(`rate-${safeId(p)}`).value = currentItems[p].rate || "";
-			}
+            
+            // If old order has items that were custom but deleted, add them back temporarily
+            for(let p in order.items) {
+                if (!products.includes(p)) {
+                    products.push(p);
+                    // Also save it locally so it acts like a custom product
+                    let customProdsList = JSON.parse(localStorage.getItem('babaStoreCustomProducts') || '[]');
+                    if (!customProdsList.includes(p)) {
+                        customProdsList.push(p);
+                        localStorage.setItem('babaStoreCustomProducts', JSON.stringify(customProdsList));
+                    }
+                }
+                currentItems[p] = { qty: order.items[p].qty, rate: order.items[p].rate };
+            }
+
+            renderProducts();
 			products.forEach(calculateItem);
-			window.scrollTo(0, 0);
+			window.scrollTo({ top: 0, behavior: 'smooth' });
 		};
 	}
 
@@ -1111,6 +1338,8 @@
 		triggerHaptic();
 		db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
 			let o = e.target.result;
+            
+            currentBillFilename = `BabaStore_Invoice_${o.customerName.replace(/ /g, "_")}.pdf`;
             
             let backDues = o.backDues || 0;
             let finalPayable = o.billTotal + backDues;
@@ -1167,7 +1396,7 @@
                 <span style="font-size:14px; font-weight:700; color:#333;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-                <span style="font-size:14px; font-weight:700; color:#ff3b30;">Back Dues</span>
+                <span style="font-size:14px; font-weight:700; color:#ff3b30;">Previous Dues</span>
                 <span style="font-size:14px; font-weight:700; color:#ff3b30;">+ ₹${backDues.toFixed(2)}</span>
                 </div>
                 <div style="border-top: 2px dashed #ccc; padding-top: 12px; display:flex; justify-content:space-between; align-items:center;">
@@ -1182,16 +1411,15 @@
                 </div>`;
             }
 
-			// ============================================================
-			// CLEAN COMPACT BILL - matches screenshot, no empty space
-			// ============================================================
 			let html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; padding: 20px;">
-        <div style="text-align: center; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1.5px solid #e0e0e0;">
+    <div id="bill" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; padding: 20px; box-sizing: border-box;">
+    <!-- Store Header -->
+    <div style="text-align: center; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1.5px solid #e0e0e0;">
     <h1 style="margin: 0 0 2px 0; font-size: 22px; color: #000; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">BABA STORE</h1>
     <p style="margin: 0; font-size: 11px; color: #999; font-weight: 600; letter-spacing: 0.5px;">INVOICE</p>
     </div>
-        <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #ebebeb;">
+    <!-- Customer Info -->
+    <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #ebebeb;">
     <table style="width:100%; font-size:13px; border-collapse:collapse;">
     <tr>
     <td style="padding: 3px 0; color:#777; font-weight:700; width:70px;">Customer</td>
@@ -1207,7 +1435,8 @@
     </tr>
     </table>
     </div>
-        <table style="width:100%; border-collapse:collapse; margin-bottom: 16px;">
+    <!-- Products Table -->
+    <table style="width:100%; border-collapse:collapse; margin-bottom: 16px;">
     <thead>
     <tr style="border-bottom: 2px solid #e0e0e0;">
     <th style="text-align:left; color:#999; text-transform:uppercase; font-size:10px; padding-bottom:8px; font-weight:800; letter-spacing:0.5px;">Item</th>
@@ -1221,19 +1450,59 @@
                                     ${itemsHtml}
     </tbody>
     </table>
-        <div style="border-top: 1px solid #e0e0e0; padding-top: 12px;">
+    <!-- Totals Section -->
+    <div style="border-top: 1px solid #e0e0e0; padding-top: 12px;">
         ${totalsHtml}
     </div>
-        <div style="margin-top: 20px; padding-top: 12px; border-top: 1px dashed #ddd; text-align:center;">
+    <!-- Footer -->
+    <div style="margin-top: 20px; padding-top: 12px; border-top: 1px dashed #ddd; text-align:center;">
     <p style="margin:0; font-size:10px; color:#ccc; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;">Thank you for shopping at Baba Store</p>
     </div>
     </div>
     
                     `;
+            
+            currentInvoiceHTML = html;
+
 			document.getElementById('modalBody').innerHTML = html;
-			document.getElementById('printArea').innerHTML = html;
 			document.getElementById('billModal').style.display = 'flex';
 		};
+	}
+
+	function downloadBill() {
+		triggerHaptic();
+		const btn = document.querySelector('.btn-print');
+		const originalText = btn.innerText;
+		btn.innerText = "⏳ Generating...";
+
+        const pdfWrapper = document.createElement('div');
+        pdfWrapper.innerHTML = currentInvoiceHTML; 
+        pdfWrapper.style.position = 'absolute';
+        pdfWrapper.style.top = '0';
+        pdfWrapper.style.left = '0';
+        pdfWrapper.style.width = '800px'; 
+        pdfWrapper.style.backgroundColor = 'white';
+        pdfWrapper.style.zIndex = '-1000'; 
+        document.body.appendChild(pdfWrapper);
+
+        const opt = {
+            margin:       10, 
+            filename:     currentBillFilename,
+            image:        { type: 'jpeg', quality: 1 },
+            html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(pdfWrapper).save().then(() => {
+            btn.innerText = "🖨️ Print / Save PDF";
+            document.body.removeChild(pdfWrapper); 
+            showToast("PDF Downloaded!", "success");
+        }).catch(err => {
+            console.error(err);
+            btn.innerText = "🖨️ Print / Save PDF";
+            if (document.body.contains(pdfWrapper)) document.body.removeChild(pdfWrapper);
+            showToast("Error generating PDF.", "error");
+        });
 	}
 
 	function openSettings() {
@@ -1245,6 +1514,12 @@
 		triggerHaptic();
 		document.getElementById('billModal').style.display = 'none';
 		document.getElementById('settingsModal').style.display = 'none';
+        document.getElementById('confirmModal').style.display = 'none';
+        
+        let customProdModal = document.getElementById('newProductModal');
+        let editProdModal = document.getElementById('editProductModal');
+        if(customProdModal) customProdModal.style.display = 'none';
+        if(editProdModal) editProdModal.style.display = 'none';
 	}
 
 	function exportData() {
@@ -1294,7 +1569,7 @@
 			});
 			document.getElementById('customerNamesList').innerHTML = Object.keys(customerMemory).map(n => `<option value="${n}">`).join("");
 			let selectedFilter = document.getElementById('filterDate').value;
-			let searchQuery = document.getElementById('searchName').value.toLowerCase();
+			let searchQuery = document.getElementById('searchName').value.toLowerCase().trim();
 			if(selectedFilter) allOrders = allOrders.filter(o => o.filterDate === selectedFilter);
 			if(searchQuery) allOrders = allOrders.filter(o => o.customerName.toLowerCase().includes(searchQuery));
 			if(selectedFilter && !searchQuery && allOrders.length > 0) {
@@ -1330,10 +1605,10 @@
 			let timeLimit = 43200000;
 			if(sorted.length === 0) {
 				return log.innerHTML = `
-    <div class="empty-state">
-    <h3 style="font-size: 40px; margin-bottom: 10px;">📋</h3>
-    <h3>No Orders Found</h3>
-    <p style="font-size: 14px;">Try changing the date or search term.</p>
+    <div class="empty-state" style="text-align:center; padding: 40px 20px;">
+    <h3 style="font-size: 50px; margin-bottom: 15px; opacity:0.8;">📋</h3>
+    <h3 style="color:#111; font-weight:800; font-size:22px;">No Orders Found</h3>
+    <p style="font-size: 15px; color:var(--text-muted); font-weight:500;">Try changing the date or search term.</p>
     </div>`;
 			}
 			sorted.forEach(order => {
@@ -1357,7 +1632,7 @@
     </div>
     <p class="order-bill">₹${order.billTotal ? order.billTotal.toFixed(2) : '0.00'}</p>
     </div>
-    <div style="font-size:13px; color:#666; font-weight:500;">Tap card to open Bill / Send WhatsApp...</div>
+    <div style="font-size:13px; color:#666; font-weight:600; margin-bottom:12px;">Tap card to open Bill / Send WhatsApp...</div>
     
                                     ${overdueHtml}
     
