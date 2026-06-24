@@ -1261,6 +1261,7 @@
 				store.get(id).onsuccess = e => {
 					let data = e.target.result;
 					data.isDelivered = true;
+					data.deliveryTimestamp = Date.now(); // Saves the exact time it was marked delivered
 					store.put(data).onsuccess = () => {
 						showToast("Locked as Delivered!", "success");
 						renderOrders();
@@ -1353,12 +1354,17 @@
 			let html = `
 	<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; width: 100%; box-sizing: border-box; min-height: 100vh;">
 	
-		<div style="background: linear-gradient(135deg, #007aff, #005bb5); padding: 25px 20px; text-align: center; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-	<h1 style="margin: 0 0 5px 0; font-size: 28px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">BABA STORE</h1>
-	<p style="margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #cce0ff;">OFFICIAL INVOICE</p>
-	<p style="margin: 4px 0 0 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #cce0ff;">📍 Dekuli, Laheriasarai, Darbhanga</p>
-	<p style="margin: 6px 0 0 0; font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #ffffff;">💬 9534549201 &nbsp;|&nbsp; 📧 ramanjha2921@gmail.com</p>
-	</div>
+		<div style="background: linear-gradient(135deg, #007aff, #005bb5); padding: 25px 30px; display: flex; justify-content: space-between; align-items: center; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+            <div style="text-align: left;">
+                <h1 style="margin: 0 0 5px 0; font-size: 28px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">BABA STORE</h1>
+                <p style="margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #cce0ff;">OFFICIAL INVOICE</p>
+                <p style="margin: 4px 0 0 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #cce0ff;">📍 Dekuli, Laheriasarai, Darbhanga</p>
+            </div>
+            <div style="text-align: right;">
+                <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #ffffff;">💬 9534549201</p>
+                <p style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #ffffff;">📧 ramanjha2921@gmail.com</p>
+            </div>
+	    </div>
 	
 	<div style="padding: 24px;">
 		<div style="background: #f8fbff; border-left: 4px solid #007aff; padding: 16px 20px; margin-bottom: 24px; border-radius: 0 12px 12px 0; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
@@ -1518,13 +1524,39 @@
 				let isOverdue = !order.isDelivered && (now - order.timestamp) > timeLimit;
 				let cardClass = "order-card " + (order.isDelivered ? "delivered" : (isOverdue ? "overdue" : ""));
 				let overdueHtml = isOverdue ? `<span class="overdue-text">⚠️ Over 12 hours pending!</span>` : '';
-				let deliveryToggleHtml = order.isDelivered ? `<div class="delivery-toggle" onclick="event.stopPropagation()">
-	<span style="font-weight:800; font-size:15px; color:var(--success)">✓ Delivered (Locked)</span>
-	<input type="checkbox" class="chk-box" checked disabled style="opacity: 0.5;">
-	</div>` : `<div class="delivery-toggle" onclick="event.stopPropagation()">
-	<span style="font-weight:800; font-size:15px; color:var(--danger)">Un Delivered</span>
-	<input type="checkbox" class="chk-box" onchange="toggleDelivery(${order.id}, this.checked)">
-	</div>`;
+				
+				let deliveryToggleHtml = "";
+				if (order.isDelivered) {
+					// Fallback to timestamp if deliveryTimestamp isn't available for older orders
+					let dTime = order.deliveryTimestamp || order.timestamp; 
+					let dDate = new Date(dTime);
+					
+					// Safely parse the original filter date
+					let [y, m, d] = order.filterDate.split('-');
+					let oDate = new Date(y, m - 1, d);
+					dDate.setHours(0, 0, 0, 0); // Reset time to midnight for accurate day comparison
+					
+					// Calculate difference in days
+					let diffDays = Math.round((dDate.getTime() - oDate.getTime()) / (1000 * 60 * 60 * 24));
+					let formattedDelDate = `${dDate.getDate()}/${dDate.getMonth() + 1}/${dDate.getFullYear()}`;
+					
+					let statusMsg = diffDays <= 0 
+						? `✓ Delivered on time (${formattedDelDate}) 🌟`
+						: `✓ Delivered ${diffDays} day(s) late (${formattedDelDate})`;
+						
+					let color = diffDays <= 0 ? "var(--success)" : "#ff9500";
+					
+					deliveryToggleHtml = `<div class="delivery-toggle" onclick="event.stopPropagation()">
+					<span style="font-weight:800; font-size:14px; color:${color}">${statusMsg}</span>
+					<input type="checkbox" class="chk-box" checked disabled style="opacity: 0.5;">
+					</div>`;
+				} else {
+					deliveryToggleHtml = `<div class="delivery-toggle" onclick="event.stopPropagation()">
+					<span style="font-weight:800; font-size:15px; color:var(--danger)">Un Delivered</span>
+					<input type="checkbox" class="chk-box" onchange="toggleDelivery(${order.id}, this.checked)">
+					</div>`;
+				}
+
 				log.innerHTML += `
 	<div class="swipe-container">
 	<div class="${cardClass}" onclick="viewBill(${order.id})">
