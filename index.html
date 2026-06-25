@@ -687,13 +687,13 @@
 		box-shadow: 0 4px 15px rgba(255, 59, 48, 0.2);
 	}
 
-	/* PRINT CSS - FIXED TO REMOVE "PAGE IN PAGE" */
+	/* PRINT CSS - FULL BLEED / NO BORDERS */
 	#printArea { display: none; }
 	
 	@media print {
 		@page {
 			size: A4 portrait;
-			margin: 0mm; /* Removes OS default borders completely */
+			margin: 0mm; 
 		}
 		html, body {
 			width: 100% !important;
@@ -716,7 +716,7 @@
 			left: 0 !important;
 			width: 100% !important;
 			margin: 0 !important;
-			padding: 0 !important; /* Forces template to touch edge of page */
+			padding: 0 !important; 
 			box-sizing: border-box !important;
 		}
 	}
@@ -873,6 +873,51 @@
 	
 	<script>
 	const products = ["Kapila Pasu Aahar", "Kapila Pasu Aahar 25 kg", "Kashyap Pasu Aahar", "Kishan Pasu Aahar", "Choker", "Chunni", "Maida", "Maida 47 Kg", "Maida 48 Kg", "Sujji", "Sujji 47 Kg", "Sujji 48 Kg", "Darra", "Milk More", "Doodh Virdhi", "Doodh Virdhi 25 Kg", "Bi-Pro", "Bi-Pro 25 Kg"];
+	
+	const baseHindiDict = {
+		"kapila pasu aahar": "कपिला पशु आहार",
+		"kapila pasu aahar 25 kg": "कपिला पशु आहार 25 किलो",
+		"kashrap pasu aahar": "कश्यप पशु आहार",
+		"kashyap pasu aahar": "कश्यप पशु आहार",
+		"kishan pasu aahar": "किसान पशु आहार",
+		"choker": "चोकर",
+		"chunni": "चुन्नी",
+		"maida": "मैदा",
+		"maida 47 kg": "मैदा 47 किलो",
+		"maida 48 kg": "मैदा 48 किलो",
+		"sujji": "सूजी",
+		"sujji 47 kg": "सूजी 47 किलो",
+		"sujji 48 kg": "सूजी 48 किलो",
+		"darra": "दर्रा",
+		"milk more": "मिल्क मोर",
+		"doodh virdi": "दूध वृद्धि",
+		"doodh virdhi 25 kg": "दूध वृद्धि 25 किलो",
+		"bi-pro": "बाई-प्रो",
+		"bi-pro 25 kg": "बाई-प्रो 25 किलो"
+	};
+
+	async function getHindi(txt) {
+		if (!txt) return '';
+		let key = txt.toLowerCase().trim();
+		if (baseHindiDict[key]) return baseHindiDict[key];
+		
+		try {
+			let res = await fetch(`https://inputtools.google.com/request?text=${encodeURIComponent(txt)}&itc=hi-t-i0-und&num=1`);
+			let data = await res.json();
+			if (data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1] && data[1][0][1][0]) {
+				return data[1][0][1][0];
+			}
+		} catch(err) {}
+
+		try {
+			let res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=hi&dt=t&q=${encodeURIComponent(txt)}`);
+			let data = await res.json();
+			return data[0][0][0]; 
+		} catch(err) {
+			return ''; 
+		}
+	}
+
 	let currentItems = {};
 	let db;
 	let editingOrderId = null;
@@ -1261,7 +1306,7 @@
 				store.get(id).onsuccess = e => {
 					let data = e.target.result;
 					data.isDelivered = true;
-					data.deliveryTimestamp = Date.now(); // Saves the exact time it was marked delivered
+					data.deliveryTimestamp = Date.now(); 
 					store.put(data).onsuccess = () => {
 						showToast("Locked as Delivered!", "success");
 						renderOrders();
@@ -1275,26 +1320,43 @@
 
 	function viewBill(id) {
 		triggerHaptic();
-		db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = (e) => {
+		document.getElementById('modalBody').innerHTML = '<div style="padding:50px 20px; text-align:center; font-size:18px; color:var(--primary); font-weight:800;">🔄 Generating Bill...</div>';
+		document.getElementById('billModal').style.display = 'flex';
+
+		db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = async (e) => {
 			let o = e.target.result;
 			
 			let backDues = o.backDues || 0;
 			let finalPayable = o.billTotal + backDues;
 
-			let whatsappText = `*BABA STORE INVOICE*\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
+			let [custNameHindi, addressHindi] = await Promise.all([
+				getHindi(o.customerName),
+				getHindi(o.address)
+			]);
+
+			let itemKeys = Object.keys(o.items);
+			let translatedNames = await Promise.all(itemKeys.map(p => getHindi(p)));
+
+			let whatsappText = `*BABA STORE INVOICE*\n📍 Dekuli, Laheriasarai, Darbhanga\n💬 9534549201\n\nDate: ${o.displayDate}\nCustomer: ${o.customerName}\n-----------------\n`;
 			let itemsHtml = "";
-			for(let p in o.items) {
-				whatsappText += `${p}: ${o.items[p].qty} x ₹${o.items[p].rate} = ₹${o.items[p].total}\n`;
+			
+			itemKeys.forEach((p, index) => {
+				let pHindi = translatedNames[index];
+				let item = o.items[p];
+				whatsappText += `${p}: ${item.qty} x ₹${item.rate} = ₹${item.total}\n`;
 				
 				itemsHtml += `
 				<tr>
-					<td style="padding:12px 10px; color:#222; font-weight:700; font-size:13px; border-bottom:1px solid #eef2f9;">${p}</td>
-					<td style="text-align:center; padding:12px 10px; color:#555; font-weight:600; font-size:13px; border-bottom:1px solid #eef2f9;">${o.items[p].qty}</td>
-					<td style="text-align:center; padding:12px 10px; color:#555; font-weight:600; font-size:13px; border-bottom:1px solid #eef2f9;">₹${o.items[p].rate}</td>
-					<td style="text-align:right; padding:12px 10px; font-weight:900; color:#111; font-size:14px; border-bottom:1px solid #eef2f9;">₹${o.items[p].total}</td>
+					<td style="padding:12px 10px; color:#222; font-weight:700; font-size:13px; border-bottom:1px solid #eef2f9;">
+						${p}
+						${pHindi && pHindi.toLowerCase() !== p.toLowerCase() ? `<br><span style="font-size:14px; color:#007aff; font-weight:800; display:inline-block; margin-top:2px;">${pHindi}</span>` : ''}
+					</td>
+					<td style="text-align:center; padding:12px 10px; color:#555; font-weight:600; font-size:13px; border-bottom:1px solid #eef2f9; vertical-align:top;">${item.qty}</td>
+					<td style="text-align:right; padding:12px 10px; color:#555; font-weight:600; font-size:13px; border-bottom:1px solid #eef2f9; vertical-align:top;">₹${item.rate}</td>
+					<td style="text-align:right; padding:12px 10px; font-weight:900; color:#111; font-size:14px; border-bottom:1px solid #eef2f9; vertical-align:top;">₹${item.total}</td>
 				</tr>`;
-			}
-			
+			});
+
 			whatsappText += `-----------------\nProducts Total: ₹${o.itemsTotal?.toFixed(2)}\n`;
 			if(o.loadTotal > 0) whatsappText += `Loading (${o.totalBags}x): ₹${o.loadTotal?.toFixed(2)}\n`;
 			if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
@@ -1354,28 +1416,34 @@
 			let html = `
 	<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; width: 100%; box-sizing: border-box; min-height: 100vh;">
 	
-		<div style="background: linear-gradient(135deg, #007aff, #005bb5); padding: 25px 30px; display: flex; justify-content: space-between; align-items: center; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-            <div style="text-align: left;">
-                <h1 style="margin: 0 0 5px 0; font-size: 28px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">BABA STORE</h1>
-                <p style="margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #cce0ff;">OFFICIAL INVOICE</p>
-                <p style="margin: 4px 0 0 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #cce0ff;">📍 Dekuli, Laheriasarai, Darbhanga</p>
-            </div>
-            <div style="text-align: right;">
-                <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #ffffff;">💬 9534549201</p>
-                <p style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #ffffff;">📧 ramanjha2921@gmail.com</p>
-            </div>
-	    </div>
+		<div style="background: linear-gradient(135deg, #007aff, #005bb5); padding: 25px 20px; display: flex; justify-content: space-between; align-items: center; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+			<div style="text-align: left;">
+				<h1 style="margin: 0 0 5px 0; font-size: 28px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">BABA STORE</h1>
+				<p style="margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #cce0ff;">OFFICIAL INVOICE</p>
+				<p style="margin: 4px 0 0 0; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #cce0ff;">📍 Dekuli, Laheriasarai, Darbhanga</p>
+			</div>
+			<div style="text-align: right;">
+				<p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #ffffff;">💬 9534549201</p>
+				<p style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #ffffff;">📧 ramanjha2921@gmail.com</p>
+			</div>
+		</div>
 	
 	<div style="padding: 24px;">
 		<div style="background: #f8fbff; border-left: 4px solid #007aff; padding: 16px 20px; margin-bottom: 24px; border-radius: 0 12px 12px 0; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
 			<table style="width:100%; font-size:14px; border-collapse:collapse;">
 			<tr>
-			<td style="padding: 4px 0; color:#666; font-weight:700; width:80px; text-transform:uppercase; font-size:11px; letter-spacing:0.5px;">Billed To</td>
-			<td style="padding: 4px 0; font-weight:900; color:#111; font-size: 16px;">: ${o.customerName}</td>
+			<td style="padding: 4px 0; color:#666; font-weight:700; width:80px; text-transform:uppercase; font-size:11px; letter-spacing:0.5px; vertical-align:top;">Billed To</td>
+			<td style="padding: 4px 0; font-weight:900; color:#111; font-size: 16px;">
+				: ${o.customerName}
+				${custNameHindi && custNameHindi.toLowerCase() !== o.customerName.toLowerCase() ? `<br><span style="font-size:14px; font-weight:700; color:#007aff;">&nbsp; ${custNameHindi}</span>` : ''}
+			</td>
 			</tr>
 			<tr>
-			<td style="padding: 4px 0; color:#666; font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:0.5px;">Address</td>
-			<td style="padding: 4px 0; color:#333; font-weight:600;">: ${o.address || 'N/A'}</td>
+			<td style="padding: 4px 0; color:#666; font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:0.5px; vertical-align:top;">Address</td>
+			<td style="padding: 4px 0; color:#333; font-weight:600;">
+				: ${o.address || 'N/A'}
+				${o.address && addressHindi && addressHindi.toLowerCase() !== o.address.toLowerCase() ? `<br><span style="font-size:13px; font-weight:600; color:#007aff;">&nbsp; ${addressHindi}</span>` : ''}
+			</td>
 			</tr>
 			<tr>
 			<td style="padding: 4px 0; color:#666; font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:0.5px;">Date</td>
@@ -1527,16 +1595,13 @@
 				
 				let deliveryToggleHtml = "";
 				if (order.isDelivered) {
-					// Fallback to timestamp if deliveryTimestamp isn't available for older orders
 					let dTime = order.deliveryTimestamp || order.timestamp; 
 					let dDate = new Date(dTime);
 					
-					// Safely parse the original filter date
 					let [y, m, d] = order.filterDate.split('-');
 					let oDate = new Date(y, m - 1, d);
-					dDate.setHours(0, 0, 0, 0); // Reset time to midnight for accurate day comparison
+					dDate.setHours(0, 0, 0, 0); 
 					
-					// Calculate difference in days
 					let diffDays = Math.round((dDate.getTime() - oDate.getTime()) / (1000 * 60 * 60 * 24));
 					let formattedDelDate = `${dDate.getDate()}/${dDate.getMonth() + 1}/${dDate.getFullYear()}`;
 					
