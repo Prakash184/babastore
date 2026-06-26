@@ -351,6 +351,25 @@
 		margin-bottom: 24px;
 		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
 	}
+
+	.filter-chip {
+		padding: 10px 16px;
+		border-radius: 20px;
+		border: 1px solid var(--border-color);
+		background: var(--card-bg);
+		color: var(--text-muted);
+		font-weight: 800;
+		font-size: 14px;
+		white-space: nowrap;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+	.filter-chip.active {
+		background: var(--primary);
+		color: white;
+		border-color: var(--primary);
+		box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2);
+	}
 	
 	.dashboard-box {
 		background: var(--primary-gradient);
@@ -697,7 +716,8 @@
 		}
 		html, body {
 			width: 100% !important;
-			height: 100% !important;
+			height: auto !important;
+			min-height: auto !important;
 			margin: 0 !important;
 			padding: 0 !important;
 			background-color: #ffffff !important;
@@ -760,6 +780,17 @@
 				<label>Back Dues (₹) </label>
 				<input type="number" inputmode="decimal" pattern="[0-9]*" id="backDues" placeholder="0"> 
 			</div>
+
+			<div class="input-group">
+				<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px;">
+					<label style="margin-bottom: 0;">Add New Payment (₹)</label>
+					<span id="paidStatus" style="font-size: 13px; font-weight: 800; color: var(--success);">Already Paid: ₹0</span>
+				</div>
+				<div style="display: flex; gap: 10px;">
+					<input type="number" inputmode="decimal" pattern="[0-9]*" id="newPayment" placeholder="Enter amount to add..." style="flex: 1; margin-bottom: 0;"> 
+					<button type="button" onclick="clearPaid()" style="padding: 0 16px; border-radius: 14px; border: 1.5px solid #ff3b30; background: #ffeceb; color: #ff3b30; font-weight: 800; font-size: 14px; cursor: pointer;">Clear Paid</button>
+				</div>
+			</div>
 		</div>
 		<div class="section">
 			<h2 class="section-title">💼 Labor Rates (Per Bag)</h2>
@@ -793,6 +824,15 @@
 		<div class="search-area">
 			<div class="input-group" style="margin-bottom: 16px;">
 				<input type="search" id="searchName" placeholder="🔍 Search by Customer Name..." oninput="renderOrders()"> </div>
+			
+			<div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 16px; scrollbar-width: none;" id="filterChips">
+				<button class="filter-chip active" onclick="setFilter(this, 'All')">All</button>
+				<button class="filter-chip" onclick="setFilter(this, 'Delivered')">Delivered</button>
+				<button class="filter-chip" onclick="setFilter(this, 'Undelivered')">Undelivered</button>
+				<button class="filter-chip" onclick="setFilter(this, 'Due')">Payment Due</button>
+				<button class="filter-chip" onclick="setFilter(this, 'Paid')">Fully Paid</button>
+			</div>
+
 			<div style="display: flex; gap: 12px;">
 				<input type="date" id="filterDate" onchange="renderOrders()" style="flex:1;">
 				<button onclick="clearFilter()" style="padding:16px 20px; border-radius:14px; border:none; font-weight:800; font-size:16px; background:#e5e5ea; color: #333; cursor:pointer;">Clear</button>
@@ -934,6 +974,10 @@
 	let editingOrderId = null;
 	let customerMemory = {};
 	let productBeingEdited = "";
+	
+	let existingPaidAmount = 0;
+	let existingPaymentHistory = [];
+	let currentStatusFilter = 'All';
 
 	function safeId(str) {
 		return str.replace(/[^a-zA-Z0-9]/g, '');
@@ -1182,6 +1226,15 @@
 		triggerHaptic();
 		document.getElementById('filterDate').value = '';
 		document.getElementById('searchName').value = '';
+		setFilter(document.querySelector('.filter-chip'), 'All');
+		renderOrders();
+	}
+	
+	function setFilter(btn, filterName) {
+		triggerHaptic();
+		currentStatusFilter = filterName;
+		document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+		btn.classList.add('active');
 		renderOrders();
 	}
 
@@ -1190,7 +1243,15 @@
 		if(customerMemory[name]) {
 			document.getElementById('custAddress').value = customerMemory[name];
 		}
-        updateHindiPreview();
+		updateHindiPreview();
+	}
+	
+	function clearPaid() {
+		triggerHaptic();
+		existingPaidAmount = 0;
+		existingPaymentHistory = [];
+		document.getElementById('paidStatus').innerText = 'Already Paid: ₹0';
+		document.getElementById('newPayment').value = '';
 	}
 
 	function submitOrder() {
@@ -1199,6 +1260,17 @@
 		const address = document.getElementById('custAddress').value.trim();
 		const rawDate = document.getElementById('orderDate').value;
 		const backDuesVal = parseFloat(document.getElementById('backDues').value) || 0;
+		const newPaymentVal = parseFloat(document.getElementById('newPayment').value) || 0;
+		
+		let d = new Date(rawDate);
+		let formattedDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+		
+		let historyToSave = [...existingPaymentHistory];
+		if (newPaymentVal > 0) {
+			historyToSave.push({ amount: newPaymentVal, date: formattedDate });
+		}
+		
+		const totalPaidSoFar = existingPaidAmount + newPaymentVal;
 
 		if(!name) return showToast("Please enter a customer name.", "error");
 		let totals = calculateGrandTotal();
@@ -1211,8 +1283,7 @@
 				total: currentItems[p].qty * (currentItems[p].rate || 0)
 			};
 		});
-		let d = new Date(rawDate);
-		let formattedDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+		
 		let orderData = {
 			customerName: name,
 			address: address,
@@ -1228,7 +1299,9 @@
 			itemsTotal: totals.itemsTotal,
 			billTotal: totals.finalTotal,
 			totalBags: totals.totalQty,
-			backDues: backDuesVal
+			backDues: backDuesVal,
+			amountPaid: totalPaidSoFar,
+			paymentHistory: historyToSave
 		};
 		let store = db.transaction(["orders"], "readwrite").objectStore("orders");
 		if(editingOrderId) {
@@ -1255,8 +1328,15 @@
 		document.getElementById('loadingRate').value = "";
 		document.getElementById('unloadingRate').value = "";
 		document.getElementById('backDues').value = "";
-        document.getElementById('hindiNamePreview').value = "";
-        document.getElementById('hindiAddrPreview').value = "";
+		
+		existingPaidAmount = 0;
+		existingPaymentHistory = [];
+		document.getElementById('paidStatus').innerText = 'Already Paid: ₹0';
+		document.getElementById('newPayment').value = "";
+		
+		document.getElementById('hindiNamePreview').value = "";
+		document.getElementById('hindiAddrPreview').value = "";
+		
 		products.forEach(p => {
 			currentItems[p].qty = 0;
 			currentItems[p].rate = "";
@@ -1281,6 +1361,16 @@
 			document.getElementById('loadingRate').value = order.loadRate || "";
 			document.getElementById('unloadingRate').value = order.unloadRate || "";
 			document.getElementById('backDues').value = order.backDues || "";
+			
+			existingPaidAmount = order.amountPaid || 0;
+			existingPaymentHistory = order.paymentHistory || [];
+			
+			if (existingPaymentHistory.length === 0 && existingPaidAmount > 0) {
+				existingPaymentHistory.push({ amount: existingPaidAmount, date: order.displayDate });
+			}
+			
+			document.getElementById('paidStatus').innerText = `Already Paid: ₹${existingPaidAmount}`;
+			document.getElementById('newPayment').value = "";
 			
 			products.forEach(p => {
 				currentItems[p] = { qty: 0, rate: "" };
@@ -1341,8 +1431,12 @@
 		db.transaction(["orders"], "readonly").objectStore("orders").get(id).onsuccess = async (e) => {
 			let o = e.target.result;
 			
-			let backDues = o.backDues || 0;
-			let finalPayable = o.billTotal + backDues;
+			let safeBillTotal = Number(o.billTotal) || 0;
+			let safeBackDues = Number(o.backDues) || 0;
+			let amountPaid = Number(o.amountPaid) || 0;
+			let totalPayable = safeBillTotal + safeBackDues;
+			let newBalance = totalPayable - amountPaid;
+			let displayDate = (o.displayDate && o.displayDate !== "undefined") ? o.displayDate : 'Unknown Date';
 
 			let [custNameHindi, addressHindi] = await Promise.all([
 				getHindi(o.customerName),
@@ -1355,7 +1449,7 @@
             let displayCustName = custNameHindi && custNameHindi !== o.customerName ? `${o.customerName} (${custNameHindi})` : o.customerName;
             let displayAddress = o.address ? (addressHindi && addressHindi !== o.address ? `${o.address} (${addressHindi})` : o.address) : 'N/A';
 
-			let whatsappText = `*BABA STORE INVOICE*\n📍 Dekuli, Laheriasarai, Darbhanga\n💬 9534549201\n\nDate: ${o.displayDate}\nCustomer: ${displayCustName}\n-----------------\n`;
+			let whatsappText = `*BABA STORE INVOICE*\n📍 Dekuli, Laheriasarai, Darbhanga\n💬 9534549201\n\nDate: ${displayDate}\nCustomer: ${displayCustName}\n-----------------\n`;
 			let itemsHtml = "";
 			
 			itemKeys.forEach((p, index) => {
@@ -1377,12 +1471,24 @@
 			if(o.loadTotal > 0) whatsappText += `Loading (${o.totalBags}x): ₹${o.loadTotal?.toFixed(2)}\n`;
 			if(o.unloadTotal > 0) whatsappText += `Unloading (${o.totalBags}x): ₹${o.unloadTotal?.toFixed(2)}\n`;
 			
-			if (backDues > 0) {
-				whatsappText += `Current Bill: ₹${o.billTotal?.toFixed(2)}\n`;
-				whatsappText += `Back Dues: ₹${backDues.toFixed(2)}\n`;
-				whatsappText += `*NET PAYABLE: ₹${finalPayable.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
+			if (safeBackDues > 0) {
+				whatsappText += `Current Bill: ₹${safeBillTotal.toFixed(2)}\n`;
+				whatsappText += `Back Dues: ₹${safeBackDues.toFixed(2)}\n`;
+			}
+			
+			whatsappText += `Total Payable: ₹${totalPayable.toFixed(2)}\n`;
+			
+			if (amountPaid > 0) {
+				if (o.paymentHistory && o.paymentHistory.length > 0) {
+					o.paymentHistory.forEach((p, idx) => {
+						whatsappText += `Payment ${idx + 1} (${p.date}): - ₹${p.amount.toFixed(2)}\n`;
+					});
+				} else {
+					whatsappText += `Amount Paid: - ₹${amountPaid.toFixed(2)}\n`;
+				}
+				whatsappText += `*BALANCE DUE: ₹${newBalance.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
 			} else {
-				whatsappText += `*GRAND TOTAL: ₹${o.billTotal?.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
+				whatsappText += `*NET PAYABLE: ₹${totalPayable.toFixed(2)}*\n\nThank you for shopping at Baba Store!`;
 			}
 
 			document.getElementById('whatsappBtn').onclick = () => {
@@ -1407,30 +1513,57 @@
 			<span>₹${o.unloadTotal?.toFixed(2) || '0.00'}</span>
 			</div>`;
 
-			if (backDues > 0) {
+			if (safeBackDues > 0) {
 				totalsHtml += `
-				<div style="border-top: 2px dashed #d1e3ff; padding-top: 10px; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:center;">
-				<span style="font-size:14px; font-weight:800; color:#222;">Current Bill</span>
-				<span style="font-size:14px; font-weight:800; color:#222;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
+				<div style="border-top: 2px dashed #d1e3ff; padding-top: 8px; margin-bottom: 4px; display:flex; justify-content:space-between; align-items:center;">
+				<span style="font-size:13px; font-weight:800; color:#222;">Current Bill</span>
+				<span style="font-size:13px; font-weight:800; color:#222;">₹${safeBillTotal.toFixed(2)}</span>
 				</div>
-				<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-				<span style="font-size:14px; font-weight:800; color:#ff3b30;">Back Dues</span>
-				<span style="font-size:14px; font-weight:800; color:#ff3b30;">+ ₹${backDues.toFixed(2)}</span>
-				</div>
-				<div style="background: linear-gradient(135deg, #eef5ff, #d6e8ff); padding: 15px 20px; border-radius: 12px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #cce0ff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-				<span style="font-size:16px; font-weight:900; text-transform:uppercase; color:#005bb5;">Net Payable</span>
-				<span style="font-size:22px; font-weight:900; color:#005bb5;">₹${finalPayable.toFixed(2)}</span>
+				<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+				<span style="font-size:13px; font-weight:800; color:#ff3b30;">Previous Dues</span>
+				<span style="font-size:13px; font-weight:800; color:#ff3b30;">+ ₹${safeBackDues.toFixed(2)}</span>
+				</div>`;
+			}
+			
+			if (amountPaid > 0) {
+				totalsHtml += `
+				<div style="border-top: 2px dashed #d1e3ff; padding-top: 8px; margin-bottom: 4px; display:flex; justify-content:space-between; align-items:center;">
+				<span style="font-size:14px; font-weight:800; color:#222;">Total Payable</span>
+				<span style="font-size:14px; font-weight:800; color:#222;">₹${totalPayable.toFixed(2)}</span>
+				</div>`;
+				
+				if (o.paymentHistory && o.paymentHistory.length > 0) {
+					o.paymentHistory.forEach((p, idx) => {
+						totalsHtml += `
+						<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
+						<span style="font-size:13px; font-weight:800; color:var(--success);">Payment ${idx + 1} (${p.date})</span>
+						<span style="font-size:13px; font-weight:800; color:var(--success);">- ₹${p.amount.toFixed(2)}</span>
+						</div>`;
+					});
+					totalsHtml += `<div style="margin-bottom: 10px;"></div>`;
+				} else {
+					totalsHtml += `
+					<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+					<span style="font-size:14px; font-weight:800; color:var(--success);">Amount Paid</span>
+					<span style="font-size:14px; font-weight:800; color:var(--success);">- ₹${amountPaid.toFixed(2)}</span>
+					</div>`;
+				}
+				
+				totalsHtml += `
+				<div style="background: linear-gradient(135deg, #eef5ff, #d6e8ff); padding: 12px 16px; border-radius: 12px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #cce0ff; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+				<span style="font-size:15px; font-weight:900; text-transform:uppercase; color:#005bb5;">Balance Due</span>
+				<span style="font-size:20px; font-weight:900; color:#005bb5;">₹${newBalance.toFixed(2)}</span>
 				</div>`;
 			} else {
 				totalsHtml += `
 				<div style="background: linear-gradient(135deg, #eef5ff, #d6e8ff); padding: 15px 20px; border-radius: 12px; display:flex; justify-content:space-between; align-items:center; border: 1px solid #cce0ff; margin-top: 10px; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-				<span style="font-size:16px; font-weight:900; text-transform:uppercase; color:#005bb5;">Grand Total</span>
-				<span style="font-size:22px; font-weight:900; color:#005bb5;">₹${o.billTotal?.toFixed(2) || '0.00'}</span>
+				<span style="font-size:16px; font-weight:900; text-transform:uppercase; color:#005bb5;">${safeBackDues > 0 ? 'Net Payable' : 'Grand Total'}</span>
+				<span style="font-size:22px; font-weight:900; color:#005bb5;">₹${totalPayable.toFixed(2)}</span>
 				</div>`;
 			}
 
 			let html = `
-	<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; width: 100%; margin: 0; padding: 0; color: #111; box-sizing: border-box; background: white;">
+	<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #111; background: white; width: 100%; margin: 0; padding: 0; box-sizing: border-box; min-height: 100vh;">
 	
 		<div style="background: linear-gradient(135deg, #007aff, #005bb5); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
 			<div style="text-align: left;">
@@ -1457,7 +1590,7 @@
 			</tr>
 			<tr>
 			<td style="padding: 4px 0; color:#666; font-weight:700; text-transform:uppercase; font-size:10px; letter-spacing:0.5px;">Date</td>
-			<td style="padding: 4px 0; color:#333; font-weight:600;">: ${o.displayDate}</td>
+			<td style="padding: 4px 0; color:#333; font-weight:600;">: ${displayDate}</td>
 			</tr>
 			</table>
 		</div>
@@ -1516,10 +1649,17 @@
 			let blob = new Blob([data], {
 				type: "application/json"
 			});
+			
 			let a = document.createElement("a");
 			a.href = URL.createObjectURL(blob);
 			a.download = `BabaStore_Backup_${new Date().toISOString().split('T')[0]}.json`;
+			
+			a.style.display = "none";
+			document.body.appendChild(a);
 			a.click();
+			document.body.removeChild(a);
+			
+			setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 		};
 	}
 
@@ -1555,10 +1695,18 @@
 				if(o.customerName && o.address) customerMemory[o.customerName] = o.address;
 			});
 			document.getElementById('customerNamesList').innerHTML = Object.keys(customerMemory).map(n => `<option value="${n}">`).join("");
+			
 			let selectedFilter = document.getElementById('filterDate').value;
 			let searchQuery = document.getElementById('searchName').value.toLowerCase().trim();
+			
 			if(selectedFilter) allOrders = allOrders.filter(o => o.filterDate === selectedFilter);
 			if(searchQuery) allOrders = allOrders.filter(o => o.customerName.toLowerCase().includes(searchQuery));
+			
+			if(currentStatusFilter === 'Delivered') allOrders = allOrders.filter(o => o.isDelivered);
+			if(currentStatusFilter === 'Undelivered') allOrders = allOrders.filter(o => !o.isDelivered);
+			if(currentStatusFilter === 'Due') allOrders = allOrders.filter(o => ((Number(o.billTotal)||0) + (Number(o.backDues)||0)) - (Number(o.amountPaid)||0) > 0);
+			if(currentStatusFilter === 'Paid') allOrders = allOrders.filter(o => ((Number(o.billTotal)||0) + (Number(o.backDues)||0)) - (Number(o.amountPaid)||0) <= 0);
+
 			if(selectedFilter && !searchQuery && allOrders.length > 0) {
 				document.getElementById('dailyDashboard').style.display = 'block';
 				document.getElementById('dashboardTitle').innerText = `📊 Summary for ${selectedFilter}`;
@@ -1603,23 +1751,39 @@
 				let cardClass = "order-card " + (order.isDelivered ? "delivered" : (isOverdue ? "overdue" : ""));
 				let overdueHtml = isOverdue ? `<span class="overdue-text">⚠️ Over 12 hours pending!</span>` : '';
 				
+				let safeBillTotal = Number(order.billTotal) || 0;
+				let safeBackDues = Number(order.backDues) || 0;
+				let safeAmountPaid = Number(order.amountPaid) || 0;
+				let displayDate = (order.displayDate && order.displayDate !== "undefined") ? order.displayDate : 'Unknown Date';
+				
+				let totalPayable = safeBillTotal + safeBackDues;
+				let paid = safeAmountPaid;
+				let due = totalPayable - paid;
+				
 				let deliveryToggleHtml = "";
+				let formattedDelDate = "N/A";
+				
 				if (order.isDelivered) {
 					let dTime = order.deliveryTimestamp || order.timestamp; 
 					let dDate = new Date(dTime);
+					formattedDelDate = `${dDate.getDate()}/${dDate.getMonth() + 1}/${dDate.getFullYear()}`;
 					
-					let [y, m, d] = order.filterDate.split('-');
-					let oDate = new Date(y, m - 1, d);
-					dDate.setHours(0, 0, 0, 0); 
-					
-					let diffDays = Math.round((dDate.getTime() - oDate.getTime()) / (1000 * 60 * 60 * 24));
-					let formattedDelDate = `${dDate.getDate()}/${dDate.getMonth() + 1}/${dDate.getFullYear()}`;
-					
-					let statusMsg = diffDays <= 0 
-						? `✓ Delivered on time (${formattedDelDate}) 🌟`
-						: `✓ Delivered ${diffDays} day(s) late (${formattedDelDate})`;
+					let statusMsg = `✓ Delivered (${formattedDelDate})`;
+					let color = "var(--success)";
+
+					if (order.filterDate) {
+						let [y, m, d] = order.filterDate.split('-');
+						let oDate = new Date(y, m - 1, d);
+						dDate.setHours(0, 0, 0, 0); 
 						
-					let color = diffDays <= 0 ? "var(--success)" : "#ff9500";
+						let diffDays = Math.round((dDate.getTime() - oDate.getTime()) / (1000 * 60 * 60 * 24));
+						
+						statusMsg = diffDays <= 0 
+							? `✓ Delivered on time (${formattedDelDate}) 🌟`
+							: `✓ Delivered ${diffDays} day(s) late (${formattedDelDate})`;
+							
+						color = diffDays <= 0 ? "var(--success)" : "#ff9500";
+					}
 					
 					deliveryToggleHtml = `<div class="delivery-toggle" onclick="event.stopPropagation()">
 					<span style="font-weight:800; font-size:14px; color:${color}">${statusMsg}</span>
@@ -1638,10 +1802,22 @@
 	<div class="order-header">
 	<div>
 	<p class="customer-name">${order.customerName}</p>
-	<p class="customer-meta">📅 ${order.displayDate} • ${order.address || 'No Address'}</p>
+	<p class="customer-meta">📅 ${displayDate} • ${order.address || 'No Address'}</p>
 	</div>
-	<p class="order-bill">₹${order.billTotal ? order.billTotal.toFixed(2) : '0.00'}</p>
 	</div>
+	
+	<div style="background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #e5e5ea;">
+		<div style="display:flex; justify-content:space-between; font-size:13px; font-weight:800; margin-bottom:8px;">
+			<span style="color:#111;">Total: ₹${totalPayable.toFixed(2)}</span>
+			<span style="color:var(--success);">Paid: ₹${paid.toFixed(2)}</span>
+			<span style="color:${due > 0 ? 'var(--danger)' : 'var(--success)'};">Due: ₹${due.toFixed(2)}</span>
+		</div>
+		<div style="font-size:12px; font-weight:600; color:var(--text-muted); display:flex; justify-content:space-between;">
+			<span>Ordered: ${displayDate}</span>
+			<span>${order.isDelivered ? `Delivered: ${formattedDelDate}` : 'Pending Delivery'}</span>
+		</div>
+	</div>
+	
 	<div style="font-size:13px; color:var(--primary); font-weight:700; margin-bottom:12px;">Tap card to open Bill / Send WhatsApp...</div>
 	
 									${overdueHtml}
